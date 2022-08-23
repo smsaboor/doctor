@@ -1,0 +1,25 @@
+[
+  {
+    "name":"Paracitamol",
+    "game":"Pils",
+    "price": "Empty Stomach"
+  },{
+  "name":"Amoxixillin",
+  "game":"Capsule",
+  "price": "Morning"
+},
+  {
+    "name":"Metrodinozole",
+    "game":"Cirup",
+    "price": "Before Launch"
+  },{
+  "name":"Bucopan",
+  "game":"Pils",
+  "price": "After Lunch"
+},
+  {
+    "name":"Multivitamine",
+    "game":"Pils",
+    "price": "Before Sleep"
+  }
+]
