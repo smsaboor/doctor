@@ -23,3 +23,17 @@ class ModelLanguages {
     "language": language,
   };
 }
+
+class ModelLanguages2{
+  ModelLanguages2({
+    this.language,
+    this.index
+  });
+  String? language;
+  String? index;
+  Map toJson() => {
+    'language': language,
+    'index': index,
+  };
+}
+

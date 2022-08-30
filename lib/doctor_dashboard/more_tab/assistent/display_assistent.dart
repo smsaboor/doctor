@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:doctor/core/constants.dart';
 import 'package:doctor/core/custom_snackbar.dart';
 import 'package:doctor/dashboard_patient/data/json.dart';
 import 'package:doctor/dashboard_patient/widgets/avatar_image.dart';
@@ -34,9 +35,7 @@ class _DisplayAssistentsState extends State<DisplayAssistents> {
   bool dataHomeFlag = true;
 
   Future<void> getAllAssitents() async {
-    print('.widget.doctorId..............................${widget.doctorId}');
-    var API =
-        'https://cabeloclinic.com/website/medlife/php_auth_api/assistant_list_api.php';
+    var API =API_BASE_URL+API_DD_ASSISTENT_LIST;
     Map<String, dynamic> body = {'doctor_id': widget.doctorId};
     http.Response response = await http
         .post(Uri.parse(API), body: body)
@@ -45,35 +44,26 @@ class _DisplayAssistentsState extends State<DisplayAssistents> {
     print('...............................${response.body}');
     response2 = response.body;
     if (response.statusCode == 200) {
-      print('..22222222222222222222222222222222....${response.body}');
       dataAssistence = jsonDecode(response.body.toString());
       setState(() {
         dataHomeFlag = false;
       });
-      print('..22222222222222222222222222222222....${dataAssistence.length}');
-      print(
-          '..2222222222222222222222222222data....${dataAssistence[0]['assistant_name']}');
     } else {}
   }
 
   Future<String> deleteAssitent(String id) async {
-    print('.widget.doctorId..............................${widget.doctorId}');
     var data;
-    var API =
-        'https://cabeloclinic.com/website/medlife/php_auth_api/delete_assistant_api.php';
+    var API =API_BASE_URL+API_DD_ASSISTENT_DELETE;
     Map<String, dynamic> body = {'assistant_id': id};
     http.Response response = await http
         .post(Uri.parse(API), body: body)
         .then((value) => value)
         .catchError((error) => print(" Failed to delete: $error"));
-    print('...............................${response.body}');
     if (response.statusCode == 200) {
-      print('..22222222222222222222222222222222....${response.body}');
       data = jsonDecode(response.body.toString());
       setState(() {
         dataHomeFlag = false;
       });
-      print('..22222222222222222222222222222222....${data.length}');
       return data[0]['status'];
     } else {
       return 'fail';
@@ -89,87 +79,24 @@ class _DisplayAssistentsState extends State<DisplayAssistents> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        // isExtended: true,
-        child: Icon(
-          Icons.add,
-          color: Colors.white,
-        ),
-        backgroundColor: Colors.blue,
-        onPressed: () {
-          print('${widget.doctorId}');
-          Navigator.of(context).push(MaterialPageRoute(
-              builder: (_) => AddAssistent(
-                    button: 'Add',
-                    doctor_id: widget.doctorId,
-                  )));
-        },
-      ),
-      // appBar: AppBar(
-      //   backgroundColor: Colors.white,
-      //   bottomOpacity: 0.0,
-      //   elevation: 0.0,
-      //   automaticallyImplyLeading: false,
-      //   actions: [
-      //     Padding(
-      //       padding: const EdgeInsets.all(8.0),
-      //       child: Column(
-      //         mainAxisAlignment: MainAxisAlignment.end,
-      //         children: [
-      //           Text(
-      //             'Dr. Abhishekh',
-      //             style: TextStyle(
-      //               fontSize: 14.0,
-      //               color: Colors.black,
-      //               fontWeight: FontWeight.bold,
-      //             ),
-      //           ),
-      //           Text(
-      //             'MBBS',
-      //             style: TextStyle(
-      //               fontSize: 14.0,
-      //               color: Colors.black,
-      //               fontWeight: FontWeight.w500,
-      //             ),
-      //           ),
-      //         ],
-      //       ),
-      //     ),
-      //     Padding(
-      //       padding: const EdgeInsets.all(8.0),
-      //       child: AvatarImagePD(
-      //         "https://images.unsplash.com/photo-1537368910025-700350fe46c7?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80",
-      //         radius: 35,
-      //         height: 40,
-      //         width: 40,
-      //       ),
-      //     ),
-      //   ],
-      //   titleSpacing: 0.00,
-      //   title: Image.asset(
-      //     'assets/img_2.png',
-      //     width: 150,
-      //     height: 90,
-      //   ),
-      // ),
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(60),
         child: CustomAppBar(
           isleading: false,
         ),
       ),
-      body: dataHomeFlag
-          ? Center(
-              child: CircularProgressIndicator(),
-            )
-          : SingleChildScrollView(
+      body: SingleChildScrollView(
               child: Column(
                 children: [
                   AppBar(
                     backgroundColor: Colors.blue,
                     title: Text("All Assistents"),
                   ),
-                  FutureBuilder(
+                  dataHomeFlag
+                      ? Center(
+                    child: CircularProgressIndicator(),
+                  )
+                      : FutureBuilder(
                     future: getAllAssitents(),
                     builder: (context, snapshot) {
                       return ListView.builder(
@@ -400,6 +327,22 @@ class _DisplayAssistentsState extends State<DisplayAssistents> {
                 ],
               ),
             ),
+      floatingActionButton: FloatingActionButton(
+        // isExtended: true,
+        child: Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
+        backgroundColor: Colors.blue,
+        onPressed: () {
+          print('${widget.doctorId}');
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (_) => AddAssistent(
+                button: 'Add',
+                doctor_id: widget.doctorId,
+              )));
+        },
+      ),
     );
   }
 

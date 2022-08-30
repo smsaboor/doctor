@@ -27,22 +27,28 @@ class _DoctorDashBoardState extends State<DoctorDashBoard>
   void getData() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     final user = preferences.getString('userDetails');
+    print('--44-------------------------${user}');
     setState(() {
       data = jsonStringToMap(user!);
     });
+    print('--44-------------------------${data}');
   }
 
   jsonStringToMap(String data) {
-    List<String> str = data
-        .replaceAll("{", "")
-        .replaceAll("}", "")
-        .replaceAll("\"", "")
-        .replaceAll("'", "")
-        .split(",");
     Map<String, dynamic> result = {};
-    for (int i = 0; i < str.length; i++) {
-      List<String> s = str[i].split(":");
-      result.putIfAbsent(s[0].trim(), () => s[1].trim());
+    try{
+      List<String> str = data
+          .replaceAll("{", "")
+          .replaceAll("}", "")
+          .replaceAll("\"", "")
+          .replaceAll("'", "")
+          .split(",");
+      for (int i = 0; i < str.length; i++) {
+        List<String> s = str[i].split(":");
+        result.putIfAbsent(s[0].trim(), () => s[1].trim());
+      }
+    }catch(e){
+      print('-------------------555$e');
     }
     return result;
   }
@@ -83,7 +89,7 @@ class _DoctorDashBoardState extends State<DoctorDashBoard>
     }
 
     return Scaffold(
-      body:getBody(data == null ? 'null' : data['user_id'],currentPage,data),
+      body:data==null?Center(child: CircularProgressIndicator(),):getBody(data['user_id'],currentPage,data),
       bottomNavigationBar: CircleBottomNavigationBar(
         initialSelection: currentPage,
         barHeight: viewPadding.bottom > 0 ? barHeightWithNotch : barHeight,
@@ -105,14 +111,14 @@ class _DoctorDashBoardState extends State<DoctorDashBoard>
   getBody(String? userId, int currentPage, var data){
     switch(currentPage){
       case 0:
-        return HomeTabDD(doctorId: userId,userData:data);
+         return HomeTabDD(doctorId: userId,userData:data);
       case 1:
         return TabAppointmentDD(doctor_id: userId,userData:data);
       case 2:
-        return TransactionTabDD(userData:data);
+        return TransactionTabDD(doctor_id:userId,userData:data);
         break;
       case 3:
-        return MoreTabDD(userData:data);
+        return MoreTabDD(userData:data,userID:data['user_id']);
     }
   }
 }

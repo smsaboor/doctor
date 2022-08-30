@@ -80,7 +80,6 @@ class MyHomePage extends StatelessWidget {
 
 class ProductBoxList extends StatelessWidget {
   final List<Product>? items;
-
   ProductBoxList({Key? key, this.items});
 
   @override

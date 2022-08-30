@@ -1,3 +1,4 @@
+import 'package:doctor/core/constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:doctor/model/model_doctor.dart';
@@ -9,6 +10,13 @@ import 'package:doctor/model/model_verify.dart';
 
 class ApiService {
   static Future<dynamic> checkUserRegistered(String mobile) async {
+    // Dio dio = Dio();
+    // Response responce;
+    // responce = await dio.post(
+    //   APIURLRegistration,
+    //   data: formData,
+    // );
+    // print("response data " + responce.toString());
     var APIURLRegistration = 'https://cabeloclinic.com/website/medlife/php_auth_api/register_api.php';
     Map<String, dynamic> body = {'mobile': mobile};
     http.Response response = await http
@@ -23,9 +31,22 @@ class ApiService {
     print(data['status']);
     return data;
   }
-
-  static Future<String> signUpUser(int userType, ModelDoctor modelDoctor,ModelPatient modelPatient ) async {
-    var APIURLRegistr = 'https://cabeloclinic.com/website/medlife/php_auth_api/sign_up_api.php';
+  static Future<dynamic> checkUserRegisteredInner(String mobile) async {
+    var APIURLRegistration = 'https://cabeloclinic.com/website/medlife/php_auth_api/inner_register_api.php';
+    Map<String, dynamic> body = {'mobile': mobile};
+    http.Response response = await http
+        .post(Uri.parse(APIURLRegistration), body: body)
+        .then((value) => value)
+        .catchError((error) =>
+        print("Doctor app Failed to registerUserwithOtp: $error"));
+    print('.............${response.body}');
+    var data = jsonDecode(response.body);
+    print("$mobile getRegistration DATA: ${data}");
+    print("getRegistration DATA: ${data['message']}");
+    print(data['status']);
+    return data;
+  }
+  static Future<String> signUpUser(String API,int userType, ModelDoctor modelDoctor,ModelPatient modelPatient ) async {
     print(',,,,usertype: $userType,,,,,,,,,,,,,,,,,,,,,,,,,,${modelDoctor.mobile},,,,,,,,,,,,,,,,${modelDoctor.password}');
     print(',,,,usertype: $userType,,,,,,,,,,,,,,,,,,,,,,,,,,${modelPatient.mobile},,,,,,,,,,,,,,,,${modelPatient.password}');
     var data;
@@ -47,7 +68,7 @@ class ApiService {
         'password': modelDoctor.password,
       };
       print('@@@@@@@@@@@@@@@@@@${body}');
-      http.Response response = await http.post(Uri.parse(APIURLRegistr), body: body)
+      http.Response response = await http.post(Uri.parse(API_BASE_URL+API), body: body)
           .then((value) => value)
           .catchError((error) =>
           print("Doctor app Failed to signUp: $error"));
@@ -72,7 +93,7 @@ class ApiService {
       };
       print('Model : @@@@@@@@@@@@@@@@@@${body}');
       http.Response response = await http
-          .post(Uri.parse(APIURLRegistr), body: body)
+          .post(Uri.parse(API_BASE_URL+API), body: body)
           .then((value) => value)
           .catchError((error) =>
           print("Doctor app Failed to registerUserwithOtp: $error"));

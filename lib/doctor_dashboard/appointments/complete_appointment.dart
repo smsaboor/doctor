@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:doctor/doctor_dashboard/appointments/completed_appointment_card.dart';
-import 'package:doctor/doctor_dashboard/appointments/rejected_appointments_card.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 

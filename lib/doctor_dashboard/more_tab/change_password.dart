@@ -26,6 +26,10 @@ class _ChangePasswordState extends State<ChangePassword> {
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   String? name = ' ';
   String? number;
+  bool changePasswordF = false;
+  bool? _isHidden1 = true;
+  bool? _isHidden2 = true;
+  bool? _isHidden3 = true;
 
   getData() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
@@ -49,26 +53,6 @@ class _ChangePasswordState extends State<ChangePassword> {
           isleading: false,
         ),
       ),
-      // appBar: AppBar(
-      //   backgroundColor: Colors.blue,
-      //   title: Text('Change Password'),
-      //   centerTitle: true,
-      //   leading: Builder(
-      //     builder: (BuildContext context) {
-      //       return IconButton(
-      //         icon: const Icon(
-      //           Icons.arrow_back,
-      //           color: Colors.white,
-      //           size: 24, // Changing Drawer Icon Size
-      //         ),
-      //         onPressed: () {
-      //           Navigator.pop(context);
-      //         },
-      //         tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
-      //       );
-      //     },
-      //   ),
-      // ),
       body: SingleChildScrollView(
         child: Form(
           key: _formKey,
@@ -100,20 +84,50 @@ class _ChangePasswordState extends State<ChangePassword> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Padding(
-                        //   padding: const EdgeInsets.fromLTRB(8, 8, 0, 15),
-                        //   child: TitleText(text: ' Profile Details'),
-                        // ),
                         SizedBox(
                           height: 10,
                         ),
-                        CustomFormField(
-                            readOnly: false,
-                            controlller: _controllerOldPassword,
-                            errorMsg: 'Enter Your Old Password',
-                            labelText: 'Old Password',
-                            icon: Icons.lock_open,
-                            textInputType: TextInputType.text),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20.0, right: 20),
+                      child: Theme(
+                        data: new ThemeData(
+                          primaryColor: Colors.redAccent,
+                          primaryColorDark: Colors.red,
+                        ),
+                        child: new TextFormField(
+                          textInputAction: TextInputAction.next,
+                          readOnly: false,
+                          controller: _controllerOldPassword,
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Enter Your Old Password';
+                            }
+                            return null;
+                          },
+                          keyboardType: TextInputType.text,
+                        obscureText: _isHidden1! ? true : false,
+                          decoration: new InputDecoration(
+                              border: new OutlineInputBorder(
+                                  borderSide: new BorderSide(color: Colors.teal)),
+                              labelText: 'Old Password',
+                              prefixText: ' ',
+                              prefixIcon: Icon(
+                                Icons.lock_open,
+                                color: Colors.blue,
+                              ),
+                              suffix: InkWell(
+                                onTap: _togglePasswordConfirmView1,
+                                child: Icon(
+                                  _isHidden1!
+                                      ? Icons.visibility
+                                      : Icons.visibility_off,
+                                ),
+                              ),
+                              suffixStyle: const TextStyle(color: Colors.green)),
+                        ),
+                      ),
+                    ),
+
                         SizedBox(
                           height: 10,
                         ),
@@ -139,6 +153,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                                 return null;
                               },
                               keyboardType: TextInputType.text,
+                              obscureText: _isHidden2! ? true : false,
                               decoration: new InputDecoration(
                                   border: new OutlineInputBorder(
                                       borderSide:
@@ -148,6 +163,14 @@ class _ChangePasswordState extends State<ChangePassword> {
                                   prefixIcon: Icon(
                                     Icons.lock_clock,
                                     color: Colors.blue,
+                                  ),
+                                  suffix: InkWell(
+                                    onTap: _togglePasswordConfirmView2,
+                                    child: Icon(
+                                      _isHidden2!
+                                          ? Icons.visibility
+                                          : Icons.visibility_off,
+                                    ),
                                   ),
                                   suffixStyle:
                                       const TextStyle(color: Colors.green)),
@@ -179,6 +202,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                                 return null;
                               },
                               keyboardType: TextInputType.text,
+                              obscureText: _isHidden3! ? true : false,
                               decoration: new InputDecoration(
                                   border: new OutlineInputBorder(
                                       borderSide:
@@ -188,6 +212,14 @@ class _ChangePasswordState extends State<ChangePassword> {
                                   prefixIcon: Icon(
                                     Icons.lock_clock,
                                     color: Colors.blue,
+                                  ),
+                                  suffix: InkWell(
+                                    onTap: _togglePasswordConfirmView3,
+                                    child: Icon(
+                                      _isHidden3!
+                                          ? Icons.visibility
+                                          : Icons.visibility_off,
+                                    ),
                                   ),
                                   suffixStyle:
                                       const TextStyle(color: Colors.green)),
@@ -211,13 +243,17 @@ class _ChangePasswordState extends State<ChangePassword> {
                                     textStyle: TextStyle(
                                         fontSize: 30,
                                         fontWeight: FontWeight.bold)),
-                                child: Text(
-                                  "Change",
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20),
-                                ),
+                                child: changePasswordF
+                                    ? Center(
+                                        child: CircularProgressIndicator(),
+                                      )
+                                    : Text(
+                                        "Change",
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 20),
+                                      ),
                               ),
                             ),
                           ),
@@ -239,7 +275,25 @@ class _ChangePasswordState extends State<ChangePassword> {
     );
   }
 
-  static Future<String> changePassword(
+  void _togglePasswordConfirmView1() {
+    setState(() {
+      _isHidden1 = !_isHidden1!;
+    });
+  }
+
+  void _togglePasswordConfirmView2() {
+    setState(() {
+      _isHidden2 = !_isHidden2!;
+    });
+  }
+
+  void _togglePasswordConfirmView3() {
+    setState(() {
+      _isHidden3 = !_isHidden3!;
+    });
+  }
+
+  Future<String> changePassword(
       {String? oldPass,
       String? newPass,
       String? mobile,
@@ -259,12 +313,13 @@ class _ChangePasswordState extends State<ChangePassword> {
         .catchError((error) => print("changePassword Failed : $error"));
     var data = jsonDecode(response.body);
     print("getRegistration DATA: ${data}");
-    print(
-        '.............................................9999999 ${data[0]['success_status']}');
     return data[0]['success_status'];
   }
 
   _changePassword(BuildContext context) async {
+    setState(() {
+      changePasswordF = true;
+    });
     if (_formKey.currentState!.validate()) {
       String success_status = await changePassword(
           mobile: widget.mobile,
@@ -272,13 +327,20 @@ class _ChangePasswordState extends State<ChangePassword> {
           newPass: _controllerNewPassword.text,
           oldPass: _controllerOldPassword.text);
       if (success_status == 'Ok') {
-        _showDialog();
-        // CustomSnackBar.snackBar(
-        //     context: context,
-        //     data: 'Password Changed Successfully New Password: ${_controllerNewPassword.text} !',
-        //     color: Colors.green);
-        // Navigator.pop(context);
+        setState(() {
+          changePasswordF = false;
+        });
+        // _showDialog();
+        //
+        CustomSnackBar.snackBar(
+            context: context,
+            data: 'Password Changed Successfully!',
+            color: Colors.green);
+        Navigator.pop(context);
       } else {
+        setState(() {
+          changePasswordF = false;
+        });
         CustomSnackBar.snackBar(
             context: context, data: 'Failed to Change !', color: Colors.red);
       }

@@ -1,12 +1,10 @@
 import 'package:doctor/doctor_dashboard/circle_image.dart';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class AppointmentCard extends StatelessWidget {
   AppointmentCard({Key? key, required this.doctor}) : super(key: key);
   var doctor;
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -62,7 +60,7 @@ class AppointmentCard extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.only(right: 2.0),
                             child: Text(
-                              'Cost: Rs-5422.00',
+                              'Cost: Rs-5422',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(

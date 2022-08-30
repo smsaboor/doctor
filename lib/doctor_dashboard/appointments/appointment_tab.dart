@@ -77,54 +77,6 @@ class _TabAppointmentDDState extends State<TabAppointmentDD>
     return DefaultTabController(
       length: 4,
       child: Scaffold(
-        // appBar: AppBar(
-        //   // leadingWidth: 8,
-        //   // leading: Icon(Icons.android),
-        //   backgroundColor: Colors.white,
-        //   bottomOpacity: 0.0,
-        //   titleSpacing: 0,
-        //   elevation: 0.0,
-        //   actions: [
-        //     Padding(
-        //       padding: const EdgeInsets.all(8.0),
-        //       child: Column(
-        //         mainAxisAlignment: MainAxisAlignment.center,
-        //         children: [
-        //           Text(
-        //             widget.userData == null ? 'Dr. ' : 'Dr. ${widget.userData['name']} ',
-        //             style: TextStyle(
-        //               fontSize: 17.0,
-        //               color: Colors.black,
-        //               fontWeight: FontWeight.bold,
-        //             ),
-        //           ),
-        //           // Text(
-        //           //   'MBBS',
-        //           //   style: TextStyle(
-        //           //     fontSize: 14.0,
-        //           //     color: Colors.black,
-        //           //     fontWeight: FontWeight.w500,
-        //           //   ),
-        //           // ),
-        //         ],
-        //       ),
-        //     ),
-        //     Padding(
-        //       padding: const EdgeInsets.all(8.0),
-        //       child: AvatarImagePD(
-        //         "https://images.unsplash.com/photo-1537368910025-700350fe46c7?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80",
-        //         radius: 35,
-        //         height: 40,
-        //         width: 40,
-        //       ),
-        //     ),
-        //   ],
-        //   title: Image.asset(
-        //     'assets/img_2.png',
-        //     width: 150,
-        //     height: 90,
-        //   ),
-        // ),
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(60),
           child: CustomAppBar(isleading: false,),),
@@ -133,15 +85,9 @@ class _TabAppointmentDDState extends State<TabAppointmentDD>
                 (BuildContext context, bool innerBoxIsScrolled) {
               return <Widget>[
                 new SliverAppBar(
-                  // centerTitle: true,
-                  // leading:  Image.asset(
-                  //   'assets/img_2.png',
-                  //   width: 200,
-                  //   height: 90,
-                  // ),
                   foregroundColor: Colors.blue,
                   title: SizedBox(
-                    width: 200,
+                    width: 230,
                     child: Chip(
                         elevation: 1,
                         padding: EdgeInsets.all(8),
@@ -153,30 +99,31 @@ class _TabAppointmentDDState extends State<TabAppointmentDD>
                               'Current Consult: ',
                               style: TextStyle(fontSize: 14),
                             ), //Tex
-                            Text(
-                              dataHomeFlag
-                                  ? ''
-                                  : '#${dataAppointments.length == 0 ? '' : dataAppointments[0]['appointment_no'] ?? ''}',
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.w900),
+                            Container(
+                              height: 20,
+                              width: 90,
+                              child: FutureBuilder(
+                                future: getAllAppointments(),
+                                builder: (context, snapshot) {
+                                  return ListView.builder(
+                                      shrinkWrap: true,
+                                      physics: ScrollPhysics(),
+                                      itemCount: 1,
+                                      itemBuilder: (context, index) {
+                                        return Text(
+                                          dataHomeFlag
+                                              ? ''
+                                              : '#${dataAppointments.length == 0 ? '' : dataAppointments[0]['appointment_no'] ?? ''}',
+                                          style: TextStyle(
+                                              fontSize: 16, fontWeight: FontWeight.w900),
+                                        );
+                                      });
+                                },
+                              ),
                             ), //Tex
                           ],
                         )),
                   ),
-                  actions: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: SizedBox(
-                        height: 20,
-                        width: 70,
-                        child: ElevatedButton(
-                            style:
-                                ElevatedButton.styleFrom(primary: Colors.pink),
-                            onPressed: () {},
-                            child: Text('Next')),
-                      ),
-                    )
-                  ],
                   automaticallyImplyLeading: false,
                   elevation: 4.0,
                   backgroundColor: Colors.white,

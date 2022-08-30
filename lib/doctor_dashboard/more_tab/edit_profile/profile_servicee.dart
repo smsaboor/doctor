@@ -10,7 +10,7 @@ class ProfileServices {
     try {
       Response response =
       await Dio().post(
-        "$baseURL/update_image_api.php",
+        "https://cabeloclinic.com/website/medlife/php_auth_api/update_image_api.php",
         data: data,
       );
       if(response.statusCode==200){
@@ -19,6 +19,7 @@ class ProfileServices {
       }
       return false;
     } catch(e){
+
       return false;
     }
   }

@@ -14,11 +14,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
-import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
-import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:dio/dio.dart' as Dio;
+import 'package:multiselect_formfield/multiselect_formfield.dart';
 
 import '../constant.dart';
 
@@ -31,6 +30,12 @@ class EditProfileDD extends StatefulWidget {
       required this.language,
       required this.degree,
       required this.specialities,
+      required this.jsonLanguage,
+      required this.jsonDegrees,
+      required this.jsonSpeciality,
+      required this.intialValueLang,
+      required this.intialValueDegree,
+      required this.intialValueSpec,
       required this.id})
       : super(key: key);
   final language;
@@ -38,6 +43,8 @@ class EditProfileDD extends StatefulWidget {
   final degree;
   final specialities;
   final button;
+  final jsonSpeciality, jsonDegrees, jsonLanguage;
+  final intialValueLang, intialValueDegree, intialValueSpec;
   XFile? image;
 
   @override
@@ -46,6 +53,7 @@ class EditProfileDD extends StatefulWidget {
 
 class _EditProfileDDState extends State<EditProfileDD> {
   bool? isUserAdded;
+  bool updateProfile=false;
   final TextEditingController _startDateController =
       new TextEditingController();
   final TextEditingController _controllerName = new TextEditingController();
@@ -60,9 +68,14 @@ class _EditProfileDDState extends State<EditProfileDD> {
   final TextEditingController _controllerAddress = new TextEditingController();
   final TextEditingController _controllerSpeaks = new TextEditingController();
 
-  var jsonLanguage;
-  var jsonDegrees;
-  var jsonSpeciality;
+  List<dynamic>? modelLanguages2 = [];
+  List? _selectedLanguages = [];
+  List? _selectedDegrees = [];
+  List? _selectedSpeciality = [];
+
+  List<ModelLanguages> languages = [];
+  List<ModelDegrees> degre = [];
+  List<ModelSpeciality> spec = [];
 
   bool getSpecialityFlag = true;
   var getSpecialityData;
@@ -70,24 +83,41 @@ class _EditProfileDDState extends State<EditProfileDD> {
   var imagePicker;
   var type;
   var imageData;
-  bool uplaodImage = false;
+  bool uplaodImage = true;
 
   var fetchImageData;
   var fetchUserData;
-  List<MultiSelectItem<ModelLanguages?>>? _selectedLanguages;
-  List<MultiSelectItem<ModelLanguages?>>? _selectedSpeciality;
-  List<MultiSelectItem<ModelLanguages?>>? _selectedDegree;
+
+  var dataDegree;
+  bool dataHomeFlag = true;
+  var dataLanguages;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getUserData();
+    _selectedLanguages = widget.intialValueLang;
+    _selectedDegrees = ['1'];
+    _selectedSpeciality = ['1'];
+    _getImgeUrl(widget.id);
+    print('-------==============$modelLanguages2');
+    imagePicker = new ImagePicker();
+    // getDegree();
+    // getLanguages();
+  }
 
   void _getImgeUrl(String doctorId) async {
-    uplaodImage = true;
-    fetchImageData = await ApiEditProfiles.getImgeUrl(widget.id);
-    if (ApiEditProfiles.fetchImageF == true) {
+    fetchImageData = await ApiEditProfiles.getImgeUrl(doctorId);
+    print('%%%%%%%%%%%%%%${fetchImageData}');
+    if (fetchImageData[0]['image'] != '') {
+      print('%%%%%%%%%%%%%%${fetchImageData}');
       setState(() {
-        uplaodImage = true;
+        uplaodImage = false;
       });
     } else {
       setState(() {
-        uplaodImage = false;
+        uplaodImage = true;
       });
     }
   }
@@ -102,146 +132,94 @@ class _EditProfileDDState extends State<EditProfileDD> {
         preferredCameraDevice: CameraDevice.front);
     setState(() {
       _image = File(image.path);
+      uplaodImage=true;
       // uploadImage();
     });
     if (_image != null) {
-      print('/7/7/7/7/7/7/7/7//77/7//7 start');
       Dio.FormData formData = new Dio.FormData.fromMap({
-        "doctor_id": '7',
+        "doctor_id": widget.id,
         "image": await Dio.MultipartFile.fromFile(_image!.path,
             filename: _image!.path.split('/').last)
       });
-      print('/7/7/7/7/7/7/7/7//77/7//7 start2');
       bool result = await ProfileServices.create(formData);
       if (result == true) {
         setState(() {
-          uplaodImage = false;
           _getImgeUrl(widget.id);
         });
       }
-      if (result) print('/7/7/7/7/7/7/7/7//77/7//7/ $result');
-    } else {}
+    } else {
+
+    }
 
     // Navigator.push(context,
     //     MaterialPageRoute(builder: (context) => ImageFromGalleryEx(type)));
   }
 
   Future<void> getUserData() async {
-    List<ModelLanguages> languages = <ModelLanguages>[];
-    List<ModelDegrees> degre = <ModelDegrees>[];
-    List<ModelSpeciality> spec = <ModelSpeciality>[];
-    var API = 'https://cabeloclinic.com/website/medlife/php_auth_api/fetch_profile_api.php';
-      Map<String, dynamic> body = {
-        'doctor_id': widget.id,
-      };
+    var API =
+        'https://cabeloclinic.com/website/medlife/php_auth_api/fetch_profile_api.php';
+    Map<String, dynamic> body = {
+      'doctor_id': widget.id,
+    };
     http.Response response = await http
-        .post(Uri.parse(API),body: body)
+        .post(Uri.parse(API), body: body)
         .then((value) => value)
         .catchError((error) => print(" Failed to fetchProfileData: $error"));
     print('...............................${response.body}');
     if (response.statusCode == 200) {
-      print('..fetchProfileData....${response.body}');
       fetchUserData = jsonDecode(response.body.toString());
-      print('..fetchProfileData....${fetchUserData.length ?? 0}');
-
-      Iterable l = json.decode(fetchUserData[0]['languages']);
-      List<ModelLanguages> posts = List<ModelLanguages>.from(
-          l.map((model) => ModelLanguages.fromJson(model)));
-      languages = posts;
-      _selectedLanguages = languages.map(
-              (lang) => MultiSelectItem<ModelLanguages>(lang, lang.language!))
-          .toList();
-      print('..fetchProfileData2....${_selectedLanguages}');
-      Iterable l2 = json.decode(fetchUserData[0]['degree']);
-      List<ModelDegrees> posts2 = List<ModelDegrees>.from(
-          l2.map((model) => ModelDegrees.fromJson(model)));
-      degre = posts2;
-      _selectedDegree = degre.map(
-              (lang) => MultiSelectItem<ModelDegrees>(lang, lang.degree!)).cast<MultiSelectItem<ModelLanguages?>>()
-          .toList();
-      Iterable l3 = json.decode(fetchUserData[0]['languages']);
-      List<ModelSpeciality> posts3 = List<ModelSpeciality>.from(
-          l3.map((model) => ModelSpeciality.fromJson(model)));
-      spec = posts3;
-      _selectedSpeciality = spec.map(
-              (lang) => MultiSelectItem<ModelSpeciality>(lang, lang.doctor_speciality!)).cast<MultiSelectItem<ModelLanguages?>>()
-          .toList();
-
-
-      var selLan=fetchUserData[0]['languages'];
-      var selSpec=fetchUserData[0]['specialty'];
-      var selDegr=fetchUserData[0]['degree'];
-
       setState(() {
-        _controllerName.text=fetchUserData[0]['doctor_name'];
-        _controllerMobile.text=fetchUserData[0]['number'];
-        _controllerSpeaks.text=fetchUserData[0]['languages'];
-        _controllerLicenceNum.text=fetchUserData[0]['license_no'];
-        _controllerDegree.text=fetchUserData[0]['degree'];
-        _controllerSpeciality.text=fetchUserData[0]['specialty'];
-        _controllerAddress.text=fetchUserData[0]['address'];
+        _controllerName.text = fetchUserData[0]['doctor_name'];
+        _controllerMobile.text = fetchUserData[0]['number'];
+        _controllerSpeaks.text = fetchUserData[0]['languages'];
+        _controllerDegree.text = fetchUserData[0]['degree'];
+        _controllerSpeciality.text = fetchUserData[0]['specialty'];
+        _controllerLicenceNum.text = fetchUserData[0]['license_no'];
+        _controllerAddress.text = fetchUserData[0]['address'];
+        _controllerExperience.text = fetchUserData[0]['experience'];
+
+        String firstText = _controllerSpeaks.text;
+        String finalString = firstText.replaceAll("[", "").replaceAll("]", "");
+        final splitedText = finalString.split(',');
+        print('777777777777${splitedText.runtimeType}');
+        for (int i = 0; i < splitedText.length; i++) {
+          print('777777777777${splitedText[i]}');
+        }
+        for (int i = 0; i < splitedText.length; i++) {
+          print('777777777777$i--${splitedText[i].toString()}');
+          modelLanguages2!.add(splitedText[i].toString());
+        }
+        print('7777777778--${modelLanguages2}');
+        print('7777777778--${_selectedDegrees}');
+        setState(() {
+          _selectedLanguages = modelLanguages2;
+        });
+        print('7777777779--${_selectedLanguages}');
       });
+      // setState(() {
+      //   _selectedLanguages=modelLanguages2;
+      // });
     } else {}
   }
 
-  // Future<void> uploadImage() async {
-  //   print('.uploadImage.................${widget.id}............$_image.');
-  //   var API = 'https://cabeloclinic.com/website/medlife/php_auth_api/update_image_api.php';
-  //   String base64Image = base64Encode(_image!.readAsBytesSync());
-  //   String fileName = _image!.path.split("/").last;
-  //   Map<String, dynamic> body = {
-  //     'doctor_id': widget.id,
-  //     'image': base64Image,
-  //   };
-  //   http.Response response = await http
-  //       .post(Uri.parse(API), body: body)
-  //       .then((value) => value)
-  //       .catchError((error) => print(" Failed to uploadImage: $error"));
-  //   print('...............................${response.body}');
-  //   if (response.statusCode == 200) {
-  //     print('..uploadImage222222222222222222222....${response.request}');
-  //     imageData = jsonDecode(response.body.toString());
-  //     setState(() {});
-  //     uplaodImage = false;
-  //     print('..uploadImage2222222222222222222222222222....${imageData.length}');
-  //     print('..uploadImage222222222222222222222222data....${imageData[0]}');
-  //     print(
-  //         '..uploadImage222222222222222222222222data....${imageData[0]['image']}');
-  //   } else {}
-  // }
-
-  var dataDegree;
-  bool dataHomeFlag = true;
-  var dataLanguages;
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    _getImgeUrl(widget.id);
-    getUserData();
-    imagePicker = new ImagePicker();
-    // getDegree();
-    // getLanguages();
-  }
-
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   bool isEditted = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar:  AppBar(
+        backgroundColor: Colors.blue,
+        title: Text("Edit Profile"),
+      ),
       body: SingleChildScrollView(
         child: Form(
           key: _formKey,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              AppBar(
-                backgroundColor: Colors.blue,
-                title: Text("Edit Profile"),
-              ),
               SizedBox(
                 width: MediaQuery.of(context).size.width,
                 child: Card(
@@ -254,59 +232,58 @@ class _EditProfileDDState extends State<EditProfileDD> {
                   child: Padding(
                     padding: const EdgeInsets.only(left: 8.0, top: 5),
                     child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          height: kSpacingUnit.w * 10,
-                          width: kSpacingUnit.w * 10,
-                          margin: EdgeInsets.only(top: kSpacingUnit.w * 3),
-                          child: Stack(
-                            children: <Widget>[
-                              GestureDetector(
-                                onTap: () async {
-                                  showAlertDialog(context);
-                                  // Navigator.of(context).push(MaterialPageRoute(builder: (_)=>UploadImageScreen()));
-                                  // final image = await ImagePicker().getImage(source: ImageSource.gallery);
-                                  // if (image == null) return;
-                                  // final directory = await getApplicationDocumentsDirectory();
-                                  // final name = basename(image.path);
-                                  // final imageFile = File('${directory.path}/$name');
-                                  // final newImage = await File(image.path).copy(imageFile.path);
-                                  // setState(() => user = user.copy(imagePath: newImage.path));
-                                },
-                                child: uplaodImage
-                                    ? CircleAvatar(
-                                        radius: kSpacingUnit.w * 5,
-                                        backgroundImage: AssetImage(
-                                            'assets/images/user.jpg'),
-                                      )
-                                    : AvatarImagePD(
-                                        fetchImageData[0]['image'],
-                                        radius: kSpacingUnit.w * 5,
+                        Center(
+                          child: Container(
+                            height: kSpacingUnit.w * 10,
+                            width: kSpacingUnit.w * 10,
+                            margin: EdgeInsets.only(top: kSpacingUnit.w * 3),
+                            child: Stack(
+                              children: <Widget>[
+                                GestureDetector(
+                                  onTap: () async {
+                                    showAlertDialog(context);
+                                  },
+                                  child: uplaodImage
+                                      ? Center(
+                                          child: CircularProgressIndicator(),
+                                        )
+                                      : fetchImageData[0]['image'] != ''
+                                          ? AvatarImagePD(
+                                              fetchImageData[0]['image'],
+                                              radius: kSpacingUnit.w * 5,
+                                            )
+                                          : AvatarImagePD(
+                                              'https://www.kindpng.com/picc/m/198-1985282_doctor-profile-icon-png-transparent-png.png',
+                                              radius: kSpacingUnit.w * 5,
+                                            ),
+                                ),
+                                Align(
+                                  alignment: Alignment.bottomRight,
+                                  child: Container(
+                                    height: kSpacingUnit.w * 2.5,
+                                    width: kSpacingUnit.w * 2.5,
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context).accentColor,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Center(
+                                      heightFactor: kSpacingUnit.w * 1.5,
+                                      widthFactor: kSpacingUnit.w * 1.5,
+                                      child: Icon(
+                                        LineAwesomeIcons.camera,
+                                        color: kDarkPrimaryColor,
+                                        size: (ScreenUtil()
+                                            .setSp(kSpacingUnit.w * 1.5)
+                                            .toDouble()),
                                       ),
-                              ),
-                              Align(
-                                alignment: Alignment.bottomRight,
-                                child: Container(
-                                  height: kSpacingUnit.w * 2.5,
-                                  width: kSpacingUnit.w * 2.5,
-                                  decoration: BoxDecoration(
-                                    color: Theme.of(context).accentColor,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Center(
-                                    heightFactor: kSpacingUnit.w * 1.5,
-                                    widthFactor: kSpacingUnit.w * 1.5,
-                                    child: Icon(
-                                      LineAwesomeIcons.camera,
-                                      color: kDarkPrimaryColor,
-                                      size: (ScreenUtil()
-                                          .setSp(kSpacingUnit.w * 1.5)
-                                          .toDouble()),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                         SizedBox(
@@ -329,58 +306,6 @@ class _EditProfileDDState extends State<EditProfileDD> {
                             textInputType: TextInputType.number),
                         SizedBox(
                             height: MediaQuery.of(context).size.height * 0.01),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 20.0, right: 20),
-                          child: MultiSelectDialogField(
-                            items: widget.language,
-                            title: Text("Languages"),
-                            selectedColor: Colors.blue,
-                            decoration: myBoxDecoration(),
-                            buttonIcon: Icon(
-                              Icons.speaker_notes_outlined,
-                              color: Colors.blue,
-                            ),
-                            buttonText: Text(
-                              "Languages Speak",
-                              style: TextStyle(
-                                color: Colors.blue[800],
-                                fontSize: 16,
-                              ),
-                            ),
-                            onConfirm: (results) {
-                              print(results.length);
-                              List<ModelLanguages> model = [];
-                              for (int i = 0; i < results.length; i++) {
-                                var newValues = results[i] as ModelLanguages;
-                                print(newValues.language);
-                                model.add(ModelLanguages(
-                                    language: newValues.language));
-                              }
-                              var jsonLanguage = jsonEncode(
-                                  model.map((e) => e.toJson()).toList());
-                              print('Sab------------------${jsonLanguage}');
-                              _controllerSpeaks.text = jsonLanguage;
-                              // List<ModelLanguages> _language = [];
-                              // var newValues = results[0] as ModelLanguages;
-                              // print(newValues.language);
-                              // // newValues.forEach((element) {
-                              // //   print(element);
-                              // //   // _language.add(element.language);
-                              // // });
-                              //
-                              // // _selectedLookingGender2 = tempSelectedLookingGender;
-                              // print(_language);
-                              // print(_language[0]);
-                              // print(_language[1]);
-                              // print(_language.runtimeType);
-                              // _controllerSpeaks.text =
-                              //     results.length.toString();
-                              // languages=results as List<ModelLanguages>;
-                            },
-                          ),
-                        ),
-                        SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.01),
                         CustomFormField(
                             controlller: _controllerLicenceNum,
                             errorMsg: 'Enter Licence No.',
@@ -388,43 +313,6 @@ class _EditProfileDDState extends State<EditProfileDD> {
                             readOnly: false,
                             icon: Icons.numbers,
                             textInputType: TextInputType.text),
-                        SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.01),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 20.0, right: 20),
-                          child: MultiSelectDialogField(
-                            items: widget.degree,
-                            title: Text("Digrees"),
-                            selectedColor: Colors.blue,
-                            decoration: myBoxDecoration(),
-                            buttonIcon: Icon(
-                              Icons.history_edu,
-                              color: Colors.blue,
-                            ),
-                            buttonText: Text(
-                              "Digrees",
-                              style: TextStyle(
-                                color: Colors.blue[800],
-                                fontSize: 16,
-                              ),
-                            ),
-                            onConfirm: (results) {
-                              print(results.length);
-                              List<ModelDegrees> model = [];
-                              for (int i = 0; i < results.length; i++) {
-                                var newValues = results[i] as ModelDegrees;
-                                print(newValues.degree);
-                                model.add(ModelDegrees(
-                                    degree: newValues.degree));
-                              }
-                              var jsonDegree = jsonEncode(
-                                  model.map((e) => e.toJson()).toList());
-                              print('Sab------------------${jsonDegree}');
-                              _controllerDegree.text = jsonDegree;
-                              //_selectedAnimals = results;
-                            },
-                          ),
-                        ),
                         SizedBox(
                             height: MediaQuery.of(context).size.height * 0.01),
                         CustomFormField(
@@ -436,43 +324,7 @@ class _EditProfileDDState extends State<EditProfileDD> {
                             textInputType: TextInputType.text),
                         SizedBox(
                             height: MediaQuery.of(context).size.height * 0.01),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 20.0, right: 20),
-                          child: MultiSelectDialogField(
-                            items: widget.specialities,
-                            title: Text("Speciality"),
-                            selectedColor: Colors.blue,
-                            decoration: myBoxDecoration(),
-                            buttonIcon: Icon(
-                              Icons.folder_special,
-                              color: Colors.blue,
-                            ),
-                            buttonText: Text(
-                              "Specialty",
-                              style: TextStyle(
-                                color: Colors.blue[800],
-                                fontSize: 16,
-                              ),
-                            ),
-                            onConfirm: (results) {
-                              print(results.length);
-                              List<ModelSpeciality> model = [];
-                              for (int i = 0; i < results.length; i++) {
-                                var newValues = results[i] as ModelSpeciality;
-                                print(newValues.doctor_speciality);
-                                model.add(ModelSpeciality(
-                                    doctor_speciality: newValues.doctor_speciality));
-                              }
-                              var jsonSpe = jsonEncode(
-                                  model.map((e) => e.toJson()).toList());
-                              print('Sab------------------${jsonSpe}');
-                              _controllerSpeciality.text = jsonSpe;
-                              //_selectedAnimals = results;
-                            },
-                          ),
-                        ),
-                        SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.01),
+
                         CustomFormField(
                             controlller: _controllerAddress,
                             errorMsg: 'Ente Full Address',
@@ -480,32 +332,173 @@ class _EditProfileDDState extends State<EditProfileDD> {
                             readOnly: false,
                             icon: Icons.home,
                             textInputType: TextInputType.text),
+                        SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.01),
+                        Container(
+                          padding: EdgeInsets.only(left: 18,right: 18),
+                          child: MultiSelectFormField(
+                            border: OutlineInputBorder(),
+                            autovalidate: AutovalidateMode.disabled,
+                            chipBackGroundColor: Colors.blue,
+                            chipLabelStyle: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                            dialogTextStyle:
+                                TextStyle(fontWeight: FontWeight.bold),
+                            checkBoxActiveColor: Colors.blue,
+                            checkBoxCheckColor: Colors.white,
+                            dialogShapeBorder: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(12.0))),
+                            title: Text(
+                              "Select languages",
+                              style: TextStyle(fontSize: 16),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.length == 0) {
+                                return 'Please select one or more options';
+                              }
+                              return null;
+                            },
+                            dataSource: widget.language,
+                            textField: 'language',
+                            valueField: 'index',
+                            okButtonLabel: 'OK',
+                            cancelButtonLabel: 'CANCEL',
+                            hintWidget: Text('Please select language'),
+                            initialValue: widget.intialValueLang,
+                            onSaved: (value) {
+                              if (value == null) return;
+                              setState(() {
+                                _selectedLanguages = value;
+                                _controllerSpeaks.text =
+                                    _selectedLanguages.toString();
+                                print(
+                                    '11---------------------------${_controllerSpeaks.text}');
+                              });
+                            },
+                          ),
+                        ),
+                        SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.01),
+                        Container(
+                          padding: EdgeInsets.only(left: 18,right: 18),
+                          child: MultiSelectFormField(
+                            border: OutlineInputBorder(),
+                            autovalidate: AutovalidateMode.disabled,
+                            chipBackGroundColor: Colors.blue,
+                            chipLabelStyle: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                            dialogTextStyle:
+                                TextStyle(fontWeight: FontWeight.bold),
+                            checkBoxActiveColor: Colors.blue,
+                            checkBoxCheckColor: Colors.white,
+                            dialogShapeBorder: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(12.0))),
+                            title: Text(
+                              "Select Degrees",
+                              style: TextStyle(fontSize: 16),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.length == 0) {
+                                return 'Please select one or more options';
+                              }
+                              return null;
+                            },
+                            dataSource: widget.degree,
+                            textField: 'degree',
+                            valueField: 'index',
+                            okButtonLabel: 'OK',
+                            cancelButtonLabel: 'CANCEL',
+                            hintWidget: Text('Please select degree'),
+                            initialValue: widget.intialValueDegree,
+                            onSaved: (value) {
+                              if (value == null) return;
+                              setState(() {
+                                _selectedDegrees = value;
+                                _controllerDegree.text =
+                                    _selectedDegrees.toString();
+                                print(
+                                    '12---------------------------${_controllerDegree.text}');
+                              });
+                            },
+                          ),
+                        ),
+                        SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.01),
+                        Container(
+                          padding: EdgeInsets.only(left: 18,right: 18),
+                          child: MultiSelectFormField(
+                            border: OutlineInputBorder(),
+                            autovalidate: AutovalidateMode.disabled,
+                            chipBackGroundColor: Colors.blue,
+                            chipLabelStyle: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                            dialogTextStyle: TextStyle(fontWeight: FontWeight.bold),
+                            checkBoxActiveColor: Colors.blue,
+                            checkBoxCheckColor: Colors.white,
+                            title: Text(
+                              "Select Speciality",
+                              style: TextStyle(fontSize: 16),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.length == 0) {
+                                return 'Please select one or more options';
+                              }
+                              return null;
+                            },
+                            dataSource: widget.specialities,
+                            textField: 'speciality',
+                            valueField: 'index',
+                            okButtonLabel: 'OK',
+                            cancelButtonLabel: 'CANCEL',
+                            hintWidget: Text('Please select specialities'),
+                            initialValue: widget.intialValueSpec,
+                            onSaved: (value) {
+                              if (value == null) return;
+                              setState(() {
+                                _selectedSpeciality = value;
+                                _controllerSpeciality.text =
+                                    _selectedSpeciality.toString();
+                                print(
+                                    '13---------------------------${_controllerSpeciality.text}');
+                              });
+                            },
+                          ),
+                        ),
+                        SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.01),
                         Divider(
                           color: Colors.black12,
                         ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: SizedBox(
-                            width: MediaQuery.of(context).size.width * .87,
-                            height: 50,
-                            child: Container(
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  _updateProfile(context);
-                                  // Navigator.of(context).push(MaterialPageRoute(
-                                  //     builder: (_) => MyHomePage()));
-                                },
-                                style: ElevatedButton.styleFrom(
-                                    primary: Colors.blue,
-                                    textStyle: TextStyle(
-                                        fontSize: 30,
-                                        fontWeight: FontWeight.bold)),
-                                child: Text(
-                                  widget.button,
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20),
+                        Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: SizedBox(
+                              width: MediaQuery.of(context).size.width * .87,
+                              height: 50,
+                              child: Container(
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    _updateProfile(context);
+                                    // Navigator.of(context).push(MaterialPageRoute(
+                                    //     builder: (_) => MyHomePage32()));
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                      primary: Colors.blue,
+                                      textStyle: TextStyle(
+                                          fontSize: 30,
+                                          fontWeight: FontWeight.bold)),
+                                  child: updateProfile?Center(child: CircularProgressIndicator(),):Text(
+                                    widget.button,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 20),
+                                  ),
                                 ),
                               ),
                             ),
@@ -604,6 +597,10 @@ class _EditProfileDDState extends State<EditProfileDD> {
   }
 
   _updateProfile(BuildContext context) async {
+    setState(() {
+      updateProfile=true;
+    });
+    print('77777777777777${_controllerSpeaks.text.toString()}');
     if (_formKey.currentState!.validate()) {
       setState(() {
         isEditted = true;
@@ -620,6 +617,9 @@ class _EditProfileDDState extends State<EditProfileDD> {
         speciality: _controllerSpeciality.text.toString(),
       ));
       if (assistant_name == _controllerName.text) {
+        setState(() {
+          updateProfile=false;
+        });
         CustomSnackBar.snackBar(
             context: context,
             data: 'Added Successfully !',
@@ -629,6 +629,7 @@ class _EditProfileDDState extends State<EditProfileDD> {
         });
         Navigator.pop(context);
       } else {
+        updateProfile=false;
         CustomSnackBar.snackBar(
             context: context,
             data: 'Failed to Registration !',

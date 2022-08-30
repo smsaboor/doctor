@@ -18,10 +18,9 @@ class _DoctorProfilePageDDState extends State<DoctorProfilePageDD> {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
-        return Container(child: Text('mytext'),);
-        // return RequestSheet(
-        //   doctor: widget.doctor,
-        // );
+        return RequestSheet(
+          doctor: widget.doctor,
+        );
       },
     );
   }

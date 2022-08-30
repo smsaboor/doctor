@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:doctor/doctor_dashboard/custom_widgtes/app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 class TermsOfServices extends StatefulWidget {
@@ -17,12 +18,8 @@ class _TermsOfServicesState extends State<TermsOfServices> {
         .post(Uri.parse(API))
         .then((value) => value)
         .catchError((error) => print(" Failed to getAllAssitents: $error"));
-    print('...............................${response.body}');
     if (response.statusCode == 200) {
-      print('..22222222222222222222222222222222....${response.body}');
       data = jsonDecode(response.body.toString());
-      print('..2222ddata2222222222222222222222222222....${data}');
-      print('..2222ddata2222222222222222222222222222....${data[0]['content']}');
       setState(() {
         dataHomeFlag=false;
       });
@@ -38,14 +35,15 @@ class _TermsOfServicesState extends State<TermsOfServices> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Terms And Conditions'),
-        centerTitle: true,
-      ),
+      appBar: PreferredSize(preferredSize: Size.fromHeight(50),child: CustomAppBar(isleading: false),),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          AppBar(
+            title: Text('Terms And Conditions'),
+            centerTitle: true,
+          ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: const Text(

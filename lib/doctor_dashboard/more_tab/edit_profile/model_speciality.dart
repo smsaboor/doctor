@@ -23,3 +23,16 @@ class ModelSpeciality {
     "doctor_speciality": doctor_speciality,
   };
 }
+
+class ModelSpeciality2{
+  ModelSpeciality2({
+    this.speciality,
+    this.index
+  });
+  String? speciality;
+  String? index;
+  Map toJson() => {
+    'speciality': speciality,
+    'index': index,
+  };
+}

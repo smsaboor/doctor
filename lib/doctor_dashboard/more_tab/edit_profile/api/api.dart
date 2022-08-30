@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 class ApiEditProfiles{
   static var updateProfileData;
-
   static updateProfile({String? doctorid,String? name,String? emeNo,String? degree,String? lang,String? lic_no,
     String? exper,String? spec,String? expe,String? address
   }) async {

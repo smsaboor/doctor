@@ -1,10 +1,10 @@
 import 'package:doctor/core/constants.dart';
-import 'package:doctor/dashboard_patient/data/json.dart';
+import 'package:doctor/core/custom_snackbar.dart';
 import 'package:doctor/dashboard_patient/widgets/avatar_image.dart';
+import 'package:doctor/doctor_dashboard/appointments/save_consult/save_consult.dart';
 import 'package:doctor/doctor_dashboard/custom_widgtes/app_bar.dart';
-import 'package:doctor/doctor_dashboard/home_tab/add_appointment.dart';
-import 'package:doctor/doctor_dashboard/home_tab/doctor_profile_page.dart';
-
+import 'package:doctor/doctor_dashboard/home_tab/search_appointment.dart';
+import 'package:doctor/doctor_dashboard/more_tab/edit_profile/api/multi.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -12,9 +12,11 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class HomeTabDD extends StatefulWidget {
-  const HomeTabDD({Key? key,required this.doctorId,required this.userData}) : super(key: key);
+  const HomeTabDD({Key? key, required this.doctorId, required this.userData})
+      : super(key: key);
   final doctorId;
   final userData;
+
   @override
   _HomeTabDDState createState() => _HomeTabDDState();
 }
@@ -23,15 +25,17 @@ class _HomeTabDDState extends State<HomeTabDD> {
   var dataAppointments;
   var dataHome;
   bool dataHomeFlag = true;
+  bool emergencyAppointmentsFlag = true;
   var response2;
+  bool updateBooking = false;
 
   Future<void> getHomeData() async {
-    var API = API_BASE_URL+API_DOCTOR_HOMETAB_DASHBOARD;
+    var API = API_BASE_URL + API_DOCTOR_HOMETAB_DASHBOARD;
     Map<String, dynamic> body = {'doctor_id': widget.doctorId};
     http.Response response = await http
         .post(Uri.parse(API), body: body)
         .then((value) => value)
-        .catchError((error) => print(" Failed to getAllAssitents: $error"));
+        .catchError((error) => print(" Failed to getHomeData: $error"));
     if (response.statusCode == 200) {
       setState(() {
         dataHomeFlag = false;
@@ -41,38 +45,98 @@ class _HomeTabDDState extends State<HomeTabDD> {
   }
 
   Future<void> getAllAssitents() async {
-    var API = API_BASE_URL+API_DOCTOR_HOMETAB_DOCTOR_APPOINTMENTS;
+    var API = API_BASE_URL + API_DOCTOR_HOMETAB_DOCTOR_EMERGENCY_APPOINTMENTS;
     Map<String, dynamic> body = {'doctor_id': widget.doctorId};
-    http.Response response = await http.post(Uri.parse(API), body: body).then((value) => value)
+    http.Response response = await http
+        .post(Uri.parse(API), body: body)
+        .then((value) => value)
         .catchError((error) => print(" Failed to getAllAssitents: $error"));
     response2 = response.body;
     if (response.statusCode == 200) {
+      setState(() {
+        emergencyAppointmentsFlag = false;
+      });
       dataAppointments = jsonDecode(response.body.toString());
-    } else {}
+    } else {
+      dataAppointments = null;
+    }
   }
 
+  var getEmergencyData;
   var emergencyData;
-  bool emergencyFlag=false;
+  bool emergencyFlag = false;
 
   bool _switchValue = false;
-  Future<void> updateEmergencyService() async {
-    var API = 'https://cabeloclinic.com/website/medlife/php_auth_api/booking_on_off_api.php';
+
+  Future<void> getEmergencyService() async {
+    var API =
+        'https://cabeloclinic.com/website/medlife/php_auth_api/booking_on_off_api.php';
     Map<String, dynamic> body = {
       'doctor_id': widget.doctorId,
     };
     http.Response response = await http
         .post(Uri.parse(API), body: body)
         .then((value) => value)
-        .catchError((error) => print(" Failed to update updateEmergencyService: $error"));
+        .catchError((error) => print(" Failed to getEmergencyService: $error"));
     if (response.statusCode == 200) {
       setState(() {
-        emergencyData = jsonDecode(response.body.toString());
-        if(emergencyData['booking']=='0'){
-          _switchValue = false;
-        }else{
-          _switchValue = true;
+        getEmergencyData = jsonDecode(response.body.toString());
+        if (getEmergencyData['on_off_status'] == "0") {
+          setState(() {
+            _switchValue = false;
+          });
+        } else {
+          setState(() {
+            _switchValue = true;
+          });
         }
       });
+    } else {}
+  }
+
+  Future<void> updateEmergencyService() async {
+    updateBooking = true;
+    String isSwitch;
+    print('check1 ${widget.doctorId}');
+    var API =
+        'https://cabeloclinic.com/website/medlife/php_auth_api/update_on_off_api.php';
+    await getEmergencyService();
+    if (getEmergencyData['on_off_status'] == "0") {
+      isSwitch = '1';
+    } else {
+      isSwitch = '0';
+    }
+    Map<String, dynamic> body = {
+      'doctor_id': widget.doctorId,
+      'on_off_status': isSwitch,
+    };
+    http.Response response = await http
+        .post(Uri.parse(API), body: body)
+        .then((value) => value)
+        .catchError((error) =>
+            print(" Failed to update updateEmergencyService: $error"));
+    if (response.statusCode == 200) {
+      getEmergencyService();
+      emergencyData = jsonDecode(response.body.toString());
+        if (getEmergencyData['on_off_status'] == "0") {
+          setState(() {
+            _switchValue = false;
+            updateBooking = false;
+          });
+          CustomSnackBar.snackBar(
+              context: context,
+              data: 'Booking On!',
+              color: Colors.green);
+        } else {
+          setState(() {
+            _switchValue = true;
+            updateBooking = false;
+            CustomSnackBar.snackBar(
+                context: context,
+                data: 'Booking Off!',
+                color: Colors.red);
+          });
+        }
     } else {}
   }
 
@@ -80,12 +144,10 @@ class _HomeTabDDState extends State<HomeTabDD> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    getAllAssitents();
     getHomeData();
-    updateEmergencyService();
+    getAllAssitents();
+    getEmergencyService();
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -99,56 +161,23 @@ class _HomeTabDDState extends State<HomeTabDD> {
         backgroundColor: Colors.blue,
         onPressed: () {
           Navigator.of(context).push(MaterialPageRoute(
-              builder: (_) => AddApointments(userData: widget.userData,)));
+              builder: (_) => SearchAppointments(
+                    userData: widget.userData,
+                  )));
         },
       ),
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(60),
-        child: CustomAppBar(isleading: false,),),
+        child: CustomAppBar(
+          isleading: false,
+        ),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
             child: Padding(
           padding: const EdgeInsets.only(left: 8.0, right: 8),
           child: Column(
             children: [
-              // Row(
-              //   children: [
-              //     Image.asset(
-              //       'assets/images/img_2.png',
-              //       width: 200,
-              //       height: 90,
-              //     ),
-              //     Spacer(),
-              //     Column(
-              //       mainAxisAlignment: MainAxisAlignment.center,
-              //       children: [
-              //         Text(
-              //           widget.userData == null ? 'Dr.' : 'Dr. ${widget.userData['name']} ',
-              //           style: TextStyle(
-              //             fontSize: 17.0,
-              //             fontWeight: FontWeight.bold,
-              //           ),
-              //         ),
-              //         // Text(
-              //         //   'MBBS',
-              //         //   style: TextStyle(
-              //         //     fontSize: 14.0,
-              //         //     fontWeight: FontWeight.w500,
-              //         //   ),
-              //         // ),
-              //       ],
-              //     ),
-              //     SizedBox(
-              //       width: 5,
-              //     ),
-              //     AvatarImagePD(
-              //       "https://images.unsplash.com/photo-1537368910025-700350fe46c7?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80",
-              //       radius: 30,
-              //       height: 45,
-              //       width: 45,
-              //     ),
-              //   ],
-              // ),
               SizedBox(
                 height: 20,
               ),
@@ -197,10 +226,16 @@ class _HomeTabDDState extends State<HomeTabDD> {
                                     onChanged: (value) {
                                       setState(() {
                                         updateEmergencyService();
-                                        _switchValue = value;
                                       });
                                     },
                                   ),
+                                  updateBooking
+                                      ? SizedBox(
+                                          width: 40,
+                                          child: Center(
+                                            child: LinearProgressIndicator(),
+                                          ))
+                                      : Text('')
                                 ],
                               )
                             ],
@@ -225,14 +260,6 @@ class _HomeTabDDState extends State<HomeTabDD> {
                                   ),
                                   child: InkWell(
                                     onTap: () {
-                                      // Scaffold.of(context).showSnackBar(SnackBar(
-                                      //     content: Text(
-                                      //   "Selected Ite",
-                                      //   style: TextStyle(
-                                      //     fontSize: 16.0,
-                                      //     fontWeight: FontWeight.bold,
-                                      //   ),
-                                      // )));
                                     },
                                     child: Center(
                                       child: Column(
@@ -241,7 +268,8 @@ class _HomeTabDDState extends State<HomeTabDD> {
                                           Padding(
                                             padding: const EdgeInsets.all(8.0),
                                             child: Text(
-                                              dataHome['new_booking_count'] ??'',
+                                              dataHome['new_booking_count'] ??
+                                                  '',
                                               style: TextStyle(
                                                   fontSize: 22.0,
                                                   fontWeight: FontWeight.bold,
@@ -291,7 +319,7 @@ class _HomeTabDDState extends State<HomeTabDD> {
                                           Padding(
                                             padding: const EdgeInsets.all(8.0),
                                             child: Text(
-                                              dataHome['today_booking'] ??'',
+                                              dataHome['today_booking'] ?? '',
                                               style: TextStyle(
                                                   fontSize: 22.0,
                                                   fontWeight: FontWeight.bold,
@@ -319,31 +347,41 @@ class _HomeTabDDState extends State<HomeTabDD> {
                         ),
                       ],
                     ),
-              dataHomeFlag
-                  ? Center(child: Text(''))
+              emergencyAppointmentsFlag
+                  ? Center(
+                    child: Column(
+                      children: [
+                        SizedBox(height: 10,),
+                        Text('Loading...'),
+                      ],
+                    ),
+                  )
                   : FutureBuilder(
                       future: getAllAssitents(),
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Center(
-                            child: SizedBox(
-                              height: 30,
-                              width: 30,
-                              child: CircularProgressIndicator(),
-                            ),
-                          );
-                        } else {
-                          return ListView.builder(
-                              shrinkWrap: true,
-                              physics: ScrollPhysics(),
-                              itemCount: dataAppointments.length ?? 0,
-                              itemBuilder: (context, index) {
-                                return Padding(
+                        return ListView.builder(
+                            shrinkWrap: true,
+                            physics: ScrollPhysics(),
+                            itemCount: dataAppointments.length,
+                            itemBuilder: (context, index) {
+                              return InkWell(
+                                onTap: () {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (_) => SaveConsultDD(
+                                            appointmentNumber:
+                                                dataAppointments[index]
+                                                    ['appointment_no'],
+                                            patientName: dataAppointments[index]
+                                                ['patient_name'],
+                                            patientId: dataAppointments[index]
+                                                ['patient_id'],
+                                          )));
+                                },
+                                child: Padding(
                                   padding: const EdgeInsets.only(
                                       left: 10.0, right: 5, bottom: 5, top: 5),
                                   child: SizedBox(
-                                    height: 220,
+                                    height: 250,
                                     width:
                                         MediaQuery.of(context).size.width * .9,
                                     child: Card(
@@ -354,227 +392,159 @@ class _HomeTabDDState extends State<HomeTabDD> {
                                             Radius.circular(10)),
                                         side: BorderSide(color: Colors.white),
                                       ),
-                                      child: InkWell(
-                                          onTap: () {
-                                            // Scaffold.of(context).showSnackBar(SnackBar(
-                                            //     content: Text(
-                                            //       "Selected Ite",
-                                            //       style: TextStyle(
-                                            //         fontSize: 16.0,
-                                            //         fontWeight: FontWeight.bold,
-                                            //       ),
-                                            //     )));
-                                          },
-                                          child: Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 8.0, top: 15),
-                                            child: Column(
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 8.0, top: 15),
+                                        child: Column(
+                                          children: [
+                                            Center(
+                                                child: Text(
+                                              'Emergency Appointment',
+                                              style: TextStyle(
+                                                  color: Colors.red,
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w500),
+                                            )),
+                                            Divider(),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: [
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 15.0),
+                                                  child: AvatarImagePD(
+                                                    dataAppointments[index]
+                                                            ['image'] ??
+                                                        '',
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  width: 20,
+                                                ),
+                                                Column(
                                                   crossAxisAlignment:
                                                       CrossAxisAlignment.start,
                                                   children: [
-                                                    Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              left: 15.0),
-                                                      child: AvatarImagePD(
-                                                        dataAppointments[index]
-                                                            ['image']??'',
-                                                      ),
+                                                    Row(
+                                                      children: [
+                                                        Text(
+                                                          'Appointment:',
+                                                          maxLines: 1,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          style: TextStyle(
+                                                              fontSize: 16,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500),
+                                                        ),
+                                                        Text(
+                                                          '  ${dataAppointments[index]['appointment_no'] ?? ''}',
+                                                          style: TextStyle(
+                                                              fontSize: 16,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w400),
+                                                        ),
+                                                      ],
                                                     ),
                                                     SizedBox(
-                                                      width: 20,
+                                                      height: 3,
                                                     ),
-                                                    Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
+                                                    Row(
+                                                      children: [
+                                                        Text(
+                                                          'Booking Type:',
+                                                          style: TextStyle(
+                                                              fontSize: 16,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500),
+                                                        ),
+                                                        Text(
+                                                          '  ${dataAppointments[index]['booking_type'] ?? ''}',
+                                                          style: TextStyle(
+                                                              color: dataAppointments[
+                                                                              index]
+                                                                          [
+                                                                          'booking_type'] ==
+                                                                      'online'
+                                                                  ? Colors.green
+                                                                  : Colors.red,
+                                                              fontSize: 16,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    SizedBox(
+                                                      height: 3,
+                                                    ),
+                                                    Row(
+                                                      children: [
+                                                        Text(
+                                                          'Date:',
+                                                          style: TextStyle(
+                                                              fontSize: 16,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500),
+                                                        ),
+                                                        Text(
+                                                          '  ${dataAppointments[index]['date'] ?? ''}',
+                                                          style: TextStyle(
+                                                              fontSize: 16,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w400),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    SizedBox(
+                                                      height: 3,
+                                                    ),
+                                                    Row(
+                                                      children: [
+                                                        Text(
+                                                          'Name:',
+                                                          style: TextStyle(
+                                                              fontSize: 16,
+                                                              color:
+                                                                  Colors.pink,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500),
+                                                        ),
+                                                        Text(
+                                                          '  ${dataAppointments[index]['patient_name'] ?? ''}',
+                                                          maxLines: 1,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          style: TextStyle(
+                                                              fontSize: 16,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    SizedBox(
+                                                      height: 3,
+                                                    ),
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceEvenly,
                                                       children: [
                                                         Row(
                                                           children: [
                                                             Text(
-                                                              'Appointment:',
-                                                              maxLines: 1,
-                                                              overflow:
-                                                                  TextOverflow
-                                                                      .ellipsis,
-                                                              style: TextStyle(
-                                                                  fontSize: 16,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500),
-                                                            ),
-                                                            Text(
-                                                              '  ${dataAppointments[
-                                                              index][
-                                                              'appointment_no']??''}',
-                                                              style: TextStyle(
-                                                                  fontSize: 16,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w400),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        SizedBox(
-                                                          height: 3,
-                                                        ),
-                                                        Row(
-                                                          children: [
-                                                            Text(
-                                                              'Booking Type:',
-                                                              style: TextStyle(
-                                                                  fontSize: 16,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500),
-                                                            ),
-                                                            Text(
-                                                              '  ${dataAppointments[
-                                                              index][
-                                                              'booking_type']??''}',
-                                                              style: TextStyle(
-                                                                color: dataAppointments[
-                                                                index][
-                                                                'booking_type']=='online'?Colors.green:Colors.red,
-                                                                  fontSize: 16,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        SizedBox(
-                                                          height: 3,
-                                                        ),
-                                                        Row(
-                                                          children: [
-                                                            Text(
-                                                              'Date:',
-                                                              style: TextStyle(
-                                                                  fontSize: 16,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500),
-                                                            ),
-                                                            Text(
-                                                              '  ${dataAppointments[
-                                                              index]
-                                                              ['date']??''}',
-                                                              style: TextStyle(
-                                                                  fontSize: 16,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w400),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        SizedBox(
-                                                          height: 3,
-                                                        ),
-                                                        Row(
-                                                          children: [
-                                                            Text(
-                                                              'Name:',
-                                                              style: TextStyle(
-                                                                  fontSize: 16,
-                                                                  color: Colors
-                                                                      .pink,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500),
-                                                            ),
-                                                            Text(
-                                                              '  ${dataAppointments[
-                                                              index]
-                                                              ['patient_name']??''}',
-                                                              maxLines: 1,
-                                                              overflow:
-                                                                  TextOverflow
-                                                                      .ellipsis,
-                                                              style: TextStyle(
-                                                                  fontSize: 16,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        SizedBox(
-                                                          height: 3,
-                                                        ),
-                                                        Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .spaceEvenly,
-                                                          children: [
-                                                            Row(
-                                                              children: [
-                                                                Text(
-                                                                  'Sex:',
-                                                                  style: TextStyle(
-                                                                      color: Colors
-                                                                          .pink,
-                                                                      fontSize:
-                                                                          16,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w500),
-                                                                ),
-                                                                Text('  ${dataAppointments[
-                                                                  index]
-                                                                  [
-                                                                  'gender']??''}',
-                                                                  style: TextStyle(
-                                                                      fontSize:
-                                                                          16,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w400),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            SizedBox(
-                                                              width: 10,
-                                                            ),
-                                                            Row(
-                                                              children: [
-                                                                Text(
-                                                                  'Age:',
-                                                                  style: TextStyle(
-                                                                      color: Colors
-                                                                          .pink,
-                                                                      fontSize:
-                                                                          16,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w500),
-                                                                ),
-                                                                Text(
-                                                                  '  ${dataAppointments[
-                                                                  index]
-                                                                  ['age']??''}',
-                                                                  style: TextStyle(
-                                                                      fontSize:
-                                                                          16,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w400),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        SizedBox(
-                                                          height: 3,
-                                                        ),
-                                                        Row(
-                                                          children: [
-                                                            Text(
-                                                              'Address:',
+                                                              'Sex:',
                                                               style: TextStyle(
                                                                   color: Colors
                                                                       .pink,
@@ -584,9 +554,32 @@ class _HomeTabDDState extends State<HomeTabDD> {
                                                                           .w500),
                                                             ),
                                                             Text(
-                                                              '  ${dataAppointments[
-                                                              index]
-                                                              ['address'] ?? '' }',
+                                                              '  ${dataAppointments[index]['gender'] ?? ''}',
+                                                              style: TextStyle(
+                                                                  fontSize: 16,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w400),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        SizedBox(
+                                                          width: 10,
+                                                        ),
+                                                        Row(
+                                                          children: [
+                                                            Text(
+                                                              'Age:',
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .pink,
+                                                                  fontSize: 16,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500),
+                                                            ),
+                                                            Text(
+                                                              '  ${dataAppointments[index]['age'] ?? ''}',
                                                               style: TextStyle(
                                                                   fontSize: 16,
                                                                   fontWeight:
@@ -596,108 +589,120 @@ class _HomeTabDDState extends State<HomeTabDD> {
                                                           ],
                                                         ),
                                                       ],
-                                                    )
+                                                    ),
+                                                    SizedBox(
+                                                      height: 3,
+                                                    ),
+                                                    Row(
+                                                      children: [
+                                                        Text(
+                                                          'Address:',
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.pink,
+                                                              fontSize: 16,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500),
+                                                        ),
+                                                        Text(
+                                                          '  ${dataAppointments[index]['address'] ?? ''}',
+                                                          style: TextStyle(
+                                                              fontSize: 16,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w400),
+                                                        ),
+                                                      ],
+                                                    ),
                                                   ],
-                                                ),
-                                                Divider(
-                                                  color: Colors.black12,
+                                                )
+                                              ],
+                                            ),
+                                            Divider(
+                                              color: Colors.black12,
+                                            ),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceEvenly,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                      'Total Fees: ',
+                                                      style: TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          color:
+                                                              Colors.black87),
+                                                    ),
+                                                    Text(
+                                                      '${dataAppointments[index]['doctor_fee'] ?? ''}',
+                                                      style: TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color:
+                                                              Colors.black87),
+                                                    ),
+                                                  ],
                                                 ),
                                                 Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceEvenly,
                                                   children: [
-                                                    Row(
-                                                      children: [
-                                                        Text(
-                                                          'Total Fees: ',
-                                                          style: TextStyle(
-                                                              fontSize: 16,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w600,
-                                                              color: Colors
-                                                                  .black87),
-                                                        ),
-                                                        Text(
-                                                         '${ dataAppointments[
-                                                         index]
-                                                         ['doctor_fee']??''}',
-                                                          style: TextStyle(
-                                                              fontSize: 16,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
-                                                              color: Colors
-                                                                  .black87),
-                                                        ),
-                                                      ],
+                                                    Text(
+                                                      'Received: ',
+                                                      style: TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          color:
+                                                              Colors.black87),
                                                     ),
-                                                    Row(
-                                                      children: [
-                                                        Text(
-                                                          'Received: ',
-                                                          style: TextStyle(
-                                                              fontSize: 16,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w600,
-                                                              color: Colors
-                                                                  .black87),
-                                                        ),
-                                                        Text(
-                                                         '${ dataAppointments[
-                                                         index][
-                                                         'received_payment']??''}',
-                                                          style: TextStyle(
-                                                              fontSize: 16,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              color:
-                                                                  Colors.green),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    Row(
-                                                      children: [
-                                                        Text(
-                                                          'Due: ',
-                                                          style: TextStyle(
-                                                              fontSize: 16,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w600,
-                                                              color: Colors
-                                                                  .black87),
-                                                        ),
-                                                        Text(
-                                                         '${ dataAppointments[
-                                                         index]
-                                                         ['due_payment']??''}',
-                                                          style: TextStyle(
-                                                              fontSize: 16,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              color:
-                                                                  Colors.red),
-                                                        ),
-                                                      ],
+                                                    Text(
+                                                      '${dataAppointments[index]['received_payment'] ?? ''}',
+                                                      style: TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: Colors.green),
                                                     ),
                                                   ],
                                                 ),
-                                                Divider(
-                                                  color: Colors.black12,
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                      'Due: ',
+                                                      style: TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          color:
+                                                              Colors.black87),
+                                                    ),
+                                                    Text(
+                                                      '${dataAppointments[index]['due_payment'] ?? ''}',
+                                                      style: TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: Colors.red),
+                                                    ),
+                                                  ],
                                                 ),
                                               ],
                                             ),
-                                          )),
+                                            Divider(
+                                              color: Colors.black12,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                );
-                              });
-                        }
+                                ),
+                              );
+                            });
                       },
                     ),
             ],

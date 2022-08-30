@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:doctor/core/constants.dart';
 import 'package:doctor/dashboard_patient/doctor/doctor_page.dart';
 import 'package:doctor/dashboard_patient/doctor/doctor_profile_page.dart';
 import 'package:doctor/dashboard_patient/widgets/category_box.dart';
@@ -39,9 +40,9 @@ class _TabHomePatientState extends State<TabHomePatient> {
   Future<void> getAllDoctors() async {
     print('...............................');
     var API =
-        'https://shivamelec.com/mywebsite/medlife/php_auth_api/all_doctor_api.php';
+        'all_doctor_api.php';
     http.Response response = await http
-        .get(Uri.parse(API))
+        .get(Uri.parse(API_BASE_URL+API))
         .then((value) => value)
         .catchError((error) => print(" Failed to getLogin: $error"));
     print('...............................${response.body}');
@@ -54,9 +55,9 @@ class _TabHomePatientState extends State<TabHomePatient> {
   Future<void> getSpecialist() async {
     print('...............................');
     var API =
-        'https://shivamelec.com/mywebsite/medlife/php_auth_api/specialist_api.php';
+        'specialist_api.php';
     http.Response response = await http
-        .get(Uri.parse(API))
+        .get(Uri.parse(API_BASE_URL+API))
         .then((value) => value)
         .catchError((error) => print(" Failed to getLogin: $error"));
     print('...............................${response.body}');
@@ -308,21 +309,6 @@ class _TabHomePatientState extends State<TabHomePatient> {
           SizedBox(
             height: 25,
           ),
-          // Container(
-          //   width: double.infinity,
-          //   padding: EdgeInsets.all(20),
-          //   height: 160,
-          //   decoration: BoxDecoration(
-          //       borderRadius: BorderRadius.circular(30),
-          //       image: DecorationImage(
-          //         image: NetworkImage(
-          //             "https://media.istockphoto.com/vectors/electronic-health-record-concept-vector-id1299616187?k=20&m=1299616187&s=612x612&w=0&h=gmUf6TXc8w6NynKB_4p2TzL5PVIztg9UK6TOoY5ckMM="),
-          //         fit: BoxFit.cover,
-          //       )),
-          // ),
-          // SizedBox(
-          //   height: 20,
-          // ),
           dataSpeciality == null
               ? CircularProgressIndicator()
               : Container(

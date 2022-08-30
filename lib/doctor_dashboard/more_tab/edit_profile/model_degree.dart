@@ -23,3 +23,19 @@ class ModelDegrees {
     "degree": degree,
   };
 }
+
+
+class ModelDegree2{
+  ModelDegree2({
+    this.degree,
+    this.index
+  });
+  String? degree;
+  String? index;
+  Map toJson() => {
+    'degree': degree,
+    'index': index,
+  };
+}
+
+

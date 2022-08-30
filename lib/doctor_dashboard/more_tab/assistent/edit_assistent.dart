@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:doctor/core/constants.dart';
 import 'package:doctor/core/custom_form_field.dart';
 import 'package:doctor/core/custom_snackbar.dart';
 import 'package:doctor/dashboard_patient/widgets/avatar_image.dart';
@@ -236,8 +237,7 @@ class _EditAssistentState extends State<EditAssistent> {
       String? address,
       String? status_order}) async {
     print('model ------------------------------------------------------');
-    var APIURL =
-        'https://cabeloclinic.com/website/medlife/php_auth_api/edit_assistant_api.php';
+    var APIURL =API_BASE_URL+API_DD_ASSISTENT_EDIT;
     Map<String, dynamic> body = {
       'assistant_id': id,
       'assistant_name': AssistName,
@@ -251,7 +251,6 @@ class _EditAssistentState extends State<EditAssistent> {
         .catchError(
             (error) => print("doctore assistenet Failed to add: $error"));
     var data = jsonDecode(response.body);
-    print("doctore assistenet DATA: ${data}");
     return data[0]['assistant_name'];
   }
 

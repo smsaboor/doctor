@@ -1,3 +1,4 @@
+import 'package:doctor/core/constants.dart';
 import 'package:doctor/screens/auth/login/login.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,7 +11,6 @@ import 'package:doctor/service/api.dart';
 class AddPatient extends StatefulWidget {
   const AddPatient({Key? key, required this.mobile}) : super(key: key);
   final mobile;
-
   @override
   _AddPatientState createState() => _AddPatientState();
 }
@@ -21,8 +21,8 @@ class _AddPatientState extends State<AddPatient> {
   // }
 
   String dropdownvalueState = 'Arunachal Pradesh';
-
-  var indianState = [
+  var stateInitial="Andhra Pradesh";
+  var stateList = [
     "Andhra Pradesh",
     "Arunachal Pradesh",
     "Assam",
@@ -84,17 +84,12 @@ class _AddPatientState extends State<AddPatient> {
 
   final GlobalKey<FormState> formKey = new GlobalKey<FormState>();
   TextEditingController _controllerName = TextEditingController();
-  TextEditingController _controllerHospitalName = TextEditingController();
   TextEditingController _controllerMobile = TextEditingController();
-  TextEditingController _controllerPhone = TextEditingController();
-  TextEditingController _controllerEmergencyNum = TextEditingController();
   TextEditingController _controllerAddress = TextEditingController();
-  TextEditingController _controllerState = TextEditingController();
-  TextEditingController _controllerPin = TextEditingController();
   TextEditingController _controllerDistrict = TextEditingController();
   TextEditingController _controllerCity = TextEditingController();
-  TextEditingController _controllerPassword = TextEditingController();
-  TextEditingController _controllerConfirmPassword = TextEditingController();
+  TextEditingController _controllerPin = TextEditingController();
+  TextEditingController _controllerState = TextEditingController();
 
   @override
   void initState() {
@@ -146,17 +141,6 @@ class _AddPatientState extends State<AddPatient> {
               SizedBox(
                 height: MediaQuery.of(context).size.height * .01,
               ),
-              Padding(
-                padding: const EdgeInsets.only(left: 25.0, bottom: 15),
-                child: Text(
-                  "Add New Patient",
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xE1100A44),
-                      fontSize: 32),
-                  textAlign: TextAlign.left,
-                ),
-              ),
               new Padding(
                 padding: const EdgeInsets.only(top: 5.0),
               ),
@@ -175,7 +159,7 @@ class _AddPatientState extends State<AddPatient> {
                         _registration(context);
                       },
                       style: ElevatedButton.styleFrom(
-                          primary: Colors.blue,
+                          primary: Colors.blueAccent,
                           textStyle: TextStyle(
                               fontSize: 30, fontWeight: FontWeight.bold)),
                       child: tryRegistration
@@ -221,35 +205,6 @@ class _AddPatientState extends State<AddPatient> {
             icon: Icons.phone_android,
             textInputType: TextInputType.number),
         SizedBox(height: MediaQuery.of(context).size.height * 0.01),
-        // Padding(
-        //   padding: const EdgeInsets.only(left: 25, right: 18),
-        //   child: DropdownButton(
-        //     // Initial Value
-        //     menuMaxHeight: MediaQuery.of(context).size.height,
-        //     value: dropdownvalue,
-        //     dropdownColor: Colors.white,
-        //     focusColor: Colors.blue,
-        //     isExpanded: true,
-        //     // Down Arrow Icon
-        //     icon: const Icon(Icons.keyboard_arrow_down),
-        //     // Array list of items
-        //     items: indianState.map((String items) {
-        //       return DropdownMenuItem(
-        //         value: items,
-        //         child: Text(items),
-        //       );
-        //     }).toList(),
-        //     // After selecting the desired option,it will
-        //     // change button value to selected value
-        //     onChanged: (String? newValue) {
-        //       setState(() {
-        //         dropdownvalue = newValue!;
-        //         _controllerState.text = newValue;
-        //         // tryRegistration = false;
-        //       });
-        //     },
-        //   ),
-        // ),
         CustomFormField(
             controlller: _controllerAddress,
             errorMsg: 'Enter Your Address',
@@ -282,57 +237,6 @@ class _AddPatientState extends State<AddPatient> {
             icon: Icons.pin,
             textInputType: TextInputType.number),
         SizedBox(height: MediaQuery.of(context).size.height * 0.01),
-        CustomFormField(
-            controlller: _controllerPassword,
-            errorMsg: 'Enter Your Password',
-            readOnly: false,
-            labelText: 'Password',
-            icon: Icons.password,
-            textInputType: TextInputType.text),
-        SizedBox(height: MediaQuery.of(context).size.height * 0.01),
-        Padding(
-          padding: const EdgeInsets.only(left: 20.0, right: 20),
-          child: Theme(
-            data: new ThemeData(
-              primaryColor: Colors.redAccent,
-              primaryColorDark: Colors.red,
-            ),
-            child: Expanded(
-              child: new TextFormField(
-                textInputAction: TextInputAction.next,
-                readOnly: false,
-                controller: _controllerConfirmPassword,
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Confirm Password';
-                  }
-                  if(_controllerPassword.text!=_controllerConfirmPassword.text){
-                    return 'please enter same password';
-                  }
-                  return null;
-                },
-                keyboardType: TextInputType.text,
-                decoration: new InputDecoration(
-                    border: new OutlineInputBorder(
-                        borderSide: new BorderSide(color: Colors.teal)),
-                    labelText: 'Confirm Password',
-                    prefixText: ' ',
-                    prefixIcon: Icon(
-                      Icons.password,
-                      color: Colors.blue,
-                    ),
-                    suffixStyle: const TextStyle(color: Colors.green)),
-              ),
-            ),
-          ),
-        )
-      ],
-    );
-  }
-
-  buildAssistentForm() {
-    return Column(
-      children: [
         Padding(
           padding: const EdgeInsets.only(left: 20.0, right: 20),
           child: Theme(
@@ -351,16 +255,16 @@ class _AddPatientState extends State<AddPatient> {
               child: Padding(
                 padding: const EdgeInsets.only(left: 8.0),
                 child: DropdownButton(
-                    // Initial Value
+                  // Initial Value
                     menuMaxHeight: MediaQuery.of(context).size.height,
-                    value: currentHospital,
+                    value: stateInitial,
                     dropdownColor: Colors.white,
                     focusColor: Colors.blue,
                     isExpanded: true,
                     // Down Arrow Icon
                     icon: const Icon(Icons.keyboard_arrow_down),
                     // Array list of items
-                    items: hospitalsName.map((String items) {
+                    items: stateList.map((String items) {
                       return DropdownMenuItem(
                         value: items,
                         child: Text(items),
@@ -368,85 +272,14 @@ class _AddPatientState extends State<AddPatient> {
                     }).toList(),
                     // After selecting the desired option,it will
                     // change button value to selected value
-                    onChanged: (hos) {
+                    onChanged: (user) {
                       setState(() {
-                        currentHospital = hos.toString();
+                        stateInitial = user.toString();
                       });
-                      print('------------------${hos}');
+                      print('------------------${user}');
+                      print('------------------${user}');
                     }),
               ),
-            ),
-          ),
-        ),
-        SizedBox(height: MediaQuery.of(context).size.height * 0.01),
-        Padding(
-          padding: const EdgeInsets.only(left: 20.0, right: 20),
-          child: Theme(
-            data: new ThemeData(
-              primaryColor: Colors.redAccent,
-              primaryColorDark: Colors.red,
-            ),
-            child: new TextFormField(
-              textInputAction: TextInputAction.next,
-              controller: _controllerName,
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Enter Your Name';
-                }
-                return null;
-              },
-              onChanged: (v) {
-                setState(() {
-                  tryRegistration = false;
-                });
-              },
-              keyboardType: TextInputType.text,
-              decoration: new InputDecoration(
-                  border: new OutlineInputBorder(
-                      borderSide: new BorderSide(color: Colors.teal)),
-                  labelText: 'Doctor Name',
-                  prefixText: ' ',
-                  prefixIcon: Icon(
-                    Icons.person,
-                    color: Colors.blue,
-                  ),
-                  suffixStyle: const TextStyle(color: Colors.green)),
-            ),
-          ),
-        ),
-        SizedBox(height: MediaQuery.of(context).size.height * 0.01),
-        Padding(
-          padding: const EdgeInsets.only(left: 20.0, right: 20),
-          child: Theme(
-            data: new ThemeData(
-              primaryColor: Colors.redAccent,
-              primaryColorDark: Colors.red,
-            ),
-            child: new TextFormField(
-              textInputAction: TextInputAction.next,
-              controller: _controllerMobile,
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Enter Your Mobile';
-                }
-                return null;
-              },
-              onChanged: (v) {
-                setState(() {
-                  tryRegistration = false;
-                });
-              },
-              keyboardType: TextInputType.number,
-              decoration: new InputDecoration(
-                  border: new OutlineInputBorder(
-                      borderSide: new BorderSide(color: Colors.teal)),
-                  labelText: 'Mobile',
-                  prefixText: ' ',
-                  prefixIcon: Icon(
-                    Icons.phone_android,
-                    color: Colors.blue,
-                  ),
-                  suffixStyle: const TextStyle(color: Colors.green)),
             ),
           ),
         ),
@@ -455,89 +288,45 @@ class _AddPatientState extends State<AddPatient> {
     );
   }
 
+
   void _registration(BuildContext context) async {
     var data;
     if (formKey.currentState!.validate()) {
-      if (currentUser == 'Patient') {
-        setState(() {
-          tryRegistration = true;
-        });
-        data = await ApiService.signUpUser(
-            1,
-            ModelDoctor(),
-            ModelPatient(
-              userType: '1',
-              name: _controllerName.text,
-              mobile: _controllerMobile.text,
-              address: _controllerAddress.text,
-              state: 'up',
-              city: _controllerCity.text,
-              district: _controllerDistrict.text,
-              pincode: _controllerPin.text,
-              password: _controllerPassword.text,
-            ));
+      setState(() {
+        tryRegistration = true;
+      });
+      data = await ApiService.signUpUser(
+        API_INNER_SIGNUP,
+          1,
+          ModelDoctor(),
+          ModelPatient(
+            userType: '1',
+            name: _controllerName.text,
+            mobile: _controllerMobile.text,
+            address: _controllerAddress.text,
+            state: stateInitial,
+            city: _controllerCity.text,
+            district: _controllerDistrict.text,
+            pincode: _controllerPin.text,
+            password: _controllerMobile.text,
+          ));
+      print('1successcode:   ${data}');
+      if (data == 'ok') {
         print('1successcode:   ${data}');
-        if (data == 'ok') {
-          print('1successcode:   ${data}');
-          setState(() {
-            tryRegistration = false;
-          });
-          Navigator.pushReplacementNamed(context, RouteGenerator.signIn);
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text('Failed to Register'),
-            backgroundColor: Colors.red,
-          ));
-        }
-      } else if (currentUser == 'Doctor') {
         setState(() {
-          tryRegistration = true;
+          tryRegistration = false;
         });
-        data = await ApiService.signUpUser(
-            2,
-            ModelDoctor(
-              userType: '2',
-              name: _controllerName.text,
-              mobile: _controllerMobile.text,
-              phone: _controllerPhone.text,
-              emergencyNumber: _controllerEmergencyNum.text,
-              clinicName: _controllerHospitalName.text,
-              specialist: specialityOF,
-              state: 'up',
-              address: _controllerAddress.text,
-              city: _controllerCity.text,
-              district: _controllerDistrict.text,
-              pincode: _controllerPin.text,
-              password: _controllerPassword.text,
-            ),
-            ModelPatient());
-        print('2successcode:   ${data}');
-        if (data == 'ok') {
-          print('2successcode:   ${data}');
-          setState(() {
-            tryRegistration = false;
-          });
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(
-              builder: (BuildContext context) => LoginScreen(),
-            ),
-            (route) => false,
-          );
-          // Navigator.pushNamedAndRemoveUntil(context, "/signin", (Route<dynamic> route) => false);
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text('Please select number'),
-            backgroundColor: Colors.red,
-          ));
-        }
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Patient Registered Successfully!'),
+          backgroundColor: Colors.green,
+        ));
+        Navigator.pop(context);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Failed to Register'),
+          backgroundColor: Colors.red,
+        ));
       }
     }
-  }
-
-  bool _isEmailValidate(String txt) {
-    return RegExp(
-            r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
-        .hasMatch(txt);
   }
 }

@@ -1,5 +1,4 @@
 import 'package:doctor/dashboard_patient/widgets/avatar_image.dart';
-import 'package:doctor/doctor_dashboard/appointments/save_consult/save_consult.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -7,6 +6,7 @@ class CompletedAppointmentCard extends StatefulWidget {
   const CompletedAppointmentCard(
       {Key? key,
       required this.button,
+        this.doses,
       this.appointment_no,
       this.booking_type,
       this.date,
@@ -19,6 +19,7 @@ class CompletedAppointmentCard extends StatefulWidget {
       this.image,
       this.due_payment})
       : super(key: key);
+  final doses;
   final button;
   final appointment_no,
       booking_type,

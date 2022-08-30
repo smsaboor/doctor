@@ -14,6 +14,7 @@ class NextAppointmentCard extends StatefulWidget {
       this.booking_type,
       this.date,
       this.patient_name,
+        this.patient_id,
       this.age,
       this.gender,
       this.address,
@@ -26,6 +27,7 @@ class NextAppointmentCard extends StatefulWidget {
       booking_type,
       date,
       patient_name,
+      patient_id,
       age,
       gender,
       address,
@@ -60,8 +62,7 @@ class _NextAppointmentCardState extends State<NextAppointmentCard> {
       } else {}
     } else if (changedValue == 2) {
       dataF = true;
-      var API =
-          'https://cabeloclinic.com/website/medlife/php_auth_api/reject_appointment_api.php';
+      var API = 'https://cabeloclinic.com/website/medlife/php_auth_api/reject_appointment_api.php';
       Map<String, dynamic> body = {'appointment_no': appNo};
       http.Response response = await http
           .post(Uri.parse(API), body: body)
@@ -349,6 +350,7 @@ class _NextAppointmentCardState extends State<NextAppointmentCard> {
                               builder: (_) => SaveConsultDD(
                                     appointmentNumber: widget.appointment_no,
                                     patientName: widget.patient_name,
+                                patientId: widget.patient_id,
                                   )));
                         },
                         style: ElevatedButton.styleFrom(

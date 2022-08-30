@@ -21,11 +21,6 @@ class MyHttpOverrides extends HttpOverrides {
 }
 
 void main() async {
-  //
-  // SharedPreferences preferencess =
-  // await SharedPreferences.getInstance();
-  // preferencess.setBool('isLogin', false);
-
   WidgetsFlutterBinding.ensureInitialized();
   HttpOverrides.global = new MyHttpOverrides();
   SharedPreferences preferences = await SharedPreferences.getInstance();
@@ -89,7 +84,7 @@ class _MyAppState extends State<MyApp> {
                 ? SplashScreen()
                 : widget.isLogin
                     ? widget.userType == '2'
-                        ? DoctorDashBoard()
+                        ? PatientDashboard()
                         : PatientDashboard()
                     : LoginScreen(),
             onGenerateRoute: (route) => RouteGenerator.generateRoute(route),

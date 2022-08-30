@@ -1,3 +1,4 @@
+import 'package:doctor/core/constants.dart';
 import 'package:doctor/screens/auth/login/login.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -620,7 +621,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         setState(() {
           tryRegistration = true;
         });
-        data = await ApiService.signUpUser(1, ModelDoctor(), ModelPatient(
+        data = await ApiService.signUpUser(API_SIGNUP,1, ModelDoctor(), ModelPatient(
           userType: '1',
           name: _controllerName.text,
           mobile: _controllerMobile.text,
@@ -648,7 +649,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         setState(() {
           tryRegistration = true;
         });
-        data = await ApiService.signUpUser(2, ModelDoctor(
+        data = await ApiService.signUpUser(API_SIGNUP,2, ModelDoctor(
           userType: '2',
           name: _controllerName.text,
           mobile: _controllerMobile.text,

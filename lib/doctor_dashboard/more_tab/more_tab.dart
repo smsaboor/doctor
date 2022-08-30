@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:animated_theme_switcher/animated_theme_switcher.dart';
 import 'package:doctor/dashboard_patient/widgets/avatar_image.dart';
+import 'package:doctor/doctor_dashboard/appointments/save_consult/api/api.dart';
 import 'package:doctor/doctor_dashboard/custom_widgtes/app_bar.dart';
 import 'package:doctor/doctor_dashboard/more_tab/about.dart';
 import 'package:doctor/doctor_dashboard/more_tab/assistent/display_assistent.dart';
@@ -19,7 +20,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
-import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'constant.dart';
@@ -28,8 +28,9 @@ import 'package:path/path.dart';
 import 'package:http/http.dart' as http;
 
 class MoreTabDD extends StatefulWidget {
-  MoreTabDD({required this.userData});
+  MoreTabDD({required this.userData, required this.userID});
 
+  final userID;
   final userData;
 
   @override
@@ -38,6 +39,18 @@ class MoreTabDD extends StatefulWidget {
 
 class _MoreTabDDState extends State<MoreTabDD> {
   var data;
+  bool uplaodImage = true;
+  var jsonLanguage;
+  var jsonDegrees;
+  var jsonSpeciality;
+
+  bool flagAccess = true;
+  List<dynamic>? modelLanguages2 = [];
+  List<dynamic>? modelLanguages3 = [];
+  List<dynamic>? modelDegree3 = [];
+  List<dynamic>? modelSpeciality3 = [];
+  List<dynamic>? modelDegree2 = [];
+  List<dynamic>? modelSpeciality2 = [];
 
   void getData() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
@@ -47,9 +60,70 @@ class _MoreTabDDState extends State<MoreTabDD> {
       print('data----------------------------$data');
       print('data----------------------------${data['user_id']}');
     });
-    // print('..data: ${data}');
-    // print('..data: ${data['name']}');
-    // print('...runtime:${data.runtimeType}');
+    _getImgeUrl(data == null ? '' : data['user_id']);
+  }
+
+  var fetchUserData;
+  String? textLanguages;
+  String? textDegree;
+  String? textSpeciality;
+
+  void getUserData() async {
+    _getImgeUrl(widget.userID);
+    setState(() {});
+    var API =
+        'https://cabeloclinic.com/website/medlife/php_auth_api/fetch_profile_api.php';
+    Map<String, dynamic> body = {
+      'doctor_id': widget.userID,
+    };
+    modelLanguages3!.clear();
+    modelSpeciality3!.clear();
+    modelDegree3!.clear();
+    http.Response response = await http
+        .post(Uri.parse(API), body: body)
+        .then((value) => value)
+        .catchError((error) => print(" Failed to fetchProfileData: $error"));
+    print('...............................${response.body}');
+    if (response.statusCode == 200) {
+      fetchUserData = jsonDecode(response.body.toString());
+
+      textLanguages = fetchUserData[0]['languages'].toString();
+      textDegree = fetchUserData[0]['degree'].toString();
+      textSpeciality = fetchUserData[0]['specialty'].toString();
+
+      String firstTextL = textLanguages!;
+      String firstTextD = textDegree!;
+      String firstTextS = textSpeciality!;
+
+      String finalStringL = firstTextL
+          .replaceAll("[", "")
+          .replaceAll("]", "")
+          .replaceAll(" ", "");
+      String finalStringD = firstTextD
+          .replaceAll("[", "")
+          .replaceAll("]", "")
+          .replaceAll(" ", "");
+      String finalStringS = firstTextS
+          .replaceAll("[", "")
+          .replaceAll("]", "")
+          .replaceAll(" ", "");
+
+      final splitedTextL = finalStringL.split(',');
+      final splitedTextD = finalStringD.split(',');
+      final splitedTextS = finalStringS.split(',');
+      for (int i = 0; i < splitedTextL.length; i++) {
+        print('77777getUserData777777755$i--${splitedTextL[i].toString()}');
+        modelLanguages3!.add(splitedTextL[i].toString());
+      }
+      for (int i = 0; i < splitedTextD.length; i++) {
+        print('77777getUserData777777755$i--${splitedTextD[i].toString()}');
+        modelDegree3!.add(splitedTextD[i].toString());
+      }
+      for (int i = 0; i < splitedTextS.length; i++) {
+        print('77777getUserData777777755$i--${splitedTextS[i].toString()}');
+        modelSpeciality3!.add(splitedTextS[i].toString());
+      }
+    } else {}
   }
 
   jsonStringToMap(String data) {
@@ -67,18 +141,26 @@ class _MoreTabDDState extends State<MoreTabDD> {
     return result;
   }
 
-  static List<ModelLanguages> languages = <ModelLanguages>[];
-  static List<ModelDegrees> degrees = <ModelDegrees>[];
-  static List<ModelSpeciality> specialities = <ModelSpeciality>[];
+  var fetchImageData;
 
-  List<MultiSelectItem<ModelSpeciality?>>? _itemsSpecialities;
-  List<MultiSelectItem<ModelLanguages?>>? _itemsLanguages;
-  List<MultiSelectItem<ModelDegrees?>>? _itemsDigrees;
-
-  bool flagAccess = true;
+  void _getImgeUrl(String doctorId) async {
+    fetchImageData = await ApiEditProfiles.getImgeUrl(doctorId);
+    print('%%%%%%%%%%%%%%${fetchImageData}');
+    if (fetchImageData[0]['image'] != '') {
+      print('%%%%%%%%%%%%%%${fetchImageData}');
+      setState(() {
+        uplaodImage = false;
+      });
+    } else {
+      setState(() {
+        uplaodImage = true;
+      });
+    }
+  }
 
   Future<dynamic> getLanguages() async {
-    var API = 'https://cabeloclinic.com/website/medlife/php_auth_api/languages_api.php';
+    var API =
+        'https://cabeloclinic.com/website/medlife/php_auth_api/languages_api.php';
     try {
       final response = await http.post(Uri.parse(API));
       if (response.statusCode == 200) {
@@ -86,21 +168,26 @@ class _MoreTabDDState extends State<MoreTabDD> {
         Iterable l = json.decode(response.body);
         List<ModelLanguages> posts = List<ModelLanguages>.from(
             l.map((model) => ModelLanguages.fromJson(model)));
-        languages = posts;
-        _itemsLanguages = languages
-            .map(
-                (lang) => MultiSelectItem<ModelLanguages>(lang, lang.language!))
-            .toList();
         for (int i = 0; i < posts.length; i++) {
-          print('////////////////////${posts[i].language}');
+          modelLanguages2!.add({
+            'index': i.toString(),
+            'language': posts[i].language.toString()
+          });
         }
+        print('/modelLanguages2///////////////${modelLanguages2}');
+        for (int i = 0; i < modelLanguages2!.length; i++) {
+          print('========${modelLanguages2![i].language}');
+        }
+        jsonLanguage =
+            jsonEncode(modelLanguages2!.map((e) => e.toJson()).toList());
+        print('=jsonLanguage=======${jsonLanguage}');
         setState(() {
           flagAccess = false;
         });
       }
     } catch (e) {
       debugPrint('$e');
-      return <ModelLanguages>[];
+      return <ModelLanguages2>[];
     }
   }
 
@@ -113,12 +200,9 @@ class _MoreTabDDState extends State<MoreTabDD> {
         Iterable l = json.decode(response.body);
         List<ModelDegrees> posts = List<ModelDegrees>.from(
             l.map((model) => ModelDegrees.fromJson(model)));
-        degrees = posts;
-        _itemsDigrees = degrees
-            .map((lang) => MultiSelectItem<ModelDegrees>(lang, lang.degree!))
-            .toList();
         for (int i = 0; i < posts.length; i++) {
-          print('////////////////////${posts[i].degree}');
+          modelDegree2!.add(
+              {'index': i.toString(), 'degree': posts[i].degree.toString()});
         }
         setState(() {
           flagAccess = false;
@@ -131,20 +215,28 @@ class _MoreTabDDState extends State<MoreTabDD> {
   }
 
   Future<dynamic> getSpecialtyc() async {
-    var API = 'https://cabeloclinic.com/website/medlife/php_auth_api/specialist_profile_api.php';
+    var API =
+        'https://cabeloclinic.com/website/medlife/php_auth_api/specialist_profile_api.php';
     try {
       final response = await http.post(Uri.parse(API));
       if (response.statusCode == 200) {
         Iterable l = json.decode(response.body);
         List<ModelSpeciality> posts = List<ModelSpeciality>.from(
             l.map((model) => ModelSpeciality.fromJson(model)));
-        specialities = posts;
-        _itemsSpecialities = specialities
-            .map((lang) => MultiSelectItem<ModelSpeciality>(lang, lang.doctor_speciality!))
-            .toList();
         for (int i = 0; i < posts.length; i++) {
-          print('////////////////////${posts[i].doctor_speciality}');
+          modelSpeciality2!.add({
+            'index': i.toString(),
+            'speciality': posts[i].doctor_speciality.toString()
+          });
         }
+        print('/modelSpeciality2///////////////${modelSpeciality2}');
+        for (int i = 0; i < modelSpeciality2!.length; i++) {
+          print('========${modelSpeciality2![i].speciality}');
+        }
+        jsonSpeciality =
+            jsonEncode(modelSpeciality2!.map((e) => e.toJson()).toList());
+        print('=jsonSpeciality=======${jsonSpeciality}');
+
         setState(() {
           flagAccess = false;
         });
@@ -160,6 +252,7 @@ class _MoreTabDDState extends State<MoreTabDD> {
     // TODO: implement initState
     super.initState();
     getData();
+    getUserData();
     getLanguages();
     getDegrees();
     getSpecialtyc();
@@ -182,19 +275,39 @@ class _MoreTabDDState extends State<MoreTabDD> {
               children: <Widget>[
                 GestureDetector(
                   onTap: () async {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (_) => EditProfileDD(
-                              button: 'Save',
-                              language: _itemsLanguages,
-                              degree: _itemsDigrees,
-                              specialities: _itemsSpecialities,
-                              id: data == null ? '' : data['user_id'],
-                            )));
+                    Navigator.of(context)
+                        .push(MaterialPageRoute(
+                            builder: (_) => EditProfileDD(
+                                  intialValueLang: modelLanguages3,
+                                  intialValueDegree: modelDegree3,
+                                  intialValueSpec: modelSpeciality3,
+                                  button: 'Save',
+                                  language: modelLanguages2,
+                                  degree: modelDegree2,
+                                  specialities: modelSpeciality2,
+                                  jsonSpeciality: jsonSpeciality,
+                                  jsonDegrees: jsonDegrees,
+                                  jsonLanguage: jsonLanguage,
+                                  id: data == null ? '' : data['user_id'],
+                                )))
+                        .then((value) {
+                      getUserData();
+                      getAppBar();
+                      });
                   },
-                  child: CircleAvatar(
-                    radius: kSpacingUnit.w * 5,
-                    backgroundImage: AssetImage('assets/images/user.jpg'),
-                  ),
+                  child: uplaodImage
+                      ? Center(
+                          child: CircularProgressIndicator(),
+                        )
+                      : fetchImageData[0]['image'] != ''
+                          ? AvatarImagePD(
+                              fetchImageData[0]['image'],
+                              radius: kSpacingUnit.w * 5,
+                            )
+                          : AvatarImagePD(
+                              'https://www.kindpng.com/picc/m/198-1985282_doctor-profile-icon-png-transparent-png.png',
+                              radius: kSpacingUnit.w * 5,
+                            ),
                 ),
                 Align(
                   alignment: Alignment.bottomRight,
@@ -227,37 +340,58 @@ class _MoreTabDDState extends State<MoreTabDD> {
             style: kTitleTextStyle,
           ),
           SizedBox(height: kSpacingUnit.w * 0.5),
-          Text(
-            'n@gmail.c',
-            style: kCaptionTextStyle,
-          ),
-          SizedBox(height: kSpacingUnit.w * 2),
-          InkWell(
-            onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (_) => EditProfileDD(
-                        button: 'Save',
-                        language: _itemsLanguages,
-                        degree: _itemsDigrees,
-                        specialities: _itemsSpecialities,
-                        id: data == null ? '' : data['user_id'],
-                      )));
-            },
-            child: Container(
-              height: kSpacingUnit.w * 4,
-              width: kSpacingUnit.w * 20,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(kSpacingUnit.w * 3),
-                color: Theme.of(context).accentColor,
-              ),
-              child: Center(
-                child: Text(
-                  'Edit Profile',
-                  style: kButtonTextStyle,
+          flagAccess
+              ? Container(
+                  height: kSpacingUnit.w * 4,
+                  width: kSpacingUnit.w * 20,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(kSpacingUnit.w * 3),
+                    color: Theme.of(context).accentColor,
+                  ),
+                  child: Center(
+                    child: Text(
+                      'Please wait..',
+                      style: kButtonTextStyle,
+                    ),
+                  ),
+                )
+              : InkWell(
+                  onTap: () {
+                    Navigator.of(context)
+                        .push(MaterialPageRoute(
+                            builder: (_) => EditProfileDD(
+                                  intialValueLang: modelLanguages3,
+                                  intialValueDegree: modelDegree3,
+                                  intialValueSpec: modelSpeciality3,
+                                  button: 'Save',
+                                  language: modelLanguages2,
+                                  degree: modelDegree2,
+                                  specialities: modelSpeciality2,
+                                  jsonSpeciality: jsonSpeciality,
+                                  jsonDegrees: jsonDegrees,
+                                  jsonLanguage: jsonLanguage,
+                                  id: data == null ? '' : data['user_id'],
+                                )))
+                        .then((value) {
+                      getUserData();
+                      getAppBar();
+                    });
+                  },
+                  child: Container(
+                    height: kSpacingUnit.w * 4,
+                    width: kSpacingUnit.w * 20,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(kSpacingUnit.w * 3),
+                      color: Theme.of(context).accentColor,
+                    ),
+                    child: Center(
+                      child: Text(
+                        'Edit Profile',
+                        style: kButtonTextStyle,
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          ),
         ],
       ),
     );
@@ -301,100 +435,154 @@ class _MoreTabDDState extends State<MoreTabDD> {
     );
 
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(60),
-        child: CustomAppBar(isleading: false,),),
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
+        bottomOpacity: 0.0,
+        titleSpacing: 0,
+        elevation: 0.0,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  data == null ? 'Dr.' : 'Dr. ${data['name']} ',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 17.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          uplaodImage
+              ? Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: AvatarImagePD(
+              "https://www.kindpng.com/picc/m/198-1985282_doctor-profile-icon-png-transparent-png.png",
+              radius: 35,
+              height: 40,
+              width: 40,
+            ),
+          )
+              : Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: AvatarImagePD(
+              fetchImageData[0]['image'],
+              radius: 35,
+              height: 40,
+              width: 40,
+            ),
+          )
+        ],
+        title: Image.asset(
+          'assets/img_2.png',
+          width: 150,
+          height: 90,
+        ),
+      ),
       body: SingleChildScrollView(
-        child: flagAccess
-            ? Center(
-                child: CircularProgressIndicator(),
-              )
-            : Column(
-                children: <Widget>[
-                  SizedBox(height: kSpacingUnit.w * 1),
-                  header,
-                  SizedBox(height: kSpacingUnit.w * 3),
-                  GestureDetector(
-                    child: ProfileListItem(
-                      icon: Icons.password,
-                      text: 'Change Password',
-                    ),
-                    onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (_) => ChangePassword(
-                                mobile: data == null ? '' : data['number'],
-                                userType: data == null ? '' : data['user_type'],
-                              )));
-                    },
-                  ),
-                  GestureDetector(
-                    child: ProfileListItem(
-                      icon: LineAwesomeIcons.user,
-                      text: 'My Assistent',
-                    ),
-                    onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (_) => DisplayAssistents(
-                                doctorId: data == null ? '' : data['user_id'],userData: widget.userData,
-                              )));
-                    },
-                  ),
-                  GestureDetector(
-                    child: ProfileListItem(
-                      icon: LineAwesomeIcons.cog,
-                      text: 'Settings',
-                    ),
-                    onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (_) => SettingDD(doctorId: data == null ? '' : data['user_id'],userData: widget.userData,)));
-                    },
-                  ),
-                  GestureDetector(
-                    child: ProfileListItem(
-                      icon: LineAwesomeIcons.question_circle,
-                      text: 'About Medeleaf',
-                    ),
-                    onTap: () {
-                      Navigator.of(context)
-                          .push(MaterialPageRoute(builder: (_) => About()));
-                    },
-                  ),
-                  GestureDetector(
-                    child: ProfileListItem(
-                      icon: LineAwesomeIcons.user_shield,
-                      text: 'Privacy Policy',
-                    ),
-                    onTap: () {
-                      Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_) => PrivacyPolicy()));
-                    },
-                  ),
-                  GestureDetector(
-                    child: ProfileListItem(
-                      icon: LineAwesomeIcons.book,
-                      text: 'Term & Condition',
-                    ),
-                    onTap: () {
-                      Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_) => TermsOfServices()));
-                    },
-                  ),
-                  GestureDetector(
-                    child: ProfileListItem(
-                      icon: LineAwesomeIcons.alternate_sign_out,
-                      text: 'Logout',
-                      hasNavigation: false,
-                    ),
-                    onTap: () async {
-                      SharedPreferences preferences =
-                          await SharedPreferences.getInstance();
-                      preferences.setBool('isLogin', false);
-                      Navigator.pushReplacementNamed(
-                          context, RouteGenerator.signIn);
-                    },
-                  )
-                ],
+        child: Column(
+          children: <Widget>[
+            SizedBox(height: kSpacingUnit.w * 1),
+            header,
+            SizedBox(height: kSpacingUnit.w * 3),
+            GestureDetector(
+              child: ProfileListItem(
+                icon: Icons.password,
+                text: 'Change Password',
               ),
+              onTap: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (_) => ChangePassword(
+                          mobile: data == null ? '' : data['number'],
+                          userType: data == null ? '' : data['user_type'],
+                        )));
+              },
+            ),
+            GestureDetector(
+              child: ProfileListItem(
+                icon: LineAwesomeIcons.user,
+                text: 'My Assistent',
+              ),
+              onTap: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (_) => DisplayAssistents(
+                          doctorId: data == null ? '' : data['user_id'],
+                          userData: widget.userData,
+                        )));
+              },
+            ),
+            GestureDetector(
+              child: ProfileListItem(
+                icon: LineAwesomeIcons.cog,
+                text: 'Settings',
+              ),
+              onTap: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (_) => SettingDD(
+                          doctorId: data == null ? '' : data['user_id'],
+                          userData: widget.userData,
+                        )));
+              },
+            ),
+            GestureDetector(
+              child: ProfileListItem(
+                icon: LineAwesomeIcons.question_circle,
+                text: 'About Medeleaf',
+              ),
+              onTap: () {
+                Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (_) => About()));
+              },
+            ),
+            GestureDetector(
+              child: ProfileListItem(
+                icon: LineAwesomeIcons.user_shield,
+                text: 'Privacy Policy',
+              ),
+              onTap: () {
+                Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (_) => PrivacyPolicy()));
+              },
+            ),
+            GestureDetector(
+              child: ProfileListItem(
+                icon: LineAwesomeIcons.book,
+                text: 'Term & Condition',
+              ),
+              onTap: () {
+                Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (_) => TermsOfServices()));
+              },
+            ),
+            GestureDetector(
+              child: ProfileListItem(
+                icon: LineAwesomeIcons.alternate_sign_out,
+                text: 'Logout',
+                hasNavigation: false,
+              ),
+              onTap: () async {
+                SharedPreferences preferences =
+                    await SharedPreferences.getInstance();
+                preferences.setBool('isLogin', false);
+                Navigator.pushReplacementNamed(context, RouteGenerator.signIn);
+              },
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+   getAppBar(){
+    return PreferredSize(
+      preferredSize: Size.fromHeight(60),
+      child: CustomAppBar(
+        isleading: false,
       ),
     );
   }

@@ -18,10 +18,9 @@ class _DoctorProfilePagePDState extends State<DoctorProfilePagePD> {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
-        return Container(child: Text('request sheet missing'),);
-        // return RequestSheet(
-        //   doctor: widget.doctor,
-        // );
+        return RequestSheet(
+          doctor: widget.doctor,
+        );
       },
     );
   }

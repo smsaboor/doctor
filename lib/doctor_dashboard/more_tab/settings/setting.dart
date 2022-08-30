@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:doctor/dashboard_patient/widgets/avatar_image.dart';
+import 'package:doctor/doctor_dashboard/custom_widgtes/app_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -21,7 +22,6 @@ class _SettingDDState extends State<SettingDD> {
       new TextEditingController();
   bool dataHomeFlag = true;
   var fetchData;
-
   var updateData;
 
   getSetting(int button) async {
@@ -56,9 +56,7 @@ class _SettingDDState extends State<SettingDD> {
   }
 
   Future<void> updateSetting(int button) async {
-    print('.widget.doctorId..............................');
-    var API =
-        'https://cabeloclinic.com/website/medlife/php_auth_api/setting_api.php';
+    var API = 'https://cabeloclinic.com/website/medlife/php_auth_api/setting_api.php';
     Map<String, dynamic> body = {
       'doctor_fee': _controllerNormalFees.text,
       'emergency_fees': _controllerEmergencyFees.text,
@@ -68,25 +66,20 @@ class _SettingDDState extends State<SettingDD> {
         .post(Uri.parse(API), body: body)
         .then((value) => value)
         .catchError((error) => print(" Failed to update Setting: $error"));
-    print('...............................${response.body}');
     if (response.statusCode == 200) {
-      print(
-          '..updateSetting22222222222222222222222222222222....${response.body}');
       updateData = jsonDecode(response.body.toString());
       setState(() {
         dataHomeFlag = false;
       });
       getSetting(button);
-      print(
-          '..updateSetting22222222222222222222222222222222....${updateData.length}');
-      print('..updateSetting2222222222222222222222222222data....${updateData}');
     } else {}
   }
 
   bool? emergencyFlag;
-var emergencyData;
-  Future<void> updateEmergencyService() async {
-    print('.widget.doctorId..............................');
+  var getEmergencyData;
+  var emergencyData;
+  bool indicatorF=false;
+  Future<void> getEmergencyService() async {
     var API = 'https://cabeloclinic.com/website/medlife/php_auth_api/emergency_api.php';
     Map<String, dynamic> body = {
       'doctor_id': widget.doctorId,
@@ -94,19 +87,46 @@ var emergencyData;
     http.Response response = await http
         .post(Uri.parse(API), body: body)
         .then((value) => value)
-        .catchError((error) => print(" Failed to update updateEmergencyService: $error"));
-    print('...............................${response.body}');
+        .catchError((error) => print(" Failed to update getEmergencyData: $error"));
     if (response.statusCode == 200) {
-      print('..emergencyData....${response.body}');
       setState(() {
-        emergencyData = jsonDecode(response.body.toString());
-        if(emergencyData['emergency_status']==0){
+        getEmergencyData = jsonDecode(response.body.toString());
+        if(getEmergencyData['emergency_status'].toString()=="0"){
           emergencyFlag = false;
         }else{
           emergencyFlag = true;
         }
       });
-      print('..emergencyData2222222222222222222222222222data....${emergencyData}');
+    } else {}
+  }
+  Future<void> updateEmergencyService() async {
+    indicatorF=true;
+    String setString;
+    var API = 'https://cabeloclinic.com/website/medlife/php_auth_api/update_emergency_api.php';
+    getEmergencyService();
+    if(getEmergencyData['emergency_status'].toString()=="0"){
+      setString ="1";
+    }else{
+      setString ="0";
+    }
+    Map<String, dynamic> body = {
+      'doctor_id': widget.doctorId,
+      'emergency_status':setString,
+    };
+    http.Response response = await http
+        .post(Uri.parse(API), body: body)
+        .then((value) => value)
+        .catchError((error) => print(" Failed to update updateEmergencyService: $error"));
+    if (response.statusCode == 200) {
+      getEmergencyData();
+      setState(() {
+        emergencyData = jsonDecode(response.body.toString());
+        if(getEmergencyData['emergency_status']=='0'){
+          emergencyFlag = false;
+        }else{
+          emergencyFlag = true;
+        }
+      });
     } else {}
   }
 
@@ -115,59 +135,15 @@ var emergencyData;
     // TODO: implement initState
     super.initState();
     getSetting(1);
-    updateEmergencyService();
+    getEmergencyService();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        bottomOpacity: 0.0,
-        elevation: 0.0,
-        automaticallyImplyLeading: false,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Text(
-                  'Dr. Abhishekh',
-                  style: TextStyle(
-                    fontSize: 14.0,
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  'MBBS',
-                  style: TextStyle(
-                    fontSize: 14.0,
-                    color: Colors.black,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: AvatarImagePD(
-              "https://images.unsplash.com/photo-1537368910025-700350fe46c7?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80",
-              radius: 35,
-              height: 40,
-              width: 40,
-            ),
-          ),
-        ],
-        titleSpacing: 0.00,
-        title: Image.asset(
-          'assets/img_2.png',
-          width: 150,
-          height: 90,
-        ),
-      ),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(50),
+        child: CustomAppBar(isleading: false),),
       body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -393,11 +369,11 @@ var emergencyData;
                                               fontSize: 20),
                                         ),
                                         Text(
-                                          '${emergencyData['emergency_status']=='0' ?'InActive':'Active'}',
+                                          '${getEmergencyData['emergency_status']=="0" ?'InActive':'Active'}',
                                           style: TextStyle(
                                               fontWeight: FontWeight.w900,
                                               fontSize: 20,
-                                              color: emergencyData['emergency_status']=='0'?Colors.red:Colors.green),
+                                              color: getEmergencyData['emergency_status']=='0'?Colors.red:Colors.green),
                                         ),
                                       ],
                                     ),
@@ -413,12 +389,12 @@ var emergencyData;
                                             // Navigator.of(context).push(MaterialPageRoute(builder: (_)=>SuccessScreen()));
                                           },
                                           style: ElevatedButton.styleFrom(
-                                              primary: emergencyData['emergency_status']=='0'?Colors.green: Colors.red,
+                                              primary: getEmergencyData['emergency_status'].toString()=='0'?Colors.green: Colors.red,
                                               textStyle: TextStyle(
                                                   fontSize: 30,
                                                   fontWeight: FontWeight.bold)),
                                           child: Text(
-                                            emergencyData['emergency_status']=='0'?'Activate':'Left',
+                                            getEmergencyData['emergency_status'].toString()=='0'?'Activate':'Left',
                                             textAlign: TextAlign.center,
                                             style: TextStyle(
                                                 fontWeight: FontWeight.bold,

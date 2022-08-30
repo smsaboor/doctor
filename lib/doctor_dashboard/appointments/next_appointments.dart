@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:doctor/core/constants.dart';
 import 'package:doctor/doctor_dashboard/appointments/next_card.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -17,13 +18,14 @@ class _NextAppointmentsDDState extends State<NextAppointmentsDD> {
   bool dataHomeFlag = true;
 
   Future<void> getAllAppointments() async {
-    var API = 'https://cabeloclinic.com/website/medlife/php_auth_api/all_appointment_api.php';
+    var API = API_BASE_URL+API_DT2_ALLAPPOINTMENTS;
     Map<String, dynamic> body = {'doctor_id': widget.doctorId};
     http.Response response = await http
         .post(Uri.parse(API), body: body)
         .then((value) => value)
         .catchError((error) => print(" Failed to getAPPOINTMENTS $error"));
     if (response.statusCode == 200) {
+      print('%%%%%%%%%%%%%%% ${response.body}');
       dataAppointments = jsonDecode(response.body.toString());
       setState(() {
         dataHomeFlag = false;
@@ -60,6 +62,7 @@ class _NextAppointmentsDDState extends State<NextAppointmentsDD> {
                             button: 'Save Consult',
                             appointment_no:
                                 dataAppointments[index]['appointment_no'] ?? '',
+                            patient_id: dataAppointments[index]['patient_id'] ?? '',
                             booking_type:
                                 dataAppointments[index]['booking_type'] ?? '',
                             address: dataAppointments[index]['address'] ?? '',

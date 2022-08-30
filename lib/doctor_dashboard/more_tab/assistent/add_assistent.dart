@@ -1,16 +1,10 @@
 import 'dart:convert';
-
+import 'package:doctor/core/constants.dart';
 import 'package:doctor/core/custom_form_field.dart';
 import 'package:doctor/core/custom_snackbar.dart';
-import 'package:doctor/dashboard_patient/widgets/avatar_image.dart';
-import 'package:doctor/doctor_dashboard/appointments/save_consult/save_consult.dart';
-import 'package:doctor/doctor_dashboard/appointments/success_screen.dart';
 import 'package:doctor/doctor_dashboard/custom_widgtes/app_bar.dart';
-import 'package:doctor/doctor_dashboard/more_tab/assistent/rating_bar.dart';
 import 'package:doctor/model/model_assistence.dart';
 import 'package:flutter/material.dart';
-import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
-import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 
 class AddAssistent extends StatefulWidget {
@@ -59,53 +53,6 @@ class _AddAssistentState extends State<AddAssistent> {
           isleading: false,
         ),
       ),
-      // appBar: AppBar(
-      //   backgroundColor: Colors.white,
-      //   bottomOpacity: 0.0,
-      //   elevation: 0.0,
-      //   automaticallyImplyLeading: false,
-      //   actions: [
-      //     Padding(
-      //       padding: const EdgeInsets.all(8.0),
-      //       child: Column(
-      //         mainAxisAlignment: MainAxisAlignment.end,
-      //         children: [
-      //           Text(
-      //             'Dr. Abhishekh',
-      //             style: TextStyle(
-      //               fontSize: 14.0,
-      //               color: Colors.black,
-      //               fontWeight: FontWeight.bold,
-      //             ),
-      //           ),
-      //           Text(
-      //             'MBBS',
-      //             style: TextStyle(
-      //               fontSize: 14.0,
-      //               color: Colors.black,
-      //               fontWeight: FontWeight.w500,
-      //             ),
-      //           ),
-      //         ],
-      //       ),
-      //     ),
-      //     Padding(
-      //       padding: const EdgeInsets.all(8.0),
-      //       child: AvatarImagePD(
-      //         "https://images.unsplash.com/photo-1537368910025-700350fe46c7?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80",
-      //         radius: 35,
-      //         height: 40,
-      //         width: 40,
-      //       ),
-      //     ),
-      //   ],
-      //   titleSpacing: 0.00,
-      //   title: Image.asset(
-      //     'assets/img_2.png',
-      //     width: 150,
-      //     height: 90,
-      //   ),
-      // ),
       body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -245,8 +192,7 @@ class _AddAssistentState extends State<AddAssistent> {
 
   static Future<String> addAssistent(ModelAssistent? model) async {
     print('${model?.assistantName}');
-    var APIURL =
-        'https://cabeloclinic.com/website/medlife/php_auth_api/add_assistant_api.php';
+    var APIURL =API_BASE_URL+API_DD_ASSISTENT_ADD;
     http.Response response = await http
         .post(Uri.parse(APIURL), body: model?.toJson())
         .then((value) => value)

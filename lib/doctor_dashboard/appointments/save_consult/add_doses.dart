@@ -1,19 +1,12 @@
 import 'dart:convert';
-import 'dart:math';
-
-import 'package:doctor/dashboard_patient/widgets/avatar_image.dart';
 import 'package:doctor/doctor_dashboard/appointments/save_consult/model_pill_repeat_time.dart';
 import 'package:doctor/doctor_dashboard/appointments/save_consult/model_pills.dart';
 import 'package:doctor/doctor_dashboard/appointments/save_consult/model_pills_dose.dart';
 import 'package:doctor/doctor_dashboard/appointments/save_consult/model_pills_power.dart';
 import 'package:doctor/doctor_dashboard/appointments/save_consult/model_pills_timing.dart';
 import 'package:doctor/doctor_dashboard/appointments/save_consult/model_pills_type.dart';
-import 'package:doctor/doctor_dashboard/appointments/save_consult/save_consult.dart';
-import 'package:doctor/doctor_dashboard/appointments/success_screen.dart';
 import 'package:doctor/doctor_dashboard/custom_widgtes/app_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
-import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 
 class AddDozesDD extends StatefulWidget {
@@ -348,25 +341,6 @@ class _AddDozesDDState extends State<AddDozesDD> {
                   ), //Tex
                 ],
               ),
-              actions: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SizedBox(
-                    height: 30,
-                    width: 70,
-                    child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            primary: Colors.white,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20))),
-                        onPressed: () {},
-                        child: Text(
-                          'Next',
-                          style: TextStyle(color: Colors.black),
-                        )),
-                  ),
-                )
-              ],
             ),
             SizedBox(
               height: 750,

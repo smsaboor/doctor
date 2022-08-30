@@ -50,16 +50,27 @@ class _DosesCardForAllState extends State<DosesCardForAll> {
             ),
             SizedBox(
                 width: MediaQuery.of(context).size.width * .40,
-                child: Text(
-                  '${widget.index + 1}) ${widget.medicineType} ${widget.medicineName}',
-                )),
+                child:  Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${widget.index + 1}) ${widget.medicineType} ${widget.medicineName}',
+                    ),
+                    SizedBox(height: 3,),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 28.0),
+                      child: Text('(${widget.medicinePower})',style: TextStyle(color: Colors.pink,fontWeight: FontWeight.w400,fontSize: 12),),
+                    ),
+                  ],
+                ),),
             SizedBox(
               width: MediaQuery.of(context).size.width * .25,
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text('${widget.medicineRepetationPerDay}'),
+                  Text('${widget.medicinDoses}'),
                   Text('(Before Food)'),
                 ],
               ),
@@ -81,7 +92,7 @@ class _DosesCardForAllState extends State<DosesCardForAll> {
                   },
                   child: SizedBox(
                     width: MediaQuery.of(context).size.width * .08,
-                    child: Icon(Icons.delete),
+                    child: Icon(Icons.delete,color: Colors.red),
                   ),
                 ))
           ],
