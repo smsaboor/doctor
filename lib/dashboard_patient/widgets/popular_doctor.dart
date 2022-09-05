@@ -8,7 +8,8 @@ class PopularDoctorPD extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('...............sssss..............$doctor');
+    print('saboor2---------------------${doctor["image"]}');
+    print('saboor3---------------------${doctor}');
     return Container(
         margin: EdgeInsets.only(right: 15),
         padding: EdgeInsets.only(left: 5, top: 15),
@@ -78,7 +79,7 @@ class PopularDoctorPD extends StatelessWidget {
                         height: 5,
                       ),
                       Text(
-                        doctor["specialty"] ?? '',
+                        doctor["specialty"].toString().replaceAll('[', '').replaceAll(']', '')  ?? '',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -90,7 +91,7 @@ class PopularDoctorPD extends StatelessWidget {
                         height: 3,
                       ),
                       Text(
-                        doctor["specialty"] ?? '',
+                        doctor["specialty"].toString().replaceAll('[', '').replaceAll(']', '')  ?? '',
                         style: TextStyle(fontSize: 12, color: Colors.black),
                       ),
                       SizedBox(
@@ -108,7 +109,7 @@ class PopularDoctorPD extends StatelessWidget {
                                 color: Colors.blue),
                           ),
                           Text(
-                            "English, Hindi",
+                            doctor["specialty"].toString().replaceAll('[', '').replaceAll(']', '')  ?? '',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(

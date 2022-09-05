@@ -1,10 +1,8 @@
 import 'package:doctor/core/constants.dart';
-import 'package:doctor/screens/auth/login/login.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:doctor/model/model_doctor.dart';
 import 'package:doctor/model/model_patient.dart';
-import 'package:doctor/route.dart';
 import 'package:doctor/screens/auth/registration/CustomFormField.dart';
 import 'package:doctor/service/api.dart';
 

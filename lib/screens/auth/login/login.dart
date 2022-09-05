@@ -199,22 +199,18 @@ class _LoginScreenState extends State<LoginScreen> {
             tryRegistration = true;
           });
         }
-        print('-----------------------------------daa');
         var data = await ApiService.checkUserRegistered(_controllerMobile.text);
-        print('-----------------------------------2 $status');
         setState(() {
           tryRegistration = false;
         });
-        print('--------------${data['status']}---------------------1');
+        print('status check reg------------${data['status']}');
         if (data['status'] == 1) {
-          print('--if------------${data['status']}-');
           setState(() {
             isRegistered = true;
             status = 1;
             FocusScope.of(context).requestFocus(text2);
           });
         } else {
-          print('-----else---------${data['status']}-');
           Navigator.of(context).push(MaterialPageRoute(
               builder: (_) => OtpVerification(
                     otp: data['otp'],
@@ -229,11 +225,8 @@ class _LoginScreenState extends State<LoginScreen> {
             tryRegistration = true;
           });
         }
-        print('-----------------------------------1');
         var data = await ApiService.login(
             mobile: _controllerMobile.text, pwd: _controllerPassword.text);
-        print(
-            '-----------------------------------2 runtimeType ${data.runtimeType}');
         if (data['status'] == '1') {
           SharedPreferences preferences = await SharedPreferences.getInstance();
           preferences.setBool('isLogin', true);

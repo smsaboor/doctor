@@ -1,7 +1,7 @@
 import 'dart:convert';
-import 'dart:io';
-
 import 'package:animated_theme_switcher/animated_theme_switcher.dart';
+import 'package:doctor/dashboard_assistent/home_dashboard_assistent.dart';
+import 'package:doctor/dashboard_patient/home_patient_dashboard.dart';
 import 'package:doctor/dashboard_patient/widgets/avatar_image.dart';
 import 'package:doctor/doctor_dashboard/appointments/save_consult/api/api.dart';
 import 'package:doctor/doctor_dashboard/custom_widgtes/app_bar.dart';
@@ -18,13 +18,10 @@ import 'package:doctor/doctor_dashboard/more_tab/terms_notes.dart';
 import 'package:doctor/route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'constant.dart';
 import 'package:doctor/doctor_dashboard/more_tab/widget/profile_list_item.dart';
-import 'package:path/path.dart';
 import 'package:http/http.dart' as http;
 
 class MoreTabDD extends StatefulWidget {
@@ -52,7 +49,7 @@ class _MoreTabDDState extends State<MoreTabDD> {
   List<dynamic>? modelDegree2 = [];
   List<dynamic>? modelSpeciality2 = [];
 
-  void getData() async {
+  getData() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     final user = preferences.getString('userDetails');
     setState(() {
@@ -61,69 +58,6 @@ class _MoreTabDDState extends State<MoreTabDD> {
       print('data----------------------------${data['user_id']}');
     });
     _getImgeUrl(data == null ? '' : data['user_id']);
-  }
-
-  var fetchUserData;
-  String? textLanguages;
-  String? textDegree;
-  String? textSpeciality;
-
-  void getUserData() async {
-    _getImgeUrl(widget.userID);
-    setState(() {});
-    var API =
-        'https://cabeloclinic.com/website/medlife/php_auth_api/fetch_profile_api.php';
-    Map<String, dynamic> body = {
-      'doctor_id': widget.userID,
-    };
-    modelLanguages3!.clear();
-    modelSpeciality3!.clear();
-    modelDegree3!.clear();
-    http.Response response = await http
-        .post(Uri.parse(API), body: body)
-        .then((value) => value)
-        .catchError((error) => print(" Failed to fetchProfileData: $error"));
-    print('...............................${response.body}');
-    if (response.statusCode == 200) {
-      fetchUserData = jsonDecode(response.body.toString());
-
-      textLanguages = fetchUserData[0]['languages'].toString();
-      textDegree = fetchUserData[0]['degree'].toString();
-      textSpeciality = fetchUserData[0]['specialty'].toString();
-
-      String firstTextL = textLanguages!;
-      String firstTextD = textDegree!;
-      String firstTextS = textSpeciality!;
-
-      String finalStringL = firstTextL
-          .replaceAll("[", "")
-          .replaceAll("]", "")
-          .replaceAll(" ", "");
-      String finalStringD = firstTextD
-          .replaceAll("[", "")
-          .replaceAll("]", "")
-          .replaceAll(" ", "");
-      String finalStringS = firstTextS
-          .replaceAll("[", "")
-          .replaceAll("]", "")
-          .replaceAll(" ", "");
-
-      final splitedTextL = finalStringL.split(',');
-      final splitedTextD = finalStringD.split(',');
-      final splitedTextS = finalStringS.split(',');
-      for (int i = 0; i < splitedTextL.length; i++) {
-        print('77777getUserData777777755$i--${splitedTextL[i].toString()}');
-        modelLanguages3!.add(splitedTextL[i].toString());
-      }
-      for (int i = 0; i < splitedTextD.length; i++) {
-        print('77777getUserData777777755$i--${splitedTextD[i].toString()}');
-        modelDegree3!.add(splitedTextD[i].toString());
-      }
-      for (int i = 0; i < splitedTextS.length; i++) {
-        print('77777getUserData777777755$i--${splitedTextS[i].toString()}');
-        modelSpeciality3!.add(splitedTextS[i].toString());
-      }
-    } else {}
   }
 
   jsonStringToMap(String data) {
@@ -141,42 +75,129 @@ class _MoreTabDDState extends State<MoreTabDD> {
     return result;
   }
 
+  var fetchUserData;
+  String? textLanguages;
+  String? textDegree;
+  String? textSpeciality;
+
+  getUserData() async {
+    _getImgeUrl(widget.userID);
+    setState(() {});
+    var API =
+        'https://cabeloclinic.com/website/medlife/php_auth_api/fetch_profile_api.php';
+    Map<String, dynamic> body = {
+      'doctor_id': widget.userID,
+    };
+    modelLanguages3!.clear();
+    modelSpeciality3!.clear();
+    modelDegree3!.clear();
+    http.Response response = await http
+        .post(Uri.parse(API), body: body)
+        .then((value) => value)
+        .catchError((error) => print(" Failed to fetchProfileData: $error"));
+    print('1...............................${response.body}');
+    if (response.statusCode == 200) {
+      fetchUserData = jsonDecode(response.body.toString());
+      textLanguages = fetchUserData[0]['languages'].toString();
+      print(
+          'textLanguages-------------------${textLanguages}------------${textLanguages!.length}');
+      textDegree = fetchUserData[0]['degree'].toString();
+      print(
+          'textDegree-------------------${textDegree}------------${textDegree!.length}');
+      textSpeciality = fetchUserData[0]['specialty'].toString();
+      print(
+          'textSpeciality-------------------${textSpeciality}------------${textSpeciality!.length}');
+      String firstTextL = textLanguages!;
+      String firstTextD = textDegree!;
+      String firstTextS = textSpeciality!;
+      String finalStringL = firstTextL
+          .replaceAll("[", "")
+          .replaceAll("]", "")
+          .replaceAll(" ", "");
+      String finalStringD = firstTextD
+          .replaceAll("[", "")
+          .replaceAll("]", "")
+          .replaceAll(" ", "");
+      String finalStringS = firstTextS
+          .replaceAll("[", "")
+          .replaceAll("]", "")
+          .replaceAll(" ", "");
+      final splitedTextL = finalStringL.split(',');
+      final splitedTextD = finalStringD.split(',');
+      final splitedTextS = finalStringS.split(',');
+      print('2...............................}');
+      if (textLanguages!.length == 0) {
+        print(
+            '5........................${modelLanguages2![0]['language']}.......}');
+        modelLanguages3=[];
+      } else {
+        for (int i = 0; i < splitedTextL.length; i++) {
+          print('77777getUserData777777755$i--${splitedTextL[i].toString()}');
+          modelLanguages3!.add(splitedTextL[i].toString());
+        }
+      }
+      print('3...............................}');
+      if (textDegree!.length == 0) {
+        print('6...............................}');
+        modelDegree3=[];
+      } else {
+        for (int i = 0; i < splitedTextD.length; i++) {
+          print('77777getUserData777777755$i--${splitedTextD[i].toString()}');
+          modelDegree3!.add(splitedTextD[i].toString());
+        }
+      }
+      print('4...............................}');
+      if (textSpeciality!.length == 0) {
+        modelSpeciality3=[];
+      } else {
+        for (int i = 0; i < splitedTextS.length; i++) {
+          print('77777getUserData777777755$i--${splitedTextS[i].toString()}');
+          modelSpeciality3!.add(splitedTextS[i].toString());
+        }
+      }
+      print('44...............................}');
+
+      print(
+          'dsa------------${modelDegree3![0]}-----${modelSpeciality3![0]}-------${modelLanguages3![0]}');
+    } else {}
+  }
+
   var fetchImageData;
 
   void _getImgeUrl(String doctorId) async {
     fetchImageData = await ApiEditProfiles.getImgeUrl(doctorId);
-    print('%%%%%%%%%%%%%%${fetchImageData}');
     if (fetchImageData[0]['image'] != '') {
-      print('%%%%%%%%%%%%%%${fetchImageData}');
       setState(() {
         uplaodImage = false;
       });
     } else {
       setState(() {
-        uplaodImage = true;
+        uplaodImage = false;
       });
     }
   }
 
   Future<dynamic> getLanguages() async {
+    print('i========');
     var API =
         'https://cabeloclinic.com/website/medlife/php_auth_api/languages_api.php';
     try {
+      print('i========');
       final response = await http.post(Uri.parse(API));
       if (response.statusCode == 200) {
-        print('saboor---${response.body}');
+        print('i========${response.body}');
         Iterable l = json.decode(response.body);
         List<ModelLanguages> posts = List<ModelLanguages>.from(
             l.map((model) => ModelLanguages.fromJson(model)));
         for (int i = 0; i < posts.length; i++) {
           modelLanguages2!.add({
-            'index': i.toString(),
+            'index': posts[i].language.toString(),
             'language': posts[i].language.toString()
           });
         }
-        print('/modelLanguages2///////////////${modelLanguages2}');
+        print('i========${modelLanguages2!.length}');
         for (int i = 0; i < modelLanguages2!.length; i++) {
-          print('========${modelLanguages2![i].language}');
+          print('i========${modelLanguages2![i]}');
         }
         jsonLanguage =
             jsonEncode(modelLanguages2!.map((e) => e.toJson()).toList());
@@ -201,8 +222,10 @@ class _MoreTabDDState extends State<MoreTabDD> {
         List<ModelDegrees> posts = List<ModelDegrees>.from(
             l.map((model) => ModelDegrees.fromJson(model)));
         for (int i = 0; i < posts.length; i++) {
-          modelDegree2!.add(
-              {'index': i.toString(), 'degree': posts[i].degree.toString()});
+          modelDegree2!.add({
+            'index': posts[i].degree.toString(),
+            'degree': posts[i].degree.toString()
+          });
         }
         setState(() {
           flagAccess = false;
@@ -225,7 +248,7 @@ class _MoreTabDDState extends State<MoreTabDD> {
             l.map((model) => ModelSpeciality.fromJson(model)));
         for (int i = 0; i < posts.length; i++) {
           modelSpeciality2!.add({
-            'index': i.toString(),
+            'index': posts[i].doctor_speciality.toString(),
             'speciality': posts[i].doctor_speciality.toString()
           });
         }
@@ -247,15 +270,19 @@ class _MoreTabDDState extends State<MoreTabDD> {
     }
   }
 
+  void getApiData() async {
+    await getLanguages();
+    await getDegrees();
+    await getSpecialtyc();
+    await getData();
+    await getUserData();
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    getData();
-    getUserData();
-    getLanguages();
-    getDegrees();
-    getSpecialtyc();
+    getApiData();
   }
 
   @override
@@ -293,7 +320,7 @@ class _MoreTabDDState extends State<MoreTabDD> {
                         .then((value) {
                       getUserData();
                       getAppBar();
-                      });
+                    });
                   },
                   child: uplaodImage
                       ? Center(
@@ -460,23 +487,23 @@ class _MoreTabDDState extends State<MoreTabDD> {
           ),
           uplaodImage
               ? Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: AvatarImagePD(
-              "https://www.kindpng.com/picc/m/198-1985282_doctor-profile-icon-png-transparent-png.png",
-              radius: 35,
-              height: 40,
-              width: 40,
-            ),
-          )
+                  padding: const EdgeInsets.all(8.0),
+                  child: AvatarImagePD(
+                    "https://www.kindpng.com/picc/m/198-1985282_doctor-profile-icon-png-transparent-png.png",
+                    radius: 35,
+                    height: 40,
+                    width: 40,
+                  ),
+                )
               : Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: AvatarImagePD(
-              fetchImageData[0]['image'],
-              radius: 35,
-              height: 40,
-              width: 40,
-            ),
-          )
+                  padding: const EdgeInsets.all(8.0),
+                  child: AvatarImagePD(
+                    fetchImageData[0]['image'],
+                    radius: 35,
+                    height: 40,
+                    width: 40,
+                  ),
+                )
         ],
         title: Image.asset(
           'assets/img_2.png',
@@ -571,14 +598,34 @@ class _MoreTabDDState extends State<MoreTabDD> {
                 preferences.setBool('isLogin', false);
                 Navigator.pushReplacementNamed(context, RouteGenerator.signIn);
               },
-            )
+            ),
+            GestureDetector(
+              child: ProfileListItem(
+                icon: LineAwesomeIcons.book,
+                text: 'Patient Dashboard',
+              ),
+              onTap: () {
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => PatientDashboard()));
+              },
+            ),
+            GestureDetector(
+              child: ProfileListItem(
+                icon: LineAwesomeIcons.book,
+                text: 'Assistent Dashboard',
+              ),
+              onTap: () {
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => AssistentDashBoard()));
+              },
+            ),
           ],
         ),
       ),
     );
   }
 
-   getAppBar(){
+  getAppBar() {
     return PreferredSize(
       preferredSize: Size.fromHeight(60),
       child: CustomAppBar(

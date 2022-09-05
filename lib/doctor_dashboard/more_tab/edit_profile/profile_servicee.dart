@@ -1,8 +1,6 @@
 import 'dart:async';
 
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 const baseURL = 'https://cabeloclinic.com/website/medlife/php_auth_api';
 class ProfileServices {
   static Future<bool> create(FormData data) async {

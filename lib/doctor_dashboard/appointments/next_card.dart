@@ -12,9 +12,10 @@ class NextAppointmentCard extends StatefulWidget {
       required this.button,
       this.appointment_no,
       this.booking_type,
+      this.image,
       this.date,
       this.patient_name,
-        this.patient_id,
+      this.patient_id,
       this.age,
       this.gender,
       this.address,
@@ -25,6 +26,7 @@ class NextAppointmentCard extends StatefulWidget {
   final button;
   final appointment_no,
       booking_type,
+      image,
       date,
       patient_name,
       patient_id,
@@ -48,7 +50,8 @@ class _NextAppointmentCardState extends State<NextAppointmentCard> {
     print('change value=$changedValue    --------  appN = $appNo');
     if (changedValue == 1) {
       dataF = true;
-      var API = 'https://cabeloclinic.com/website/medlife/php_auth_api/skip_appointment_api.php';
+      var API =
+          'https://cabeloclinic.com/website/medlife/php_auth_api/skip_appointment_api.php';
       Map<String, dynamic> body = {'appointment_no': appNo};
       http.Response response = await http
           .post(Uri.parse(API), body: body)
@@ -62,7 +65,8 @@ class _NextAppointmentCardState extends State<NextAppointmentCard> {
       } else {}
     } else if (changedValue == 2) {
       dataF = true;
-      var API = 'https://cabeloclinic.com/website/medlife/php_auth_api/reject_appointment_api.php';
+      var API =
+          'https://cabeloclinic.com/website/medlife/php_auth_api/reject_appointment_api.php';
       Map<String, dynamic> body = {'appointment_no': appNo};
       http.Response response = await http
           .post(Uri.parse(API), body: body)
@@ -350,7 +354,7 @@ class _NextAppointmentCardState extends State<NextAppointmentCard> {
                               builder: (_) => SaveConsultDD(
                                     appointmentNumber: widget.appointment_no,
                                     patientName: widget.patient_name,
-                                patientId: widget.patient_id,
+                                    patientId: widget.patient_id,
                                   )));
                         },
                         style: ElevatedButton.styleFrom(

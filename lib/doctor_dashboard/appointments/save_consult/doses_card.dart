@@ -1,5 +1,4 @@
 import 'package:doctor/dashboard_patient/widgets/avatar_image.dart';
-import 'package:doctor/doctor_dashboard/appointments/save_consult/save_consult.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 

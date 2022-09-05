@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:doctor/screens/auth/login/login.dart';
 import 'package:doctor/screens/auth/registration/registration.dart';
-import 'package:doctor/screens/auth/verify_otp.dart';
 import 'package:doctor/splash_screen.dart';
 
 

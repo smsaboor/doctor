@@ -1,4 +1,3 @@
-import 'package:doctor/dashboard_patient/tabs/tab_profile/constant.dart';
 import 'package:doctor/dashboard_patient/widgets/avatar_image.dart';
 import 'package:doctor/doctor_dashboard/appointments/save_consult/api/api.dart';
 import 'package:flutter/material.dart';

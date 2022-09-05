@@ -1,6 +1,5 @@
 import 'package:animated_theme_switcher/animated_theme_switcher.dart';
 import 'package:doctor/dashboard_patient/tabs/tab_profile/change_password.dart';
-import 'package:doctor/doctor_dashboard/more_tab/change_password.dart';
 import 'package:doctor/doctor_dashboard/more_tab/terms_notes.dart';
 import 'package:doctor/route.dart';
 import 'package:flutter/material.dart';
@@ -24,9 +23,6 @@ class _PatientProfilePDState extends State<PatientProfilePD> {
     setState(() {
       data = jsonStringToMap(user!);
     });
-    // print('..data: ${data}');
-    // print('..data: ${data['name']}');
-    // print('...runtime:${data.runtimeType}');
   }
 
   jsonStringToMap(String data) {

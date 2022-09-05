@@ -23,9 +23,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
   //   await SharedPreferences.getInstance();
   // }
 
-  String dropdownvalueState = 'Arunachal Pradesh';
 
-  var indianState = [
+  var stateInitial="Andhra Pradesh";
+  var stateList = [
     "Andhra Pradesh",
     "Arunachal Pradesh",
     "Assam",
@@ -201,8 +201,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             setState(() {
                               currentUser = user.toString();
                             });
-                            print('------------------${user}');
-                            print('------------------${user}');
                           }),
                     ),
                   ),
@@ -281,53 +279,52 @@ class _SignUpScreenState extends State<SignUpScreen> {
         //     print('------------------${spec}');
         //   },
         // ),
-        Padding(
-          padding: const EdgeInsets.only(left: 20.0, right: 20),
-          child: Theme(
-            data: new ThemeData(
-              primaryColor: Colors.redAccent,
-              primaryColorDark: Colors.red,
-            ),
-            child: Container(
-              margin: const EdgeInsets.all(1.0),
-              padding: const EdgeInsets.only(left: 5.0),
-              decoration: myBoxDecoration(),
-              height: 60,
-              //
-              width: MediaQuery.of(context).size.width,
-              //          <// --- BoxDecoration here
-              child: Padding(
-                padding: const EdgeInsets.only(left: 8.0),
-                child: DropdownButton(
-                    // Initial Value
-                    menuMaxHeight: MediaQuery.of(context).size.height,
-                    value: specialityOF,
-                    dropdownColor: Colors.white,
-                    focusColor: Colors.blue,
-                    isExpanded: true,
-                    // Down Arrow Icon
-                    icon: const Icon(Icons.keyboard_arrow_down),
-                    // Array list of items
-                    items: speciality.map((String items) {
-                      return DropdownMenuItem(
-                        value: items,
-                        child: Text(items),
-                      );
-                    }).toList(),
-                    // After selecting the desired option,it will
-                    // change button value to selected value
-                    onChanged: (spec) {
-                      if (mounted) {
-                        setState(() {
-                          specialityOF = spec.toString();
-                        });
-                      }
-                      print('------------------${spec}');
-                    }),
-              ),
-            ),
-          ),
-        ),
+        // Padding(
+        //   padding: const EdgeInsets.only(left: 20.0, right: 20),
+        //   child: Theme(
+        //     data: new ThemeData(
+        //       primaryColor: Colors.redAccent,
+        //       primaryColorDark: Colors.red,
+        //     ),
+        //     child: Container(
+        //       margin: const EdgeInsets.all(1.0),
+        //       padding: const EdgeInsets.only(left: 5.0),
+        //       decoration: myBoxDecoration(),
+        //       height: 60,
+        //       //
+        //       width: MediaQuery.of(context).size.width,
+        //       //          <// --- BoxDecoration here
+        //       child: Padding(
+        //         padding: const EdgeInsets.only(left: 8.0),
+        //         child: DropdownButton(
+        //             // Initial Value
+        //             menuMaxHeight: MediaQuery.of(context).size.height,
+        //             value: specialityOF,
+        //             dropdownColor: Colors.white,
+        //             focusColor: Colors.blue,
+        //             isExpanded: true,
+        //             // Down Arrow Icon
+        //             icon: const Icon(Icons.keyboard_arrow_down),
+        //             // Array list of items
+        //             items: speciality.map((String items) {
+        //               return DropdownMenuItem(
+        //                 value: items,
+        //                 child: Text(items),
+        //               );
+        //             }).toList(),
+        //             // After selecting the desired option,it will
+        //             // change button value to selected value
+        //             onChanged: (spec) {
+        //               if (mounted) {
+        //                 setState(() {
+        //                   specialityOF = spec.toString();
+        //                 });
+        //               }
+        //             }),
+        //       ),
+        //     ),
+        //   ),
+        // ),
         SizedBox(height: MediaQuery.of(context).size.height * 0.01),
         CustomFormField(
             controlller: _controllerMobile,
@@ -360,6 +357,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
             readOnly: false,
             icon: Icons.home,
             textInputType: TextInputType.text),
+        SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+        stateWidget(),
         SizedBox(height: MediaQuery.of(context).size.height * 0.01),
         CustomFormField(
             controlller: _controllerCity,
@@ -454,6 +453,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
             icon: Icons.home,
             textInputType: TextInputType.text),
         SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+        stateWidget(),
+        SizedBox(height: MediaQuery.of(context).size.height * 0.01),
         CustomFormField(
             controlller: _controllerCity,
             errorMsg: 'Enter Your City',
@@ -531,7 +532,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       setState(() {
                         currentHospital = hos.toString();
                       });
-                      print('------------------${hos}');
                     }),
               ),
             ),
@@ -613,7 +613,54 @@ class _SignUpScreenState extends State<SignUpScreen> {
       ],
     );
   }
-
+stateWidget(){
+    return  Padding(
+      padding: const EdgeInsets.only(left: 20.0, right: 20),
+      child: Theme(
+        data: new ThemeData(
+          primaryColor: Colors.redAccent,
+          primaryColorDark: Colors.red,
+        ),
+        child: Container(
+          margin: const EdgeInsets.all(1.0),
+          padding: const EdgeInsets.only(left: 5.0),
+          decoration: myBoxDecoration(),
+          height: 60,
+          //
+          width: MediaQuery.of(context).size.width,
+          //          <// --- BoxDecoration here
+          child: Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: DropdownButton(
+              // Initial Value
+                menuMaxHeight: MediaQuery.of(context).size.height,
+                value: stateInitial,
+                dropdownColor: Colors.white,
+                focusColor: Colors.blue,
+                isExpanded: true,
+                // Down Arrow Icon
+                icon: const Icon(Icons.keyboard_arrow_down),
+                // Array list of items
+                items: stateList.map((String items) {
+                  return DropdownMenuItem(
+                    value: items,
+                    child: Text(items),
+                  );
+                }).toList(),
+                // After selecting the desired option,it will
+                // change button value to selected value
+                onChanged: (user) {
+                  setState(() {
+                    stateInitial = user.toString();
+                  });
+                  print('------------------${user}');
+                  print('------------------${user}');
+                }),
+          ),
+        ),
+      ),
+    );
+}
   void _registration(BuildContext context) async {
     var data;
     if (formKey.currentState!.validate()) {
@@ -626,15 +673,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
           name: _controllerName.text,
           mobile: _controllerMobile.text,
           address: _controllerAddress.text,
-          state: 'up',
+          state: stateInitial.toString(),
           city: _controllerCity.text,
           district: _controllerDistrict.text,
           pincode: _controllerPin.text,
           password: _controllerPassword.text,
         ));
-        print('1successcode:   ${data}');
         if (data == 'ok') {
-          print('1successcode:   ${data}');
           setState(() {
             tryRegistration = false;
           });
@@ -656,7 +701,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           phone: _controllerPhone.text,
           emergencyNumber: _controllerEmergencyNum.text,
           clinicName: _controllerHospitalName.text,
-          specialist: specialityOF,
+          specialist: '',
           state: 'up',
           address: _controllerAddress.text,
           city: _controllerCity.text,
@@ -664,9 +709,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           pincode: _controllerPin.text,
           password: _controllerPassword.text,
         ), ModelPatient());
-        print('2successcode:   ${data}');
         if (data == 'ok') {
-          print('2successcode:   ${data}');
           setState(() {
             tryRegistration = false;
           });

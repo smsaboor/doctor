@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:doctor/dashboard_patient/widgets/avatar_image.dart';
 import 'package:doctor/doctor_dashboard/custom_widgtes/app_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -25,12 +24,8 @@ class _SettingDDState extends State<SettingDD> {
   var updateData;
 
   getSetting(int button) async {
-    if(button==1){
       _controllerNormalFees.text = '0';
-    }
-    else{
       _controllerEmergencyFees.text = '0';
-    }
     var API =
         'https://cabeloclinic.com/website/medlife/php_auth_api/setting_api.php';
     Map<String, dynamic> body = {
@@ -40,18 +35,13 @@ class _SettingDDState extends State<SettingDD> {
         .post(Uri.parse(API), body: body)
         .then((value) => value)
         .catchError((error) => print(" Failed to getSetting: $error"));
-    print('...............................${response.body}');
     if (response.statusCode == 200) {
-      print('..getSetting22222222222222222222222222222222....${response.body}');
       fetchData = jsonDecode(response.body.toString());
       setState(() {
         dataHomeFlag = false;
         _controllerNormalFees.text = fetchData['doctor_fee'];
         _controllerEmergencyFees.text = fetchData['emergency_fees'];
       });
-      print(
-          '..getSetting22222222222222222222222222222222....${fetchData.length}');
-      print('..getSetting2222222222222222222222222222data....${fetchData}');
     } else {}
   }
 
@@ -75,10 +65,11 @@ class _SettingDDState extends State<SettingDD> {
     } else {}
   }
 
-  bool? emergencyFlag;
+  bool emergencyFlag=true;
   var getEmergencyData;
   var emergencyData;
   bool indicatorF=false;
+
   Future<void> getEmergencyService() async {
     var API = 'https://cabeloclinic.com/website/medlife/php_auth_api/emergency_api.php';
     Map<String, dynamic> body = {
@@ -156,7 +147,7 @@ class _SettingDDState extends State<SettingDD> {
             SizedBox(
               height: 15,
             ),
-            dataHomeFlag
+            dataHomeFlag || emergencyFlag
                 ? Center(
                     child: CircularProgressIndicator(),
                   )

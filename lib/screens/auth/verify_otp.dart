@@ -144,12 +144,10 @@ class _OtpVerificationState extends State<OtpVerification> {
 
   _verify() async {
     if (formKey.currentState!.validate()) {
-      print('-----------------------------------1');
       String otp = _controller1.text +
           _controller2.text +
           _controller3.text +
           _controller4.text;
-      print('-------------${widget.otp}------------------$otp----1');
       if (widget.otp.toString() == otp.toString()) {
         CustomSnackBar.snackBar(
             context: context,

@@ -19,8 +19,7 @@ class _RejectedAppointmentsDDState extends State<RejectedAppointmentsDD> {
   bool dataHomeFlag = true;
 
   Future<void> getAllAppointments() async {
-    print(
-        '.appointments_1 widget.doctorId..............................${widget.doctorId}');
+    print('.appointments_1 widget.doctorId..............................${widget.doctorId}');
     var API =
         'https://cabeloclinic.com/website/medlife/php_auth_api/rejected_appointment_api.php';
     Map<String, dynamic> body = {'doctor_id': widget.doctorId};

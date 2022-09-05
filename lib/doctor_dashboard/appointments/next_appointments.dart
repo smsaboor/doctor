@@ -63,6 +63,7 @@ class _NextAppointmentsDDState extends State<NextAppointmentsDD> {
                             appointment_no:
                                 dataAppointments[index]['appointment_no'] ?? '',
                             patient_id: dataAppointments[index]['patient_id'] ?? '',
+                            image:dataAppointments[index]['image'] ?? '',
                             booking_type:
                                 dataAppointments[index]['booking_type'] ?? '',
                             address: dataAppointments[index]['address'] ?? '',

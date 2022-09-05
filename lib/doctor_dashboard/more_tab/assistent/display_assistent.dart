@@ -3,17 +3,11 @@ import 'dart:convert';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:doctor/core/constants.dart';
 import 'package:doctor/core/custom_snackbar.dart';
-import 'package:doctor/dashboard_patient/data/json.dart';
 import 'package:doctor/dashboard_patient/widgets/avatar_image.dart';
 import 'package:doctor/doctor_dashboard/custom_widgtes/app_bar.dart';
-import 'package:doctor/doctor_dashboard/custom_widgtes/transaction_card.dart';
 import 'package:doctor/doctor_dashboard/more_tab/assistent/add_assistent.dart';
-import 'package:doctor/doctor_dashboard/more_tab/assistent/assistents_card.dart';
 import 'package:doctor/doctor_dashboard/more_tab/assistent/edit_assistent.dart';
 import 'package:flutter/material.dart';
-import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
-import 'package:intl/intl.dart';
-
 import 'package:http/http.dart' as http;
 
 class DisplayAssistents extends StatefulWidget {
@@ -31,18 +25,15 @@ class _DisplayAssistentsState extends State<DisplayAssistents> {
   DateTime selectedDate = DateTime.now();
 
   var dataAssistence;
-  var response2;
   bool dataHomeFlag = true;
 
   Future<void> getAllAssitents() async {
-    var API =API_BASE_URL+API_DD_ASSISTENT_LIST;
+    var API = API_BASE_URL + API_DD_ASSISTENT_LIST;
     Map<String, dynamic> body = {'doctor_id': widget.doctorId};
     http.Response response = await http
         .post(Uri.parse(API), body: body)
         .then((value) => value)
         .catchError((error) => print(" Failed to getAllAssitents: $error"));
-    print('...............................${response.body}');
-    response2 = response.body;
     if (response.statusCode == 200) {
       dataAssistence = jsonDecode(response.body.toString());
       setState(() {
@@ -53,7 +44,7 @@ class _DisplayAssistentsState extends State<DisplayAssistents> {
 
   Future<String> deleteAssitent(String id) async {
     var data;
-    var API =API_BASE_URL+API_DD_ASSISTENT_DELETE;
+    var API = API_BASE_URL + API_DD_ASSISTENT_DELETE;
     Map<String, dynamic> body = {'assistant_id': id};
     http.Response response = await http
         .post(Uri.parse(API), body: body)
@@ -86,106 +77,146 @@ class _DisplayAssistentsState extends State<DisplayAssistents> {
         ),
       ),
       body: SingleChildScrollView(
-              child: Column(
-                children: [
-                  AppBar(
-                    backgroundColor: Colors.blue,
-                    title: Text("All Assistents"),
-                  ),
-                  dataHomeFlag
-                      ? Center(
+        child: Column(
+          children: [
+            AppBar(
+              backgroundColor: Colors.blue,
+              title: Text("All Assistents"),
+            ),
+            dataHomeFlag
+                ? Center(
                     child: CircularProgressIndicator(),
                   )
-                      : FutureBuilder(
+                : FutureBuilder(
                     future: getAllAssitents(),
                     builder: (context, snapshot) {
-                      return ListView.builder(
-                          shrinkWrap: true,
-                          physics: ScrollPhysics(),
-                          itemCount: dataAssistence.length,
-                          itemBuilder: (context, index) {
-                            return Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 10.0, right: 5, bottom: 5, top: 5),
-                              child: SizedBox(
-                                height: 220,
-                                width: MediaQuery.of(context).size.width,
-                                child: Card(
-                                  elevation: 10,
-                                  color: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(10)),
-                                    side: BorderSide(color: Colors.white),
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 8.0, top: 15),
-                                    child: Column(
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                      return dataAssistence[0]['status'] == 0
+                          ? Center(
+                              child: Text('No Data Found!'),
+                            )
+                          : ListView.builder(
+                              shrinkWrap: true,
+                              physics: ScrollPhysics(),
+                              itemCount: dataAssistence.length,
+                              itemBuilder: (context, index) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 10.0, right: 5, bottom: 5, top: 5),
+                                  child: SizedBox(
+                                    height: 220,
+                                    width: MediaQuery.of(context).size.width,
+                                    child: Card(
+                                      elevation: 10,
+                                      color: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(10)),
+                                        side: BorderSide(color: Colors.white),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 8.0, top: 15),
+                                        child: Column(
                                           children: [
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 15.0),
-                                              child: AvatarImagePD(
-                                                dataAssistence[index]
-                                                        ['image'] ??
-                                                    'https://st.depositphotos.com/2101611/3925/v/600/depositphotos_39258143-stock-illustration-businessman-avatar-profile-picture.jpg',
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              width: 20,
-                                            ),
-                                            Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  SizedBox(
-                                                    height: 3,
-                                                  ),
-                                                  Row(
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 15.0),
+                                                  child: AvatarImagePD(
+                                                      dataAssistence[index]
+                                                          ['image']),
+                                                ),
+                                                SizedBox(
+                                                  width: 20,
+                                                ),
+                                                Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
                                                     children: [
-                                                      Text(
-                                                        'Name:  ',
-                                                        style: TextStyle(
-                                                            fontSize: 18,
-                                                            color: Colors.pink,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .w600),
+                                                      SizedBox(
+                                                        height: 3,
                                                       ),
-                                                      Text(
-                                                        dataAssistence[index][
-                                                                'assistant_name'] ??
-                                                            '',
-                                                        maxLines: 1,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                        style: TextStyle(
-                                                            fontSize: 18,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .w500),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  SizedBox(
-                                                    height: 8,
-                                                  ),
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceEvenly,
-                                                    children: [
                                                       Row(
                                                         children: [
                                                           Text(
-                                                            'Mobile:  ',
+                                                            'Name:  ',
+                                                            style: TextStyle(
+                                                                fontSize: 18,
+                                                                color:
+                                                                    Colors.pink,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600),
+                                                          ),
+                                                          Text(
+                                                            dataAssistence[
+                                                                        index][
+                                                                    'assistant_name'] ??
+                                                                '',
+                                                            maxLines: 1,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                            style: TextStyle(
+                                                                fontSize: 18,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      SizedBox(
+                                                        height: 8,
+                                                      ),
+                                                      Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceEvenly,
+                                                        children: [
+                                                          Row(
+                                                            children: [
+                                                              Text(
+                                                                'Mobile:  ',
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .pink,
+                                                                    fontSize:
+                                                                        18,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500),
+                                                              ),
+                                                              Text(
+                                                                dataAssistence[
+                                                                            index]
+                                                                        [
+                                                                        'number'] ??
+                                                                    '',
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        18,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      SizedBox(
+                                                        height: 8,
+                                                      ),
+                                                      Row(
+                                                        children: [
+                                                          Text(
+                                                            'Status:  ',
                                                             style: TextStyle(
                                                                 color:
                                                                     Colors.pink,
@@ -197,7 +228,37 @@ class _DisplayAssistentsState extends State<DisplayAssistents> {
                                                           Text(
                                                             dataAssistence[
                                                                         index][
-                                                                    'number'] ??
+                                                                    'status_order'] ??
+                                                                '',
+                                                            style: TextStyle(
+                                                                fontSize: 18,
+                                                                color: Colors
+                                                                    .green,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      SizedBox(
+                                                        height: 8,
+                                                      ),
+                                                      Row(
+                                                        children: [
+                                                          Text(
+                                                            'Address:',
+                                                            style: TextStyle(
+                                                                color:
+                                                                    Colors.pink,
+                                                                fontSize: 18,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500),
+                                                          ),
+                                                          Text(
+                                                            dataAssistence[
+                                                                        index][
+                                                                    'address'] ??
                                                                 '',
                                                             style: TextStyle(
                                                                 fontSize: 18,
@@ -207,126 +268,75 @@ class _DisplayAssistentsState extends State<DisplayAssistents> {
                                                           ),
                                                         ],
                                                       ),
-                                                    ],
-                                                  ),
-                                                  SizedBox(
-                                                    height: 8,
-                                                  ),
-                                                  Row(
-                                                    children: [
-                                                      Text(
-                                                        'Status:  ',
+                                                    ])
+                                              ],
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 38.0,
+                                                  right: 38,
+                                                  top: 15),
+                                              child: Row(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  InkWell(
+                                                      onTap: () {
+                                                        _showDialog(
+                                                            dataAssistence[
+                                                                    index][
+                                                                'assistant_id']);
+                                                      },
+                                                      child: Text(
+                                                        'Delete',
                                                         style: TextStyle(
-                                                            color: Colors.pink,
-                                                            fontSize: 18,
+                                                            fontSize: 20,
                                                             fontWeight:
                                                                 FontWeight
                                                                     .w500),
-                                                      ),
-                                                      Text(
-                                                        dataAssistence[index][
-                                                                'status_order'] ??
-                                                            '',
-                                                        style: TextStyle(
-                                                            fontSize: 18,
-                                                            color: Colors.green,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .w500),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  SizedBox(
-                                                    height: 8,
-                                                  ),
-                                                  Row(
-                                                    children: [
-                                                      Text(
-                                                        'Address:',
-                                                        style: TextStyle(
-                                                            color: Colors.pink,
-                                                            fontSize: 18,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .w500),
-                                                      ),
-                                                      Text(
-                                                        dataAssistence[index]
-                                                                ['address'] ??
-                                                            '',
-                                                        style: TextStyle(
-                                                            fontSize: 18,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .w500),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ])
-                                          ],
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 38.0, right: 38,top: 15),
-                                          child: Row(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              InkWell(
-                                                  onTap: () {
-                                                    _showDialog(
-                                                        dataAssistence[index]
-                                                            ['assistant_id']);
-                                                  },
-                                                  child: Text(
-                                                    'Delete',
-                                                    style: TextStyle(
-                                                        fontSize: 20,
-                                                        fontWeight:
-                                                            FontWeight.w500),
-                                                  )),
-                                              Spacer(),
-                                              InkWell(
-                                                  onTap: () {
-                                                    Navigator.of(context).push(
-                                                        MaterialPageRoute(
-                                                            builder: (_) =>
-                                                                EditAssistent(
+                                                      )),
+                                                  Spacer(),
+                                                  InkWell(
+                                                      onTap: () {
+                                                        Navigator.of(context).push(
+                                                            MaterialPageRoute(
+                                                                builder: (_) => EditAssistent(
                                                                     button:
                                                                         'Update',
                                                                     data: dataAssistence[
                                                                         index])));
-                                                  },
-                                                  child: Text(
-                                                    'Edit',
-                                                    style: TextStyle(
-                                                        fontSize: 20,
-                                                        fontWeight:
-                                                            FontWeight.w500),
-                                                  )),
-                                            ],
-                                          ),
+                                                      },
+                                                      child: Text(
+                                                        'Edit',
+                                                        style: TextStyle(
+                                                            fontSize: 20,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w500),
+                                                      )),
+                                                ],
+                                              ),
+                                            ),
+                                            Divider(
+                                              color: Colors.black12,
+                                            ),
+                                          ],
                                         ),
-                                        Divider(
-                                          color: Colors.black12,
-                                        ),
-                                      ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ),
-                            );
-                          });
+                                );
+                              });
                     },
                   ),
-                  SizedBox(
-                    height: 200,
-                  )
-                ],
-              ),
-            ),
+            SizedBox(
+              height: 200,
+            )
+          ],
+        ),
+      ),
       floatingActionButton: FloatingActionButton(
         // isExtended: true,
         child: Icon(
@@ -338,9 +348,9 @@ class _DisplayAssistentsState extends State<DisplayAssistents> {
           print('${widget.doctorId}');
           Navigator.of(context).push(MaterialPageRoute(
               builder: (_) => AddAssistent(
-                button: 'Add',
-                doctor_id: widget.doctorId,
-              )));
+                    button: 'Add',
+                    doctor_id: widget.doctorId,
+                  )));
         },
       ),
     );

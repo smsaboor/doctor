@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:doctor/core/constants.dart';
+import 'package:doctor/dashboard_patient/data/members.dart';
+import 'package:doctor/dashboard_patient/doctor/booking_screen.dart';
 import 'package:doctor/dashboard_patient/doctor/doctor_page.dart';
 import 'package:doctor/dashboard_patient/doctor/doctor_profile_page.dart';
 import 'package:doctor/dashboard_patient/widgets/category_box.dart';
@@ -38,33 +40,25 @@ class _TabHomePatientState extends State<TabHomePatient> {
   var dataSpeciality;
 
   Future<void> getAllDoctors() async {
-    print('...............................');
-    var API =
-        'all_doctor_api.php';
+    var API = 'all_doctor_api.php';
     http.Response response = await http
         .get(Uri.parse(API_BASE_URL+API))
         .then((value) => value)
         .catchError((error) => print(" Failed to getLogin: $error"));
-    print('...............................${response.body}');
     if (response.statusCode == 200) {
-      print('..22222222222222222222222222222222....${response.body}');
       dataAllDoctors = jsonDecode(response.body.toString());
-      print('..22222222222222222222222222222222....${dataAllDoctors.length}');
+      print('Response saboor--------------------------${dataAllDoctors}');
     } else {}
   }
   Future<void> getSpecialist() async {
-    print('...............................');
     var API =
         'specialist_api.php';
     http.Response response = await http
         .get(Uri.parse(API_BASE_URL+API))
         .then((value) => value)
         .catchError((error) => print(" Failed to getLogin: $error"));
-    print('...............................${response.body}');
     if (response.statusCode == 200) {
-      print('..33333333333333333333333333....${response.body}');
       dataSpeciality = jsonDecode(response.body.toString());
-      print('..3333333333333333333333333333333....${dataAllDoctors.length}');
     } else {}
   }
 
@@ -92,11 +86,16 @@ class _TabHomePatientState extends State<TabHomePatient> {
           SizedBox(
             height: 45,
           ),
-          Center(
-              child: Text(
-                "Let's Find Your Doctor",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-              )),
+          GestureDetector(
+            onTap: (){
+              Navigator.of(context).push(MaterialPageRoute(builder: (_)=>BookingScreenPD(familyMember: familyMembers[0],doctor: doctors[0],)));
+            },
+            child: Center(
+                child: Text(
+                  "Let's Find Your Doctor",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                )),
+          ),
           SizedBox(height: 15),
           CustomTextBoxPD(),
           SizedBox(height: 25),
@@ -199,7 +198,7 @@ class _TabHomePatientState extends State<TabHomePatient> {
                                         width: .1,
                                       ),
                                     ),
-                                    child: Image.asset('assets/icons/male.png'),
+                                    child: Image.asset('assets/images/male.png'),
                                   )),
                               SizedBox(height: 5),
                               Text(
@@ -223,7 +222,7 @@ class _TabHomePatientState extends State<TabHomePatient> {
                                 height: 80,
                                 width: 80,
                                 child: Image.asset(
-                                    'assets/icons/medical-record.png'),
+                                    'assets/images/medical-record.png'),
                               ),
                               SizedBox(height: 5),
                               Text(
@@ -327,8 +326,6 @@ class _TabHomePatientState extends State<TabHomePatient> {
                         SharedPreferences preferencess =
                         await SharedPreferences.getInstance();
                         preferencess.setBool('isLogin', false);
-
-                        print('........data......${dataAllDoctors[index]}');
                         Navigator.of(context).push(MaterialPageRoute(
                             builder: (_) =>
                                 DoctorProfilePagePD(doctor: dataAllDoctors[index])));
@@ -432,8 +429,6 @@ class _TabHomePatientState extends State<TabHomePatient> {
                         SharedPreferences preferencess =
                         await SharedPreferences.getInstance();
                         preferencess.setBool('isLogin', false);
-
-                        print('........data......${dataAllDoctors[index]}');
                         Navigator.of(context).push(MaterialPageRoute(
                             builder: (_) =>
                                 DoctorProfilePagePD(doctor: dataAllDoctors[index])));

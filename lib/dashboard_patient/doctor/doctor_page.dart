@@ -6,7 +6,6 @@ import 'package:doctor/dashboard_patient/theme/colors.dart';
 import 'package:doctor/dashboard_patient/widgets/avatar_image.dart';
 import 'package:doctor/dashboard_patient/widgets/doctor_box.dart';
 import 'package:doctor/dashboard_patient/widgets/textbox.dart';
-import 'package:doctor/doctor_dashboard/home_tab/doctor_profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 

@@ -44,7 +44,6 @@ class _SaveConsultDDState extends State<SaveConsultDD>
         .then((value) => value)
         .catchError((error) => print(" Failed to getAPPOINTMENTS $error"));
     if (response.statusCode == 200) {
-      print('@@@@@@@@@@@@@@@@@@@@@sabo21${response.body}');
       dataDoses = jsonDecode(response.body.toString());
       setState(() {
         dataHomeFlag = false;
@@ -58,7 +57,6 @@ class _SaveConsultDDState extends State<SaveConsultDD>
     });
     var API =
         'https://cabeloclinic.com/website/medlife/php_auth_api/old_appointment_api.php';
-    print('getOldAPPOINTMENTS@@@@@@@@@@@@@@@@@@@@@sabo${widget.patientId}');
     Map<String, dynamic> body = {'patient_id': widget.patientId.toString()};
     http.Response response = await http
         .post(Uri.parse(API), body: body)

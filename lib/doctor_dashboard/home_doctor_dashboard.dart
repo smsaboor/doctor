@@ -6,10 +6,8 @@ import 'package:doctor/doctor_dashboard/more_tab/more_tab.dart';
 import 'package:doctor/doctor_dashboard/transaction_tab/transaction.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tab_indicator_styler/tab_indicator_styler.dart';
 
 class DoctorDashBoard extends StatefulWidget {
   @override

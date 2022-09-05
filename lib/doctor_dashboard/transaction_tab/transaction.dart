@@ -1,10 +1,8 @@
 import 'dart:convert';
-import 'package:doctor/dashboard_patient/widgets/avatar_image.dart';
 import 'package:doctor/doctor_dashboard/custom_widgtes/app_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 
 class TransactionTabDD extends StatefulWidget {
@@ -107,6 +105,7 @@ class _TransactionTabDDState extends State<TransactionTabDD> {
           children: [
             AppBar(
               backgroundColor: Colors.blue,
+              automaticallyImplyLeading: false,
               title: Text("All Transaction"),
               actions: [
                 Padding(

@@ -3,6 +3,7 @@ import 'package:doctor/core/custom_form_field.dart';
 import 'package:doctor/core/custom_snackbar.dart';
 import 'package:doctor/dashboard_patient/widgets/avatar_image.dart';
 import 'package:doctor/doctor_dashboard/more_tab/edit_profile/api/api.dart';
+import 'package:doctor/doctor_dashboard/more_tab/edit_profile/api/multi.dart';
 import 'package:doctor/doctor_dashboard/more_tab/edit_profile/image.dart';
 import 'package:doctor/doctor_dashboard/more_tab/edit_profile/model_degree.dart';
 import 'package:doctor/doctor_dashboard/more_tab/edit_profile/model_lang.dart';
@@ -18,10 +19,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:dio/dio.dart' as Dio;
 import 'package:multiselect_formfield/multiselect_formfield.dart';
-
 import '../constant.dart';
-
-import 'package:dio/dio.dart';
 
 class EditProfileDD extends StatefulWidget {
   EditProfileDD(
@@ -46,7 +44,6 @@ class EditProfileDD extends StatefulWidget {
   final jsonSpeciality, jsonDegrees, jsonLanguage;
   final intialValueLang, intialValueDegree, intialValueSpec;
   XFile? image;
-
   @override
   _EditProfileDDState createState() => _EditProfileDDState();
 }
@@ -96,6 +93,9 @@ class _EditProfileDDState extends State<EditProfileDD> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    print('-----%%%%%%%%%%%%%%%%%%%%%%-----------${widget.specialities}--------${widget.intialValueSpec}');
+    print('-----%%%%%%%%%%%%%%%%%%%%%%-----------${widget.specialities.length}--------${widget.intialValueDegree}');
+    print('-----%%%%%%%%%%%%%%%%%%%%%%-----------${widget.language}--------${widget.intialValueLang}');
     getUserData();
     _selectedLanguages = widget.intialValueLang;
     _selectedDegrees = ['1'];
@@ -109,15 +109,13 @@ class _EditProfileDDState extends State<EditProfileDD> {
 
   void _getImgeUrl(String doctorId) async {
     fetchImageData = await ApiEditProfiles.getImgeUrl(doctorId);
-    print('%%%%%%%%%%%%%%${fetchImageData}');
     if (fetchImageData[0]['image'] != '') {
-      print('%%%%%%%%%%%%%%${fetchImageData}');
       setState(() {
         uplaodImage = false;
       });
     } else {
       setState(() {
-        uplaodImage = true;
+        uplaodImage = false;
       });
     }
   }
@@ -165,7 +163,6 @@ class _EditProfileDDState extends State<EditProfileDD> {
         .post(Uri.parse(API), body: body)
         .then((value) => value)
         .catchError((error) => print(" Failed to fetchProfileData: $error"));
-    print('...............................${response.body}');
     if (response.statusCode == 200) {
       fetchUserData = jsonDecode(response.body.toString());
       setState(() {
@@ -181,24 +178,15 @@ class _EditProfileDDState extends State<EditProfileDD> {
         String firstText = _controllerSpeaks.text;
         String finalString = firstText.replaceAll("[", "").replaceAll("]", "");
         final splitedText = finalString.split(',');
-        print('777777777777${splitedText.runtimeType}');
         for (int i = 0; i < splitedText.length; i++) {
-          print('777777777777${splitedText[i]}');
         }
         for (int i = 0; i < splitedText.length; i++) {
-          print('777777777777$i--${splitedText[i].toString()}');
           modelLanguages2!.add(splitedText[i].toString());
         }
-        print('7777777778--${modelLanguages2}');
-        print('7777777778--${_selectedDegrees}');
         setState(() {
           _selectedLanguages = modelLanguages2;
         });
-        print('7777777779--${_selectedLanguages}');
       });
-      // setState(() {
-      //   _selectedLanguages=modelLanguages2;
-      // });
     } else {}
   }
 
@@ -244,7 +232,7 @@ class _EditProfileDDState extends State<EditProfileDD> {
                               children: <Widget>[
                                 GestureDetector(
                                   onTap: () async {
-                                    showAlertDialog(context);
+                                    uplaodImage?null:showAlertDialog(context);
                                   },
                                   child: uplaodImage
                                       ? Center(
@@ -463,8 +451,6 @@ class _EditProfileDDState extends State<EditProfileDD> {
                                 _selectedSpeciality = value;
                                 _controllerSpeciality.text =
                                     _selectedSpeciality.toString();
-                                print(
-                                    '13---------------------------${_controllerSpeciality.text}');
                               });
                             },
                           ),
@@ -483,9 +469,8 @@ class _EditProfileDDState extends State<EditProfileDD> {
                               child: Container(
                                 child: ElevatedButton(
                                   onPressed: () {
+                                    // Navigator.of(context).push(MaterialPageRoute(builder: (_)=>MyHomePage()));
                                     _updateProfile(context);
-                                    // Navigator.of(context).push(MaterialPageRoute(
-                                    //     builder: (_) => MyHomePage32()));
                                   },
                                   style: ElevatedButton.styleFrom(
                                       primary: Colors.blue,

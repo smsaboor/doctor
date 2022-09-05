@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:animated_theme_switcher/animated_theme_switcher.dart';
 import 'package:doctor/dashboard_patient/home_patient_dashboard.dart';
 import 'package:doctor/doctor_dashboard/home_doctor_dashboard.dart';
@@ -39,14 +38,12 @@ class MyApp extends StatefulWidget {
       : super(key: key);
   final isFirst, isLogin;
   final userType;
-
   @override
   _MyAppState createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
   _MyAppState();
-
   @override
   void initState() {
     super.initState();
@@ -84,7 +81,7 @@ class _MyAppState extends State<MyApp> {
                 ? SplashScreen()
                 : widget.isLogin
                     ? widget.userType == '2'
-                        ? PatientDashboard()
+                        ? DoctorDashBoard()
                         : PatientDashboard()
                     : LoginScreen(),
             onGenerateRoute: (route) => RouteGenerator.generateRoute(route),

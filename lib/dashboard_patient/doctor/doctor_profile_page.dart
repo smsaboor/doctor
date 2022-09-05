@@ -1,4 +1,5 @@
 
+import 'package:doctor/dashboard_patient/doctor/request_sheet.dart';
 import 'package:doctor/dashboard_patient/theme/colors.dart';
 import 'package:doctor/dashboard_patient/widgets/avatar_image.dart';
 import 'package:doctor/dashboard_patient/widgets/doctor_info_box.dart';
@@ -8,7 +9,6 @@ import 'package:flutter/material.dart';
 class DoctorProfilePagePD extends StatefulWidget {
   const DoctorProfilePagePD({Key? key, required this.doctor}) : super(key: key);
   final doctor;
-
   @override
   _DoctorProfilePagePDState createState() => _DoctorProfilePagePDState();
 }
@@ -19,11 +19,12 @@ class _DoctorProfilePagePDState extends State<DoctorProfilePagePD> {
       context: context,
       builder: (BuildContext context) {
         return RequestSheet(
-          doctor: widget.doctor,
         );
       },
     );
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +54,6 @@ class _DoctorProfilePagePDState extends State<DoctorProfilePagePD> {
   }
 
   getBody() {
-    print('..............................${widget.doctor['image'].toString()}');
     return SingleChildScrollView(
       padding: EdgeInsets.only(left: 15, right: 15),
       child: Column(

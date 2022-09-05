@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import '../widgets/avatar_image.dart';
 
 class UpComingAppointments extends StatelessWidget {
   UpComingAppointments({Key? key, required this.doctor}) : super(key: key);

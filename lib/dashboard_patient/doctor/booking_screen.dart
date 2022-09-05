@@ -1,4 +1,5 @@
 
+import 'package:doctor/dashboard_patient/doctor/payment_mode.dart';
 import 'package:doctor/dashboard_patient/theme/colors.dart';
 import 'package:doctor/dashboard_patient/widgets/mybutton.dart';
 import 'package:flutter/material.dart';
@@ -27,7 +28,7 @@ class _BookingScreenPDState extends State<BookingScreenPD> {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
-        return Container();
+        return PaymentMode();
         // return PaymentSheet();
       },
     );
@@ -183,13 +184,13 @@ class _BookingScreenPDState extends State<BookingScreenPD> {
                       padding: const EdgeInsets.only(top: 8.0, left: 1),
                       child: Column(
                         children: [
-                          Text(widget.doctor['clinic_name'].toString(),
+                          Text(widget.doctor['name'].toString(),
                               style: TextStyle(
                                   fontSize: 20, fontWeight: FontWeight.w700)),
                           SizedBox(
                             height: 5,
                           ),
-                          Text(widget.doctor['doctor_name'].toString(),
+                          Text(widget.doctor['hospital'].toString(),
                               style: TextStyle(
                                   fontSize: 17, fontWeight: FontWeight.w500)),
                           SizedBox(

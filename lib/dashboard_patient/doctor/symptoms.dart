@@ -17,6 +17,8 @@ class Symptoms extends StatefulWidget {
 
 class _SymptomsState extends State<Symptoms> {
   @override
+
+
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: appBgColor,
