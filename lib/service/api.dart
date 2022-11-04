@@ -1,39 +1,42 @@
-import 'package:doctor/core/constants.dart';
+import 'package:doctor/core/constants/apis.dart';
 import 'package:http/http.dart' as http;
 import 'package:doctor/model/model_doctor.dart';
 import 'package:doctor/model/model_otp.dart';
 import 'package:doctor/model/model_patient.dart';
 import 'dart:convert';
 
-import 'package:doctor/model/model_verify.dart';
-
 class ApiService {
   static Future<dynamic> checkUserRegistered(String mobile) async {
-    // Dio dio = Dio();
-    // Response responce;
-    // responce = await dio.post(
-    //   APIURLRegistration,
-    //   data: formData,
-    // );
-    // print("response data " + responce.toString());
-    var APIURLRegistration = 'https://cabeloclinic.com/website/medlife/php_auth_api/register_api.php';
+    var Api = '${API_BASE_URL}register_api.php';
     Map<String, dynamic> body = {'mobile': mobile};
     http.Response response = await http
-        .post(Uri.parse(APIURLRegistration), body: body)
+        .post(Uri.parse(Api), body: body)
         .then((value) => value)
         .catchError((error) =>
-            print("Doctor app Failed to registerUserwithOtp: $error"));
+            print(error));
+    var data = jsonDecode(response.body);
+    return data;
+  }
+
+  static Future<dynamic> checkUserRegisteredForgetPassword(String mobile) async {
+    var Api = '${API_BASE_URL}for_forget_register_api.php';
+    Map<String, dynamic> body = {'mobile': mobile};
+    http.Response response = await http
+        .post(Uri.parse(Api), body: body)
+        .then((value) => value)
+        .catchError((error) =>
+        print(error));
     var data = jsonDecode(response.body);
     return data;
   }
   static Future<dynamic> checkUserRegisteredInner(String mobile) async {
-    var APIURLRegistration = 'https://cabeloclinic.com/website/medlife/php_auth_api/inner_register_api.php';
+    var Api = '${API_BASE_URL}inner_register_api.php';
     Map<String, dynamic> body = {'mobile': mobile};
     http.Response response = await http
-        .post(Uri.parse(APIURLRegistration), body: body)
+        .post(Uri.parse(Api), body: body)
         .then((value) => value)
         .catchError((error) =>
-        print("Doctor app Failed to registerUserwithOtp: $error"));
+        print(error));
     var data = jsonDecode(response.body);
     return data;
   }
@@ -58,7 +61,7 @@ class ApiService {
       http.Response response = await http.post(Uri.parse(API_BASE_URL+API), body: body)
           .then((value) => value)
           .catchError((error) =>
-          print("Doctor app Failed to signUp: $error"));
+          print(error));
       data = jsonDecode(response.body);
     }
     else if(userType==1){
@@ -77,7 +80,7 @@ class ApiService {
           .post(Uri.parse(API_BASE_URL+API), body: body)
           .then((value) => value)
           .catchError((error) =>
-          print("Doctor app Failed to registerUserwithOtp: $error"));
+          print(error));
       data = jsonDecode(response.body);
     }
     return data['sucess_code'];
@@ -87,25 +90,23 @@ class ApiService {
       'mobile': mobile,
       'password': pwd,
     };
-    var APIURLRegistration =
-        'https://cabeloclinic.com/website/medlife/php_auth_api/login_api.php';
+    var Api = '${API_BASE_URL}login_api.php';
     http.Response response = await http
-        .post(Uri.parse(APIURLRegistration), body: body)
+        .post(Uri.parse(Api), body: body)
         .then((value) => value)
-        .catchError(
-            (error) => print("medelif Failed to login: $error"));
+        .catchError((error) => print(error));
     var data = jsonDecode(response.body);
     return data;
   }
 
 
   static Future<String> verifyOtp(OtpModel model) async {
-    var APIURLRegistration = 'https://cabeloclinic.com/website/medlife/php_auth_api/otp_verified.php';
+    var Api = '${API_BASE_URL}otp_verified.php';
     http.Response response = await http
-        .post(Uri.parse(APIURLRegistration), body: model.toMap())
+        .post(Uri.parse(Api), body: model.toMap())
         .then((value) => value)
         .catchError(
-            (error) => print("Colorgame Failed to getRegistration: $error"));
+            (error) => print(error));
     var data = jsonDecode(response.body);
     return data[0]['success_code'];
   }

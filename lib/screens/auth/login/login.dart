@@ -1,10 +1,10 @@
 import 'package:doctor/core/custom_snackbar.dart';
-import 'package:doctor/dashboard_patient/home_patient_dashboard.dart';
 import 'package:doctor/doctor_dashboard/home_doctor_dashboard.dart';
 import 'package:doctor/screens/auth/verify_otp.dart';
 import 'package:doctor/service/api.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../forget_password/forget_password.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -13,9 +13,6 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  // getSP()async{
-  //   await SharedPreferences.getInstance();
-  // }
   late FocusNode text1, text2;
 
   @override
@@ -34,9 +31,9 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  final GlobalKey<FormState> formKey = new GlobalKey<FormState>();
-  TextEditingController _controllerMobile = TextEditingController();
-  TextEditingController _controllerPassword = TextEditingController();
+  final GlobalKey<FormState> formKey =  GlobalKey<FormState>();
+  final TextEditingController _controllerMobile = TextEditingController();
+  final TextEditingController _controllerPassword = TextEditingController();
   bool tryRegistration = false;
   bool isRegistered = false;
   int? status = 0;
@@ -61,10 +58,10 @@ class _LoginScreenState extends State<LoginScreen> {
               SizedBox(
                 height: MediaQuery.of(context).size.height * .13,
               ),
-              Padding(
-                padding: const EdgeInsets.only(left: 18.0, bottom: 15),
+              const Padding(
+                padding:  EdgeInsets.only(left: 18.0, bottom: 15),
                 child: Text(
-                  "SignIn / SignUp",
+                  "SignIn / SignUp Doctor",
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Color(0xE1100A44),
@@ -80,7 +77,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     primaryColor: Colors.redAccent,
                     primaryColorDark: Colors.red,
                   ),
-                  child: new TextFormField(
+                  child: TextFormField(
                     textInputAction: TextInputAction.next,
                     autofocus: true,
                     focusNode: text1,
@@ -88,6 +85,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     validator: (value) {
                       if (value!.isEmpty) {
                         return 'Enter Your Mobile';
+                      }
+                      else if (value!.length>10) {
+                        return 'Number Limit 10';
                       }
                       return null;
                     },
@@ -97,16 +97,16 @@ class _LoginScreenState extends State<LoginScreen> {
                       });
                     },
                     keyboardType: TextInputType.number,
-                    decoration: new InputDecoration(
-                        border: new OutlineInputBorder(
-                            borderSide: new BorderSide(color: Colors.teal)),
+                    decoration: const InputDecoration(
+                        border: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.teal)),
                         labelText: 'Mobile',
                         prefixText: ' ',
                         prefixIcon: Icon(
                           Icons.phone_android,
                           color: Colors.blue,
                         ),
-                        suffixStyle: const TextStyle(color: Colors.green)),
+                        suffixStyle: TextStyle(color: Colors.green)),
                   ),
                 ),
               ),
@@ -115,11 +115,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   ? Padding(
                       padding: const EdgeInsets.only(left: 20.0, right: 20),
                       child: Theme(
-                        data: new ThemeData(
+                        data: ThemeData(
                           primaryColor: Colors.redAccent,
                           primaryColorDark: Colors.red,
                         ),
-                        child: new TextFormField(
+                        child: TextFormField(
                           focusNode: text2,
                           textInputAction: TextInputAction.next,
                           controller: _controllerPassword,
@@ -137,10 +137,10 @@ class _LoginScreenState extends State<LoginScreen> {
                             return null;
                           },
                           keyboardType: TextInputType.text,
-                          decoration: new InputDecoration(
-                              border: new OutlineInputBorder(
+                          decoration: const InputDecoration(
+                              border: OutlineInputBorder(
                                   borderSide:
-                                      new BorderSide(color: Colors.teal)),
+                                      BorderSide(color: Colors.teal)),
                               labelText: 'Password',
                               prefixText: ' ',
                               prefixIcon: Icon(
@@ -148,39 +148,51 @@ class _LoginScreenState extends State<LoginScreen> {
                                 color: Colors.blue,
                               ),
                               suffixStyle:
-                                  const TextStyle(color: Colors.green)),
+                                  TextStyle(color: Colors.green)),
                         ),
                       ),
                     )
                   : Container(),
+              const SizedBox(
+                height: 10,
+              ),
+              Align(
+                alignment: Alignment.bottomRight,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 20.0),
+                  child: GestureDetector(
+                      onTap: (){
+                        Navigator.of(context).push(MaterialPageRoute(builder: (_)=>const HomeForgetPassword()));
+                      },
+                      child: const Text('Forget Password')),
+                ),
+              ),
               SizedBox(
                 height: MediaQuery.of(context).size.height * .1,
               ),
               SizedBox(
                 width: MediaQuery.of(context).size.width * .9,
                 height: 60,
-                child: Container(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      _verifyUser(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                        primary: Colors.blue,
-                        textStyle: TextStyle(
-                            fontSize: 36, fontWeight: FontWeight.bold)),
-                    child: tryRegistration
-                        ? Center(
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                            ),
-                          )
-                        : Text(
-                            isRegistered ? "Login" : "Continue",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 22),
+                child: ElevatedButton(
+                  onPressed: () {
+                    _verifyUser(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                      primary: Colors.blue,
+                      textStyle: const TextStyle(
+                          fontSize: 36, fontWeight: FontWeight.bold)),
+                  child: tryRegistration
+                      ? const Center(
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
                           ),
-                  ),
+                        )
+                      : Text(
+                          isRegistered ? "Login" : "Continue",
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 22),
+                        ),
                 ),
               )
             ],
@@ -191,7 +203,6 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _verifyUser(BuildContext context) async {
-    // Navigator.of(context).push(MaterialPageRoute(builder: (_) => DoctorDashBoard()));
     if (status == 0) {
       if (formKey.currentState!.validate()) {
         if (mounted) {
@@ -203,7 +214,6 @@ class _LoginScreenState extends State<LoginScreen> {
         setState(() {
           tryRegistration = false;
         });
-        print('status check reg------------${data['status']}');
         if (data['status'] == 1) {
           setState(() {
             isRegistered = true;
@@ -211,10 +221,12 @@ class _LoginScreenState extends State<LoginScreen> {
             FocusScope.of(context).requestFocus(text2);
           });
         } else {
+          if (!mounted) return;
           Navigator.of(context).push(MaterialPageRoute(
               builder: (_) => OtpVerification(
                     otp: data['otp'],
                     mobile: _controllerMobile.text,
+                isForgetPassword: false,
                   )));
         }
       }
@@ -233,11 +245,13 @@ class _LoginScreenState extends State<LoginScreen> {
           if (data['user_type'] == '1') {
             preferences.setString('userType', data['user_type']);
             preferences.setString('userDetails', data.toString());
+            if (!mounted) return;
             Navigator.of(context)
-                .push(MaterialPageRoute(builder: (_) => PatientDashboard()));
+                .push(MaterialPageRoute(builder: (_) => const Scaffold(body: Center(child: Text('Patient Dashboard'),),)));
           } else {
             preferences.setString('userDetails', data.toString());
             preferences.setString('userType', data['user_type']);
+            if (!mounted) return;
             Navigator.of(context)
                 .push(MaterialPageRoute(builder: (_) => DoctorDashBoard()));
           }
@@ -248,7 +262,7 @@ class _LoginScreenState extends State<LoginScreen> {
           }
         } else {
           CustomSnackBar.snackBar(
-              context: context, data: 'Failed to Login !', color: Colors.red);
+              context: context, data: 'Mobile or Password is Incorrect !', color: Colors.red);
           if (mounted) {
             setState(() {
               tryRegistration = false;

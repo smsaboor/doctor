@@ -1,25 +1,21 @@
-import 'package:doctor/core/constants.dart';
+import 'package:doctor/core/constants/apis.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:doctor/model/model_doctor.dart';
 import 'package:doctor/model/model_patient.dart';
-import 'package:doctor/screens/auth/registration/CustomFormField.dart';
+import 'package:flutter_package1/CustomFormField.dart';
 import 'package:doctor/service/api.dart';
 
 class AddPatient extends StatefulWidget {
   const AddPatient({Key? key, required this.mobile}) : super(key: key);
   final mobile;
+
   @override
   _AddPatientState createState() => _AddPatientState();
 }
 
 class _AddPatientState extends State<AddPatient> {
-  // getSP()async{
-  //   await SharedPreferences.getInstance();
-  // }
-
   String dropdownvalueState = 'Arunachal Pradesh';
-  var stateInitial="Andhra Pradesh";
+  var stateInitial = "Andhra Pradesh";
   var stateList = [
     "Andhra Pradesh",
     "Arunachal Pradesh",
@@ -72,7 +68,7 @@ class _AddPatientState extends State<AddPatient> {
     'Surya Hospital',
     'PGI Hospital',
   ];
-  String? _selectedState = "Choose State";
+
   String dropdownvalue = 'Patient';
   String? currentUser = 'Patient';
   String? specialityOF = 'Sergion';
@@ -80,14 +76,13 @@ class _AddPatientState extends State<AddPatient> {
 
   bool tryRegistration = false;
 
-  final GlobalKey<FormState> formKey = new GlobalKey<FormState>();
-  TextEditingController _controllerName = TextEditingController();
-  TextEditingController _controllerMobile = TextEditingController();
-  TextEditingController _controllerAddress = TextEditingController();
-  TextEditingController _controllerDistrict = TextEditingController();
-  TextEditingController _controllerCity = TextEditingController();
-  TextEditingController _controllerPin = TextEditingController();
-  TextEditingController _controllerState = TextEditingController();
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final TextEditingController _controllerName = TextEditingController();
+  final TextEditingController _controllerMobile = TextEditingController();
+  final TextEditingController _controllerAddress = TextEditingController();
+  final TextEditingController _controllerDistrict = TextEditingController();
+  final TextEditingController _controllerCity = TextEditingController();
+  final TextEditingController _controllerPin = TextEditingController();
 
   @override
   void initState() {
@@ -105,7 +100,7 @@ class _AddPatientState extends State<AddPatient> {
   BoxDecoration myBoxDecoration() {
     return BoxDecoration(
       border: Border.all(width: 1.0, color: Colors.black26),
-      borderRadius: BorderRadius.all(
+      borderRadius: const BorderRadius.all(
           Radius.circular(5.0) //                 <--- border radius here
           ),
     );
@@ -125,22 +120,40 @@ class _AddPatientState extends State<AddPatient> {
               SizedBox(
                 height: MediaQuery.of(context).size.height * .05,
               ),
-              Padding(
-                padding: const EdgeInsets.only(right: 18.0),
-                child: Align(
-                    alignment: Alignment.topRight,
-                    child: Column(
-                      children: [
-                        SizedBox(
-                            width: 80, child: Image.asset('assets/logo2.png')),
-                      ],
-                    )),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(
+                    icon: const Icon(
+                      Icons.arrow_back,
+                      color: Colors.black,
+                      size: 24, // Changing Drawer Icon Size
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    tooltip:
+                        MaterialLocalizations.of(context).openAppDrawerTooltip,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 18.0),
+                    child: Align(
+                        alignment: Alignment.topRight,
+                        child: Column(
+                          children: [
+                            SizedBox(
+                                width: 80,
+                                child: Image.asset('assets/logo2.png')),
+                          ],
+                        )),
+                  ),
+                ],
               ),
               SizedBox(
                 height: MediaQuery.of(context).size.height * .01,
               ),
-              new Padding(
-                padding: const EdgeInsets.only(top: 5.0),
+              const Padding(
+                padding: EdgeInsets.only(top: 5.0),
               ),
               SizedBox(height: size.height * 0.006),
               buildPatientForm(),
@@ -151,28 +164,26 @@ class _AddPatientState extends State<AddPatient> {
                 child: SizedBox(
                   width: MediaQuery.of(context).size.width * .9,
                   height: 50,
-                  child: Container(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        _registration(context);
-                      },
-                      style: ElevatedButton.styleFrom(
-                          primary: Colors.blueAccent,
-                          textStyle: TextStyle(
-                              fontSize: 30, fontWeight: FontWeight.bold)),
-                      child: tryRegistration
-                          ? Center(
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                              ),
-                            )
-                          : Text(
-                              "Submit",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 22),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      _registration(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                        primary: Colors.blueAccent,
+                        textStyle: const TextStyle(
+                            fontSize: 30, fontWeight: FontWeight.bold)),
+                    child: tryRegistration
+                        ? const Center(
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
                             ),
-                    ),
+                          )
+                        : const Text(
+                            "Submit",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 22),
+                          ),
                   ),
                 ),
               )
@@ -193,6 +204,8 @@ class _AddPatientState extends State<AddPatient> {
             labelText: 'Patient Name',
             readOnly: false,
             icon: Icons.person,
+            maxLimit: 30,
+            maxLimitError: '30',
             textInputType: TextInputType.text),
         SizedBox(height: MediaQuery.of(context).size.height * 0.01),
         CustomFormField(
@@ -200,6 +213,8 @@ class _AddPatientState extends State<AddPatient> {
             errorMsg: 'Enter Your Mobile',
             labelText: 'Mobile',
             readOnly: true,
+            maxLimit: 10,
+            maxLimitError: '10',
             icon: Icons.phone_android,
             textInputType: TextInputType.number),
         SizedBox(height: MediaQuery.of(context).size.height * 0.01),
@@ -209,6 +224,8 @@ class _AddPatientState extends State<AddPatient> {
             labelText: 'Address',
             readOnly: false,
             icon: Icons.home,
+            maxLimit: 60,
+            maxLimitError: '60',
             textInputType: TextInputType.text),
         SizedBox(height: MediaQuery.of(context).size.height * 0.01),
         CustomFormField(
@@ -216,6 +233,8 @@ class _AddPatientState extends State<AddPatient> {
             errorMsg: 'Enter Your City',
             labelText: 'City',
             readOnly: false,
+            maxLimit: 30,
+            maxLimitError: '30',
             icon: Icons.location_city,
             textInputType: TextInputType.text),
         SizedBox(height: MediaQuery.of(context).size.height * 0.01),
@@ -224,6 +243,8 @@ class _AddPatientState extends State<AddPatient> {
             errorMsg: 'Enter Your District',
             readOnly: false,
             labelText: 'District',
+            maxLimit: 30,
+            maxLimitError: '30',
             icon: Icons.location_city_sharp,
             textInputType: TextInputType.text),
         SizedBox(height: MediaQuery.of(context).size.height * 0.01),
@@ -232,13 +253,15 @@ class _AddPatientState extends State<AddPatient> {
             errorMsg: 'Enter Your Pin',
             readOnly: false,
             labelText: 'Pin',
+            maxLimit: 8,
+            maxLimitError: '8',
             icon: Icons.pin,
             textInputType: TextInputType.number),
         SizedBox(height: MediaQuery.of(context).size.height * 0.01),
         Padding(
           padding: const EdgeInsets.only(left: 20.0, right: 20),
           child: Theme(
-            data: new ThemeData(
+            data: ThemeData(
               primaryColor: Colors.redAccent,
               primaryColorDark: Colors.red,
             ),
@@ -253,7 +276,7 @@ class _AddPatientState extends State<AddPatient> {
               child: Padding(
                 padding: const EdgeInsets.only(left: 8.0),
                 child: DropdownButton(
-                  // Initial Value
+                    // Initial Value
                     menuMaxHeight: MediaQuery.of(context).size.height,
                     value: stateInitial,
                     dropdownColor: Colors.white,
@@ -274,8 +297,6 @@ class _AddPatientState extends State<AddPatient> {
                       setState(() {
                         stateInitial = user.toString();
                       });
-                      print('------------------${user}');
-                      print('------------------${user}');
                     }),
               ),
             ),
@@ -286,7 +307,6 @@ class _AddPatientState extends State<AddPatient> {
     );
   }
 
-
   void _registration(BuildContext context) async {
     var data;
     if (formKey.currentState!.validate()) {
@@ -294,7 +314,7 @@ class _AddPatientState extends State<AddPatient> {
         tryRegistration = true;
       });
       data = await ApiService.signUpUser(
-        API_INNER_SIGNUP,
+          API_INNER_SIGNUP,
           1,
           ModelDoctor(),
           ModelPatient(
@@ -308,18 +328,19 @@ class _AddPatientState extends State<AddPatient> {
             pincode: _controllerPin.text,
             password: _controllerMobile.text,
           ));
-      print('1successcode:   ${data}');
       if (data == 'ok') {
-        print('1successcode:   ${data}');
         setState(() {
           tryRegistration = false;
         });
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text('Patient Registered Successfully!'),
           backgroundColor: Colors.green,
         ));
+        if (!mounted) return;
         Navigator.pop(context);
       } else {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text('Failed to Register'),
           backgroundColor: Colors.red,

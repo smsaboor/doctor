@@ -1,15 +1,13 @@
+import 'package:flutter_package1/components.dart';
 import 'package:flutter/material.dart';
-import 'package:doctor/core/custom_snackbar.dart';
-import 'package:doctor/model/model_otp.dart';
-import 'package:doctor/route.dart';
 import 'package:doctor/screens/auth/registration/registration.dart';
-import 'package:doctor/service/api.dart';
-
+import 'forget_password/create_password.dart';
 
 class OtpVerification extends StatefulWidget {
-  const OtpVerification({Key? key, required this.otp, this.mobile})
+  const OtpVerification({Key? key, required this.otp, this.mobile, this.isForgetPassword})
       : super(key: key);
   final otp, mobile;
+  final isForgetPassword;
 
   @override
   _OtpVerificationState createState() => _OtpVerificationState();
@@ -18,13 +16,13 @@ class OtpVerification extends StatefulWidget {
 class _OtpVerificationState extends State<OtpVerification> {
   _OtpVerificationState();
 
-  final GlobalKey<FormState> formKey = new GlobalKey<FormState>();
-  TextEditingController _controller1 = TextEditingController();
-  TextEditingController _controller2 = TextEditingController();
-  TextEditingController _controller3 = TextEditingController();
-  TextEditingController _controller4 = TextEditingController();
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final TextEditingController _controller1 = TextEditingController();
+  final TextEditingController _controller2 = TextEditingController();
+  final TextEditingController _controller3 = TextEditingController();
+  final TextEditingController _controller4 = TextEditingController();
   late FocusNode text1, text2, text3, text4;
-
+  bool isVerify=false;
   @override
   void initState() {
     super.initState();
@@ -60,19 +58,6 @@ class _OtpVerificationState extends State<OtpVerification> {
                 child: Column(
                   children: [
                     SizedBox(width: 80, child: Image.asset('assets/logo2.png')),
-                    // SizedBox(
-                    //     height: 40,
-                    //     width: 80,
-                    //     child: Image.asset('assets/img_4.png'))
-                    // Text(
-                    //   'medilipse',
-                    //   style: FlutterFlowTheme.title1.override(
-                    //     fontFamily: 'Cabin',
-                    //     color: Colors.blue,
-                    //     fontSize: MediaQuery.of(context).size.height * .02,
-                    //     fontWeight: FontWeight.bold,
-                    //   ),
-                    // ),
                   ],
                 )),
           ),
@@ -81,8 +66,8 @@ class _OtpVerificationState extends State<OtpVerification> {
           ),
           Container(
             alignment: Alignment.centerLeft,
-            padding: EdgeInsets.symmetric(horizontal: 40),
-            child: Text(
+            padding: const EdgeInsets.symmetric(horizontal: 40),
+            child: const Text(
               "Verify OTP",
               style: TextStyle(
                   fontWeight: FontWeight.bold,
@@ -94,10 +79,10 @@ class _OtpVerificationState extends State<OtpVerification> {
           SizedBox(height: size.height * 0.03),
           Container(
             alignment: Alignment.centerLeft,
-            padding: EdgeInsets.symmetric(horizontal: 40),
+            padding: const EdgeInsets.symmetric(horizontal: 40),
             child: Text(
               "Enter 4 digit code\nsend on ${widget.otp} ",
-              style: TextStyle(
+              style: const TextStyle(
                   fontWeight: FontWeight.normal,
                   color: Colors.black45,
                   fontSize: 20),
@@ -117,22 +102,21 @@ class _OtpVerificationState extends State<OtpVerification> {
             child: SizedBox(
               width: MediaQuery.of(context).size.width * .6,
               height: 50,
-              child: Container(
-                child: ElevatedButton(
-                  onPressed: () {
-                    _verify();
-                    // Navigator.of(context).push(MaterialPageRoute(
-                    //     builder: (_) => RegistrationScreen()));
-                  },
-                  style: ElevatedButton.styleFrom(
-                      primary: Colors.blue,
-                      textStyle:
-                          TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
-                  child: Text(
-                    "Verify",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
-                  ),
+              child: ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    isVerify=true;
+                  });
+                  _verify();
+                },
+                style: ElevatedButton.styleFrom(
+                    primary: Colors.blue,
+                    textStyle:
+                        const TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+                child: Text(
+                  isVerify?"Verifying...":"Verify",
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
                 ),
               ),
             ),
@@ -149,14 +133,20 @@ class _OtpVerificationState extends State<OtpVerification> {
           _controller3.text +
           _controller4.text;
       if (widget.otp.toString() == otp.toString()) {
-        CustomSnackBar.snackBar(
-            context: context,
-            data: 'Otp Verified Successfully !',
-            color: Colors.green);
-        Navigator.of(context).push(MaterialPageRoute(builder: (_)=>SignUpScreen(mobile: widget.mobile,)));
+        setState(() {
+          isVerify=false;
+        });
+        showToast(msg: 'OTP Verified Successfully !');
+        if(widget.isForgetPassword){
+          Navigator.of(context).push(MaterialPageRoute(builder: (_)=>CreatePassword(mobile: widget.mobile,)));
+        }else{
+          Navigator.of(context).push(MaterialPageRoute(builder: (_)=>SignUpScreen(mobile: widget.mobile,)));
+        }
       } else {
-        CustomSnackBar.snackBar(
-            context: context, data: 'Wrong otp!', color: Colors.red);
+        setState(() {
+          isVerify=false;
+        });
+        showToast(msg: 'Wrong otp!');
       }
     }
   }
@@ -178,16 +168,18 @@ class _OtpVerificationState extends State<OtpVerification> {
   Widget _box(BuildContext context, TextEditingController customController,
       bool focus, FocusNode text, FocusNode changeFocus) {
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 6, horizontal: 2.5),
+      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 2.5),
       alignment: Alignment.center,
       height: MediaQuery.of(context).size.height / 14,
       width: MediaQuery.of(context).size.width / 8,
+      decoration:
+          BoxDecoration(border: Border.all(color: Colors.blue, width: 1)),
       child: Center(
         child: TextField(
           autofocus: focus,
           focusNode: text,
           onChanged: (value) {
-            if (value.length > 0) {
+            if (value.isNotEmpty) {
               FocusScope.of(context).requestFocus(changeFocus);
             }
           },
@@ -196,14 +188,12 @@ class _OtpVerificationState extends State<OtpVerification> {
           textAlign: TextAlign.center,
           keyboardType: TextInputType.number,
           maxLength: 1,
-          decoration: InputDecoration(
+          decoration: const InputDecoration(
               border: InputBorder.none,
               counterText: '',
-              contentPadding: const EdgeInsets.all(20)),
+              contentPadding: EdgeInsets.all(20)),
         ),
       ),
-      decoration:
-          BoxDecoration(border: Border.all(color: Colors.blue, width: 1)),
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:doctor/core/constants/apis.dart';
 import 'package:doctor/doctor_dashboard/appointments/save_consult/model_pill_repeat_time.dart';
 import 'package:doctor/doctor_dashboard/appointments/save_consult/model_pills.dart';
 import 'package:doctor/doctor_dashboard/appointments/save_consult/model_pills_dose.dart';
@@ -13,13 +14,12 @@ class AddDozesDD extends StatefulWidget {
   const AddDozesDD({Key? key, required this.button, required this.appNo})
       : super(key: key);
   final button, appNo;
-
   @override
   _AddDozesDDState createState() => _AddDozesDDState();
 }
 
 class _AddDozesDDState extends State<AddDozesDD> {
-  final TextEditingController _controllerComment = new TextEditingController();
+  final TextEditingController _controllerComment = TextEditingController();
 
   var dataPills;
   bool dataPillsFlag = true;
@@ -31,7 +31,7 @@ class _AddDozesDDState extends State<AddDozesDD> {
     setState(() {
       dataAddDosesF = true;
     });
-    var API = 'https://cabeloclinic.com/website/medlife/php_auth_api/add_dose_api.php';
+    var API = '${API_BASE_URL}add_dose_api.php';
     Map<String, dynamic> body = {
       'appointment_no': appNo,
       'pills_name': pills,
@@ -45,13 +45,11 @@ class _AddDozesDDState extends State<AddDozesDD> {
         http.Response response = await http
         .post(Uri.parse(API), body: body)
         .then((value) => value)
-        .catchError((error) => print(" Failed to addDoses: $error"));
+        .catchError((error) => print(error));
     if (response.statusCode == 200) {
       setState(() {
         dataAddDosesF = false;
       });
-      print(
-          '..addDoses 22222222222222222222222222222222....${response.body}');
       dataAddDoses = jsonDecode(response.body.toString());
     } else {}
   }
@@ -61,16 +59,12 @@ class _AddDozesDDState extends State<AddDozesDD> {
   List<String> pillsList = [];
 
   Future<void> getAllPills() async {
-    print('.getAllPills ..............................');
-    var API =
-        'https://cabeloclinic.com/website/medlife/php_auth_api/pills_api.php';
+    var API = '${API_BASE_URL}pills_api.php';
     http.Response response = await http
         .post(Uri.parse(API))
         .then((value) => value)
-        .catchError((error) => print(" Failed to getAllPills $error"));
-    print('...............................${response.body}');
+        .catchError((error) => print(error));
     if (response.statusCode == 200) {
-      print('..getAllPills....${response.body}');
       Iterable l = jsonDecode(response.body.toString());
       List<ModelPills> pillss =
           List<ModelPills>.from(l.map((model) => ModelPills.fromJson(model)));
@@ -78,7 +72,6 @@ class _AddDozesDDState extends State<AddDozesDD> {
         print('////////////////////${pillss[i].pills}');
       }
       for (int i = 0; i < pillss.length; i++) {
-        print('////////////////////${pillss[i].pills}');
         pillsList.add('${pillss[i].pills}');
       }
       setState(() {
@@ -94,24 +87,19 @@ class _AddDozesDDState extends State<AddDozesDD> {
   List<String> pillsTypeList = [];
 
   Future<void> getAllPillsType() async {
-    print('.getAllPills ..............................');
-    var API =
-        'https://cabeloclinic.com/website/medlife/php_auth_api/pills_type_api.php';
+    var API = '${API_BASE_URL}pills_type_api.php';
     http.Response response = await http
         .post(Uri.parse(API))
         .then((value) => value)
-        .catchError((error) => print(" Failed to getAllPills $error"));
-    print('...............................${response.body}');
+        .catchError((error) => print(error));
     if (response.statusCode == 200) {
-      print('..getAllPills....${response.body}');
       Iterable l = jsonDecode(response.body.toString());
       List<ModelPillsType> pillss =
           List<ModelPillsType>.from(l.map((model) => ModelPillsType.fromJson(model)));
       for (int i = 0; i < pillss.length; i++) {
-        print('////////////////////${pillss[i].pills_type}');
+        print('${pillss[i].pills_type}');
       }
       for (int i = 0; i < pillss.length; i++) {
-        print('////////////////////${pillss[i].pills_type}');
         pillsTypeList.add('${pillss[i].pills_type}');
       }
       setState(() {
@@ -125,24 +113,19 @@ class _AddDozesDDState extends State<AddDozesDD> {
   List<String> pillsPowerList = [];
 
   Future<void> getAllPillsPower() async {
-    print('.getAllPills ..............................');
-    var API =
-        'https://cabeloclinic.com/website/medlife/php_auth_api/pills_power_api.php';
+    var API = '${API_BASE_URL}pills_power_api.php';
     http.Response response = await http
         .post(Uri.parse(API))
         .then((value) => value)
-        .catchError((error) => print(" Failed to getAllPills $error"));
-    print('...............................${response.body}');
+        .catchError((error) => print(error));
     if (response.statusCode == 200) {
-      print('..getAllPills....${response.body}');
       Iterable l = jsonDecode(response.body.toString());
       List<ModelPillsPower> pillss =
       List<ModelPillsPower>.from(l.map((model) => ModelPillsPower.fromJson(model)));
       for (int i = 0; i < pillss.length; i++) {
-        print('////////////////////${pillss[i].pills_power}');
+        print('${pillss[i].pills_power}');
       }
       for (int i = 0; i < pillss.length; i++) {
-        print('////////////////////${pillss[i].pills_power}');
         pillsPowerList.add('${pillss[i].pills_power}');
       }
       setState(() {
@@ -158,24 +141,19 @@ class _AddDozesDDState extends State<AddDozesDD> {
   List<String> pillsDoseList = [];
 
   Future<void> getAllPillsDose() async {
-    print('.getAllPills ..............................');
-    var API =
-        'https://cabeloclinic.com/website/medlife/php_auth_api/pills_dose_api.php';
+    var API = '${API_BASE_URL}pills_dose_api.php';
     http.Response response = await http
         .post(Uri.parse(API))
         .then((value) => value)
-        .catchError((error) => print(" Failed to getAllPills $error"));
-    print('...............................${response.body}');
+        .catchError((error) => print(error));
     if (response.statusCode == 200) {
-      print('..getAllPills....${response.body}');
       Iterable l = jsonDecode(response.body.toString());
       List<ModelPillsDose> pillss =
       List<ModelPillsDose>.from(l.map((model) => ModelPillsDose.fromJson(model)));
       for (int i = 0; i < pillss.length; i++) {
-        print('////////////////////${pillss[i].pills_dose}');
+        print('${pillss[i].pills_dose}');
       }
       for (int i = 0; i < pillss.length; i++) {
-        print('////////////////////${pillss[i].pills_dose}');
         pillsDoseList.add('${pillss[i].pills_dose}');
       }
       setState(() {
@@ -190,24 +168,19 @@ class _AddDozesDDState extends State<AddDozesDD> {
   List<String> pillsTimingList = [];
 
   Future<void> getAllPillsTiming() async {
-    print('.getAllPills ..............................');
-    var API =
-        'https://cabeloclinic.com/website/medlife/php_auth_api/pills_timing_api.php';
+    var API = '${API_BASE_URL}pills_timing_api.php';
     http.Response response = await http
         .post(Uri.parse(API))
         .then((value) => value)
-        .catchError((error) => print(" Failed to getAllPills $error"));
-    print('...............................${response.body}');
+        .catchError((error) => print(error));
     if (response.statusCode == 200) {
-      print('..getAllPills....${response.body}');
       Iterable l = jsonDecode(response.body.toString());
       List<ModelPillsTiming> pillss =
       List<ModelPillsTiming>.from(l.map((model) => ModelPillsTiming.fromJson(model)));
       for (int i = 0; i < pillss.length; i++) {
-        print('////////////////////${pillss[i].pills_timing}');
+        print('${pillss[i].pills_timing}');
       }
       for (int i = 0; i < pillss.length; i++) {
-        print('////////////////////${pillss[i].pills_timing}');
         pillsTimingList.add('${pillss[i].pills_timing}');
       }
       setState(() {
@@ -222,24 +195,19 @@ class _AddDozesDDState extends State<AddDozesDD> {
   List<String> pillsRepeatTimingList = [];
 
   Future<void> getAllPillsRepeatTiming() async {
-    print('.getAllPills ..............................');
-    var API =
-        'https://cabeloclinic.com/website/medlife/php_auth_api/pills_repeat_timing_api.php';
+    var API = '${API_BASE_URL}pills_repeat_timing_api.php';
     http.Response response = await http
         .post(Uri.parse(API))
         .then((value) => value)
-        .catchError((error) => print(" Failed to getAllPills $error"));
-    print('...............................${response.body}');
+        .catchError((error) => print(error));
     if (response.statusCode == 200) {
-      print('..getAllPills....${response.body}');
       Iterable l = jsonDecode(response.body.toString());
       List<ModelPillsRepeatTime> pillss =
       List<ModelPillsRepeatTime>.from(l.map((model) => ModelPillsRepeatTime.fromJson(model)));
       for (int i = 0; i < pillss.length; i++) {
-        print('////////////////////${pillss[i].repeat_time}');
+        print('${pillss[i].repeat_time}');
       }
       for (int i = 0; i < pillss.length; i++) {
-        print('////////////////////${pillss[i].repeat_time}');
         pillsRepeatTimingList.add('${pillss[i].repeat_time}');
       }
       setState(() {
@@ -318,7 +286,7 @@ class _AddDozesDDState extends State<AddDozesDD> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
+      appBar: const PreferredSize(
         preferredSize: Size.fromHeight(45),
         child: CustomAppBar(isleading: false),
       ),
@@ -331,13 +299,13 @@ class _AddDozesDDState extends State<AddDozesDD> {
               backgroundColor: Colors.blue,
               title: Row(
                 children: [
-                  Text(
+                  const Text(
                     'Current Consult: ',
                     style: TextStyle(fontSize: 18),
                   ), //Tex
                   Text(
                     '#${widget.appNo}',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
                   ), //Tex
                 ],
               ),
@@ -348,7 +316,7 @@ class _AddDozesDDState extends State<AddDozesDD> {
               child: Card(
                 elevation: 10,
                 color: Colors.white,
-                shape: RoundedRectangleBorder(
+                shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                   side: BorderSide(color: Colors.white),
                 ),
@@ -357,7 +325,7 @@ class _AddDozesDDState extends State<AddDozesDD> {
                   child: Column(
                     children: [
                       Theme(
-                        data: new ThemeData(
+                        data: ThemeData(
                           primaryColor: Colors.redAccent,
                           primaryColorDark: Colors.red,
                         ),
@@ -393,12 +361,11 @@ class _AddDozesDDState extends State<AddDozesDD> {
                                     pills = spec.toString();
                                   });
                                 }
-                                print('------------------${spec}');
                               }),
                         ),
                       ),
                       Theme(
-                        data: new ThemeData(
+                        data: ThemeData(
                           primaryColor: Colors.redAccent,
                           primaryColorDark: Colors.red,
                         ),
@@ -426,20 +393,17 @@ class _AddDozesDDState extends State<AddDozesDD> {
                                   child: Text(items),
                                 );
                               }).toList(),
-                              // After selecting the desired option,it will
-                              // change button value to selected value
                               onChanged: (spec) {
                                 if (mounted) {
                                   setState(() {
                                     pillsType = spec.toString();
                                   });
                                 }
-                                print('------------------${spec}');
                               }),
                         ),
                       ),
                       Theme(
-                        data: new ThemeData(
+                        data: ThemeData(
                           primaryColor: Colors.redAccent,
                           primaryColorDark: Colors.red,
                         ),
@@ -467,20 +431,17 @@ class _AddDozesDDState extends State<AddDozesDD> {
                                   child: Text(items),
                                 );
                               }).toList(),
-                              // After selecting the desired option,it will
-                              // change button value to selected value
                               onChanged: (spec) {
                                 if (mounted) {
                                   setState(() {
                                     pillsPower = spec.toString();
                                   });
                                 }
-                                print('------------------${spec}');
                               }),
                         ),
                       ),
                       Theme(
-                        data: new ThemeData(
+                        data: ThemeData(
                           primaryColor: Colors.redAccent,
                           primaryColorDark: Colors.red,
                         ),
@@ -508,20 +469,17 @@ class _AddDozesDDState extends State<AddDozesDD> {
                                   child: Text(items),
                                 );
                               }).toList(),
-                              // After selecting the desired option,it will
-                              // change button value to selected value
                               onChanged: (spec) {
                                 if (mounted) {
                                   setState(() {
                                     pillsDose = spec.toString();
                                   });
                                 }
-                                print('------------------${spec}');
                               }),
                         ),
                       ),
                       Theme(
-                        data: new ThemeData(
+                        data: ThemeData(
                           primaryColor: Colors.redAccent,
                           primaryColorDark: Colors.red,
                         ),
@@ -557,12 +515,11 @@ class _AddDozesDDState extends State<AddDozesDD> {
                                     pillsTiming = spec.toString();
                                   });
                                 }
-                                print('------------------${spec}');
                               }),
                         ),
                       ),
                       Theme(
-                        data: new ThemeData(
+                        data: ThemeData(
                           primaryColor: Colors.redAccent,
                           primaryColorDark: Colors.red,
                         ),
@@ -598,7 +555,6 @@ class _AddDozesDDState extends State<AddDozesDD> {
                                     pillsRepeatTiming = spec.toString();
                                   });
                                 }
-                                print('------------------${spec}');
                               }),
                         ),
                       ),
@@ -609,7 +565,7 @@ class _AddDozesDDState extends State<AddDozesDD> {
                             primaryColor: Colors.redAccent,
                             primaryColorDark: Colors.red,
                           ),
-                          child: new TextFormField(
+                          child: TextFormField(
                             textInputAction: TextInputAction.next,
                             controller: _controllerComment,
                             validator: (value) {
@@ -623,22 +579,17 @@ class _AddDozesDDState extends State<AddDozesDD> {
                             },
                             keyboardType: TextInputType.text,
                             maxLines: 4,
-                            decoration: new InputDecoration(
-                                border: new OutlineInputBorder(
+                            decoration: const InputDecoration(
+                                border: OutlineInputBorder(
                                     borderSide:
-                                        new BorderSide(color: Colors.teal)),
+                                        BorderSide(color: Colors.teal)),
                                 labelText: 'Notes',
-                                // prefixText: ' ',
-                                // prefixIcon: Icon(
-                                //   Icons.message,
-                                //   color: Colors.blue,
-                                // ),
                                 suffixStyle:
-                                    const TextStyle(color: Colors.green)),
+                                    TextStyle(color: Colors.green)),
                           ),
                         ),
                       ),
-                      Divider(
+                      const Divider(
                         color: Colors.black12,
                       ),
                       Padding(
@@ -646,25 +597,21 @@ class _AddDozesDDState extends State<AddDozesDD> {
                         child: SizedBox(
                           width: MediaQuery.of(context).size.width * .87,
                           height: 50,
-                          child: Container(
-                            child: ElevatedButton(
-                              onPressed: () {
-                                addDoses(widget.appNo);
-                                Navigator.pop(context);
-                                // Navigator.of(context).push(MaterialPageRoute(
-                                //     builder: (_) => SuccessScreen()));
-                              },
-                              style: ElevatedButton.styleFrom(
-                                  primary: Colors.blue,
-                                  textStyle: TextStyle(
-                                      fontSize: 30,
-                                      fontWeight: FontWeight.bold)),
-                              child: dataAddDosesF?Center(child: CircularProgressIndicator()):Text(
-                                widget.button,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 20),
-                              ),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              addDoses(widget.appNo);
+                              Navigator.pop(context);
+                            },
+                            style: ElevatedButton.styleFrom(
+                                primary: Colors.blue,
+                                textStyle: const TextStyle(
+                                    fontSize: 30,
+                                    fontWeight: FontWeight.bold)),
+                            child: dataAddDosesF?const Center(child: CircularProgressIndicator()):Text(
+                              widget.button,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 20),
                             ),
                           ),
                         ),
@@ -683,7 +630,7 @@ class _AddDozesDDState extends State<AddDozesDD> {
   BoxDecoration myBoxDecoration() {
     return BoxDecoration(
       border: Border.all(width: 1.0, color: Colors.black26),
-      borderRadius: BorderRadius.all(
+      borderRadius: const BorderRadius.all(
           Radius.circular(5.0) //                 <--- border radius here
           ),
     );

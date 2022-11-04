@@ -1,10 +1,11 @@
 import 'dart:convert';
-import 'package:doctor/core/constants.dart';
+import 'package:doctor/core/constants/apis.dart';
 import 'package:doctor/core/custom_form_field.dart';
 import 'package:doctor/core/custom_snackbar.dart';
-import 'package:doctor/dashboard_patient/widgets/avatar_image.dart';
+import 'package:doctor/core/avatar_image.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:doctor/core/constants/urls.dart';
 
 class EditAssistent extends StatefulWidget {
   const EditAssistent({Key? key, required this.button, required this.data})
@@ -17,10 +18,9 @@ class EditAssistent extends StatefulWidget {
 }
 
 class _EditAssistentState extends State<EditAssistent> {
-  final TextEditingController _startDateController =
-      new TextEditingController();
-  final TextEditingController _controllerName = new TextEditingController();
-  final TextEditingController _controllerMobile = new TextEditingController();
+  final TextEditingController _startDateController = TextEditingController();
+  final TextEditingController _controllerName =  TextEditingController();
+  final TextEditingController _controllerMobile =  TextEditingController();
   final TextEditingController _controllerAddress = TextEditingController();
 
   @override
@@ -33,7 +33,7 @@ class _EditAssistentState extends State<EditAssistent> {
     status = widget.data['status_order'];
   }
 
-  bool isAssistentAdded = false;
+  bool isAssistantAdded = false;
 
   String? status = 'Active';
   var statusList = [
@@ -41,7 +41,7 @@ class _EditAssistentState extends State<EditAssistent> {
     "Left",
   ];
 
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -56,9 +56,9 @@ class _EditAssistentState extends State<EditAssistent> {
             padding: const EdgeInsets.all(8.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
-              children: [
+              children: const [
                 Text(
-                  'Dr. Abhishekh',
+                  'Dr. Bakhshish',
                   style: TextStyle(
                     fontSize: 14.0,
                     color: Colors.black,
@@ -76,10 +76,10 @@ class _EditAssistentState extends State<EditAssistent> {
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
+          const Padding(
+            padding: EdgeInsets.all(8.0),
             child: AvatarImagePD(
-              "https://images.unsplash.com/photo-1537368910025-700350fe46c7?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80",
+              AppUrls.user,
               radius: 35,
               height: 40,
               width: 40,
@@ -100,7 +100,7 @@ class _EditAssistentState extends State<EditAssistent> {
           children: [
             AppBar(
               backgroundColor: Colors.blue,
-              title: Text("Edit Assistent ${widget.data['status_order']}"),
+              title: Text("Edit Assistant ${widget.data['status_order']}"),
             ),
             SizedBox(
               height: 450,
@@ -108,7 +108,7 @@ class _EditAssistentState extends State<EditAssistent> {
               child: Card(
                 elevation: 10,
                 color: Colors.white,
-                shape: RoundedRectangleBorder(
+                shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                   side: BorderSide(color: Colors.white),
                 ),
@@ -119,16 +119,16 @@ class _EditAssistentState extends State<EditAssistent> {
                     child: Column(
                       children: [
                         CustomFormField(
-                            controlller: _controllerName,
-                            errorMsg: 'Enter Assistent Name',
-                            labelText: 'Assistent Name',
+                            controller: _controllerName,
+                            errorMsg: 'Enter Assistant Name',
+                            labelText: 'Assistant Name',
                             readOnly: false,
                             icon: Icons.person,
                             textInputType: TextInputType.text),
                         SizedBox(
                             height: MediaQuery.of(context).size.height * 0.01),
                         CustomFormField(
-                            controlller: _controllerMobile,
+                            controller: _controllerMobile,
                             errorMsg: 'Enter Your Mobile',
                             labelText: 'Mobile',
                             readOnly: false,
@@ -137,7 +137,7 @@ class _EditAssistentState extends State<EditAssistent> {
                         SizedBox(
                             height: MediaQuery.of(context).size.height * 0.01),
                         Theme(
-                          data: new ThemeData(
+                          data: ThemeData(
                             primaryColor: Colors.redAccent,
                             primaryColorDark: Colors.red,
                           ),
@@ -166,26 +166,23 @@ class _EditAssistentState extends State<EditAssistent> {
                                     child: Text(items),
                                   );
                                 }).toList(),
-                                // After selecting the desired option,it will
-                                // change button value to selected value
                                 onChanged: (spec) {
                                   if (mounted) {
                                     setState(() {
                                       status = spec.toString();
                                     });
                                   }
-                                  print('------------------${spec}');
                                 }),
                           ),
                         ),
                         CustomFormField(
-                            controlller: _controllerAddress,
-                            errorMsg: 'Ente Full Address',
+                            controller: _controllerAddress,
+                            errorMsg: 'Enter Full Address',
                             labelText: 'Address',
                             readOnly: false,
                             icon: Icons.person,
                             textInputType: TextInputType.text),
-                        Divider(
+                        const Divider(
                           color: Colors.black12,
                         ),
                         Padding(
@@ -193,28 +190,26 @@ class _EditAssistentState extends State<EditAssistent> {
                           child: SizedBox(
                             width: MediaQuery.of(context).size.width * .87,
                             height: 50,
-                            child: Container(
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  _add(context);
-                                },
-                                style: ElevatedButton.styleFrom(
-                                    primary: Colors.blue,
-                                    textStyle: TextStyle(
-                                        fontSize: 30,
-                                        fontWeight: FontWeight.bold)),
-                                child: isAssistentAdded
-                                    ? Center(
-                                        child: CircularProgressIndicator(),
-                                      )
-                                    : Text(
-                                        widget.button,
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 20),
-                                      ),
-                              ),
+                            child: ElevatedButton(
+                              onPressed: () {
+                                _add(context);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                  primary: Colors.blue,
+                                  textStyle: const TextStyle(
+                                      fontSize: 30,
+                                      fontWeight: FontWeight.bold)),
+                              child: isAssistantAdded
+                                  ? const Center(
+                                      child: CircularProgressIndicator(),
+                                    )
+                                  : Text(
+                                      widget.button,
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20),
+                                    ),
                             ),
                           ),
                         )
@@ -236,8 +231,7 @@ class _EditAssistentState extends State<EditAssistent> {
       String? number,
       String? address,
       String? status_order}) async {
-    print('model ------------------------------------------------------');
-    var APIURL =API_BASE_URL+API_DD_ASSISTENT_EDIT;
+    var Api =API_BASE_URL+API_DD_ASSISTENT_EDIT;
     Map<String, dynamic> body = {
       'assistant_id': id,
       'assistant_name': AssistName,
@@ -246,10 +240,10 @@ class _EditAssistentState extends State<EditAssistent> {
       'status_order': status_order,
     };
     http.Response response = await http
-        .post(Uri.parse(APIURL), body: body)
+        .post(Uri.parse(Api), body: body)
         .then((value) => value)
         .catchError(
-            (error) => print("doctore assistenet Failed to add: $error"));
+            (error) => print(error));
     var data = jsonDecode(response.body);
     return data[0]['assistant_name'];
   }
@@ -257,22 +251,23 @@ class _EditAssistentState extends State<EditAssistent> {
   _add(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
       setState(() {
-        isAssistentAdded = true;
+        isAssistantAdded = true;
       });
-      String assistant_name = await updateAssistent(
+      String assistantName = await updateAssistent(
           id: widget.data['assistant_id'],
           address: _controllerAddress.text.toString(),
           status_order: status,
           number: _controllerMobile.text.toString(),
           AssistName: _controllerName.text.toString());
-      if (assistant_name == _controllerName.text) {
+      if (assistantName == _controllerName.text) {
         CustomSnackBar.snackBar(
             context: context,
             data: 'Added Successfully !',
             color: Colors.green);
         setState(() {
-          isAssistentAdded = false;
+          isAssistantAdded = false;
         });
+        if (!mounted) return;
         Navigator.pop(context);
       } else {
         CustomSnackBar.snackBar(
@@ -286,7 +281,7 @@ class _EditAssistentState extends State<EditAssistent> {
   BoxDecoration myBoxDecoration() {
     return BoxDecoration(
       border: Border.all(width: 1.0, color: Colors.black26),
-      borderRadius: BorderRadius.all(
+      borderRadius: const BorderRadius.all(
           Radius.circular(5.0) //                 <--- border radius here
           ),
     );

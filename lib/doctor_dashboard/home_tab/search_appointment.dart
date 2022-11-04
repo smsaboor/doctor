@@ -1,8 +1,8 @@
 import 'dart:convert';
+import 'package:doctor/core/constants/apis.dart';
 import 'package:doctor/doctor_dashboard/custom_widgtes/app_bar.dart';
 import 'package:doctor/doctor_dashboard/home_tab/search_patient_cared.dart';
 import 'package:doctor/doctor_dashboard/home_tab/verify_number_otp.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -23,21 +23,17 @@ class _SearchAppointmentsState extends State<SearchAppointments> {
   bool membersF = true;
 
   Future<void> searchPatients(String mobile) async {
-    print('...ch............................}');
     setState(() {
       dataF2 = true;
       status = 1;
     });
-    var API =
-        'https://cabeloclinic.com/website/medlife/php_auth_api/search_patient_members_api.php';
+    var API = '${API_BASE_URL}search_patient_members_api.php';
     Map<String, dynamic> body = {'mobile': mobile};
     http.Response response = await http
         .post(Uri.parse(API), body: body)
         .then((value) => value)
-        .catchError((error) => print(" Failed to searchPatients: $error"));
-    print('...ch............................${response.body}');
+        .catchError((error) => print(error));
     if (response.statusCode == 200) {
-      print('..1111....${response.body}');
       dataPatients = jsonDecode(response.body.toString());
       if (dataPatients[0]['status'] == '1') {
         setState(() {
@@ -55,7 +51,6 @@ class _SearchAppointmentsState extends State<SearchAppointments> {
           status = 3;
         });
       }
-      print('..111111111222222222222....${dataPatients.length ?? 0}');
     } else {}
   }
 
@@ -69,12 +64,12 @@ class _SearchAppointmentsState extends State<SearchAppointments> {
 
   DateTime selectedDate = DateTime.now();
 
-  TextEditingController _controllerMobile = TextEditingController();
+  final TextEditingController _controllerMobile = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
+      appBar: const PreferredSize(
         preferredSize: Size.fromHeight(55),
         child: CustomAppBar(
           isleading: false,
@@ -103,16 +98,16 @@ class _SearchAppointmentsState extends State<SearchAppointments> {
                   );
                 },
               ),
-              title: Text("Book Appointment"),
+              title: const Text("Book Appointment"),
               actions: [
                 Padding(
                   padding: const EdgeInsets.only(right: 15.0),
                   child: IconButton(
                     onPressed: () {
                       Navigator.of(context)
-                          .push(MaterialPageRoute(builder: (_) => VerifyOtp()));
+                          .push(MaterialPageRoute(builder: (_) => const VerifyOtp()));
                     },
-                    icon: Icon(
+                    icon: const Icon(
                       Icons.add,
                       color: Colors.white,
                       size: 30,
@@ -126,30 +121,33 @@ class _SearchAppointmentsState extends State<SearchAppointments> {
               padding: const EdgeInsets.only(left: 10.0, right: 10),
               child: Column(
                 children: [
-                  new TextFormField(
+                  TextFormField(
                     textInputAction: TextInputAction.next,
                     controller: _controllerMobile,
                     keyboardType: TextInputType.text,
-                    decoration: new InputDecoration(
-                        border: new OutlineInputBorder(
-                            borderSide: new BorderSide(color: Colors.teal)),
-                        labelText: 'search patient with registerd mobile',
+                    decoration: const InputDecoration(
+                        border: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.teal)),
+                        labelText: 'search patient with registered mobile',
                         prefixText: ' ',
                         prefixIcon: Icon(
                           Icons.search,
                           color: Colors.blue,
                         ),
-                        suffixStyle: const TextStyle(color: Colors.green)),
+                        suffixStyle: TextStyle(color: Colors.green)),
+                  ),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * .05,
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(left: 8.0, right: 8),
+                    padding: EdgeInsets.only(left: 8.0, right: 8),
                     child: SizedBox(
                       width: MediaQuery.of(context).size.width * .2,
                       child: ElevatedButton(
                           onPressed: () {
                             searchPatients(_controllerMobile.text);
                           },
-                          child: Text('Search')),
+                          child: const Text('Search')),
                     ),
                   )
                 ],
@@ -157,19 +155,19 @@ class _SearchAppointmentsState extends State<SearchAppointments> {
             ),
             SizedBox(height: MediaQuery.of(context).size.height * 0.01),
             status == 0
-                ? Text('')
+                ? const Text('')
                 : status == 1
-                    ? Text('Searching....')
+                    ? const Text('Searching....')
                     : status == 2
-                        ? Text('')
+                        ? const Text('')
                         : status == 3
-                            ? Text('Data Not Found')
-                            : Text('oops something wrong please try again '),
+                            ? const Text('Data Not Found')
+                            : const Text('oops something wrong please try again '),
             status != 2
-                ? Center(child: Text(''))
+                ? const Center(child: Text(''))
                 : ListView.builder(
                     shrinkWrap: true,
-                    physics: ScrollPhysics(),
+                    physics: const ScrollPhysics(),
                     itemCount: dataPatients.length ?? 0,
                     itemBuilder: (context, index) {
                       return Padding(
@@ -195,10 +193,10 @@ class _SearchAppointmentsState extends State<SearchAppointments> {
                     }),
             SizedBox(height: MediaQuery.of(context).size.height * 0.01),
             membersF
-                ? Center(child: Text(''))
+                ? const Center(child: Text(''))
                 : ListView.builder(
                     shrinkWrap: true,
-                    physics: ScrollPhysics(),
+                    physics: const ScrollPhysics(),
                     itemCount: dataPatients[0]['members'].length ?? 0,
                     itemBuilder: (context, index) {
                       return Padding(
@@ -233,25 +231,25 @@ class _SearchAppointmentsState extends State<SearchAppointments> {
       Container(
         decoration: BoxDecoration(color: oddColour),
         padding:
-            EdgeInsets.only(top: 20.0, bottom: 20.0, left: 5.0, right: 5.0),
+            const EdgeInsets.only(top: 20.0, bottom: 20.0, left: 5.0, right: 5.0),
         child: Column(
           children: <Widget>[
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Text(item, style: TextStyle(fontSize: 16.0)),
-                Text(charge, style: TextStyle(fontSize: 16.0))
+                Text(item, style: const TextStyle(fontSize: 16.0)),
+                Text(charge, style: const TextStyle(fontSize: 16.0))
               ],
             ),
-            SizedBox(
+            const SizedBox(
               height: 10.0,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 Text(dateString,
-                    style: TextStyle(color: Colors.grey, fontSize: 14.0)),
-                Text(type, style: TextStyle(color: Colors.grey, fontSize: 14.0))
+                    style: const TextStyle(color: Colors.grey, fontSize: 14.0)),
+                Text(type, style: const TextStyle(color: Colors.grey, fontSize: 14.0))
               ],
             ),
           ],

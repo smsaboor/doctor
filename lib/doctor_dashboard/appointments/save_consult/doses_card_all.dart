@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
+import 'package:doctor/core/constants/apis.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -35,6 +35,7 @@ class DosesCardForAll extends StatefulWidget {
 }
 
 class _DosesCardForAllState extends State<DosesCardForAll> {
+  String test='aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa aaaaaaaaa0';
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -52,12 +53,18 @@ class _DosesCardForAllState extends State<DosesCardForAll> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '${widget.index + 1}) ${widget.medicineType} ${widget.medicineName}',
+                      '${widget.index + 1}) ${widget.medicineType.length > 4 ?
+                      widget.medicineType.substring(0, 4) :
+                      widget.medicineType ?? ''} ${widget.medicineName.length > 12 ?
+                      widget.medicineName.substring(0, 12)+'..' :
+                      widget.medicineName ?? ''}',
                     ),
-                    SizedBox(height: 3,),
+                    const SizedBox(height: 3,),
                     Padding(
                       padding: const EdgeInsets.only(left: 28.0),
-                      child: Text('(${widget.medicinePower})',style: TextStyle(color: Colors.pink,fontWeight: FontWeight.w400,fontSize: 12),),
+                      child: Text('(${widget.medicinePower.length > 15 ?
+                      widget.medicinePower.substring(0, 15)+'..' :
+                      widget.medicinePower ?? ''})',style: const TextStyle(color: Colors.pink,fontWeight: FontWeight.w400,fontSize: 12),),
                     ),
                   ],
                 ),),
@@ -67,8 +74,10 @@ class _DosesCardForAllState extends State<DosesCardForAll> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text('${widget.medicinDoses}'),
-                  Text('(Before Food)'),
+                  Text('${widget.medicinDoses.length > 10 ?
+                  widget.medicinDoses.substring(0, 10)+'..' :
+                  widget.medicinDoses ?? ''}'),
+                  const Text('(After Food)'),
                 ],
               ),
             ),
@@ -76,8 +85,10 @@ class _DosesCardForAllState extends State<DosesCardForAll> {
               width: MediaQuery.of(context).size.width * .25,
               child: Column(
                 children: [
-                  Text('${widget.medicineRepedationLongTime}'),
-                  Text('(Total ${widget.index} Tab)'),
+                  Text('${widget.medicineRepedationLongTime.length > 10 ?
+                  widget.medicineRepedationLongTime.substring(0, 10)+'..' :
+                  widget.medicineRepedationLongTime ?? ''}'),
+                  Text('(Total Tab:  )'),
                 ],
               ),
             ),
@@ -89,12 +100,12 @@ class _DosesCardForAllState extends State<DosesCardForAll> {
                   },
                   child: SizedBox(
                     width: MediaQuery.of(context).size.width * .08,
-                    child: Icon(Icons.delete,color: Colors.red),
+                    child: const Icon(Icons.delete,color: Colors.red),
                   ),
                 ))
           ],
         ),
-        Divider(
+        const Divider(
           thickness: 1,
         )
       ],
@@ -103,44 +114,18 @@ class _DosesCardForAllState extends State<DosesCardForAll> {
 
   var dataDelete;
   Future<void> deleteDose() async {
-    print('doses--delete---------------${widget.doseId}--');
-    var API = 'https://cabeloclinic.com/website/medlife/php_auth_api/delete_doses_api.php';
+    var API = '${API_BASE_URL}delete_doses_api.php';
     Map<String, dynamic> body = {
       'doses_id': widget.doseId.toString()
     };
-    print('doses--delete------------------');
     http.Response response = await http
         .post(Uri.parse(API), body: body)
         .then((value) => value)
-        .catchError((error) => print(" Failed to getAPPOINTMENTS $error"));
-    print('doses--delete------------------');
+        .catchError((error) => print(error));
     if (response.statusCode == 200) {
       dataDelete = jsonDecode(response.body.toString());
-      print('doses--delete------------------${dataDelete}');
       setState(() {
       });
     } else {}
   }
-  void choiceAction(String choice) {
-    if (choice == Constants.fund) {
-      print('Settings');
-    } else if (choice == Constants.SignOut) {
-      print('Subscribe');
-    } else if (choice == Constants.SignOut) {
-      print('SignOut');
-    }
-  }
-}
-
-class Constants {
-  static const String fund = 'Fund';
-
-//  static const String Settings = 'Settings';
-  static const String SignOut = 'Sign out';
-
-  static const List<String> choices = <String>[
-    'fund',
-    'enter code here',
-    'SignOut'
-  ];
 }

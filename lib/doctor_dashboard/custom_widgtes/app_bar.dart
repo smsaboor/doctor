@@ -1,4 +1,5 @@
-import 'package:doctor/dashboard_patient/widgets/avatar_image.dart';
+import 'package:doctor/core/constants/urls.dart';
+import 'package:doctor/core/avatar_image.dart';
 import 'package:doctor/doctor_dashboard/appointments/save_consult/api/api.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,13 +15,12 @@ class CustomAppBar extends StatefulWidget {
 class _CustomAppBarState extends State<CustomAppBar> {
   var data;
   bool uplaodImage = true;
+
   void getData() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     final user = preferences.getString('userDetails');
     setState(() {
       data = jsonStringToMap(user!);
-      print('data----------------------------$data');
-      print('data----------------------------${data['user_id']}');
     });
     _getImgeUrl(data['user_id']);
   }
@@ -40,15 +40,11 @@ class _CustomAppBarState extends State<CustomAppBar> {
     return result;
   }
 
-
-
   var fetchImageData;
 
   void _getImgeUrl(String doctorId) async {
-    fetchImageData = await ApiEditProfiles.getImgeUrl(doctorId);
-    print('%%%%%%%%%%%%%%${fetchImageData}');
-    if (fetchImageData[0]['image'] !='') {
-      print('%%%%%%%%%%%%%%${fetchImageData}');
+    fetchImageData = await ApiEditProfiles.getImageUrl(doctorId);
+    if (fetchImageData[0]['image'] != '') {
       setState(() {
         uplaodImage = false;
       });
@@ -58,7 +54,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
       });
     }
   }
-
+  String test='aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa aaaaaaaaa0';
   @override
   void initState() {
     // TODO: implement initState
@@ -70,8 +66,6 @@ class _CustomAppBarState extends State<CustomAppBar> {
   Widget build(BuildContext context) {
     return AppBar(
       automaticallyImplyLeading: false,
-      // leadingWidth: 8,
-      // leading: Icon(Icons.android),
       leading: widget.isleading
           ? Builder(
               builder: (BuildContext context) {
@@ -101,8 +95,10 @@ class _CustomAppBarState extends State<CustomAppBar> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                data == null ? 'Dr.' : 'Dr. ${data['name']} ',
-                style: TextStyle(
+                data == null
+                    ? 'Dr.'
+                    : 'Dr. ${data['name'].length > 17 ? data['name'].substring(0, 17) + '...' : data['name'] ?? ''} ',
+                style: const TextStyle(
                   color: Colors.black,
                   fontSize: 17.0,
                   fontWeight: FontWeight.bold,
@@ -112,10 +108,10 @@ class _CustomAppBarState extends State<CustomAppBar> {
           ),
         ),
         uplaodImage
-            ? Padding(
-                padding: const EdgeInsets.all(8.0),
+            ? const Padding(
+                padding: EdgeInsets.all(8.0),
                 child: AvatarImagePD(
-                  "https://www.kindpng.com/picc/m/198-1985282_doctor-profile-icon-png-transparent-png.png",
+                  AppUrls.user,
                   radius: 35,
                   height: 40,
                   width: 40,

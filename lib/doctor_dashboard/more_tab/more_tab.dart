@@ -1,8 +1,7 @@
 import 'dart:convert';
 import 'package:animated_theme_switcher/animated_theme_switcher.dart';
-import 'package:doctor/dashboard_assistent/home_dashboard_assistent.dart';
-import 'package:doctor/dashboard_patient/home_patient_dashboard.dart';
-import 'package:doctor/dashboard_patient/widgets/avatar_image.dart';
+import 'package:doctor/core/constants/apis.dart';
+import 'package:doctor/core/avatar_image.dart';
 import 'package:doctor/doctor_dashboard/appointments/save_consult/api/api.dart';
 import 'package:doctor/doctor_dashboard/custom_widgtes/app_bar.dart';
 import 'package:doctor/doctor_dashboard/more_tab/about.dart';
@@ -15,7 +14,7 @@ import 'package:doctor/doctor_dashboard/more_tab/edit_profile/model_speciality.d
 import 'package:doctor/doctor_dashboard/more_tab/privacy_policy.dart';
 import 'package:doctor/doctor_dashboard/more_tab/settings/setting.dart';
 import 'package:doctor/doctor_dashboard/more_tab/terms_notes.dart';
-import 'package:doctor/route.dart';
+import 'package:doctor/core/constants/route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
@@ -23,10 +22,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'constant.dart';
 import 'package:doctor/doctor_dashboard/more_tab/widget/profile_list_item.dart';
 import 'package:http/http.dart' as http;
+import 'package:doctor/core/constants/urls.dart';
 
 class MoreTabDD extends StatefulWidget {
   MoreTabDD({required this.userData, required this.userID});
-
   final userID;
   final userData;
 
@@ -54,8 +53,6 @@ class _MoreTabDDState extends State<MoreTabDD> {
     final user = preferences.getString('userDetails');
     setState(() {
       data = jsonStringToMap(user!);
-      print('data----------------------------$data');
-      print('data----------------------------${data['user_id']}');
     });
     _getImgeUrl(data == null ? '' : data['user_id']);
   }
@@ -84,7 +81,7 @@ class _MoreTabDDState extends State<MoreTabDD> {
     _getImgeUrl(widget.userID);
     setState(() {});
     var API =
-        'https://cabeloclinic.com/website/medlife/php_auth_api/fetch_profile_api.php';
+        '${API_BASE_URL}fetch_profile_api.php';
     Map<String, dynamic> body = {
       'doctor_id': widget.userID,
     };
@@ -94,19 +91,12 @@ class _MoreTabDDState extends State<MoreTabDD> {
     http.Response response = await http
         .post(Uri.parse(API), body: body)
         .then((value) => value)
-        .catchError((error) => print(" Failed to fetchProfileData: $error"));
-    print('1...............................${response.body}');
+        .catchError((error) => print(error));
     if (response.statusCode == 200) {
       fetchUserData = jsonDecode(response.body.toString());
       textLanguages = fetchUserData[0]['languages'].toString();
-      print(
-          'textLanguages-------------------${textLanguages}------------${textLanguages!.length}');
       textDegree = fetchUserData[0]['degree'].toString();
-      print(
-          'textDegree-------------------${textDegree}------------${textDegree!.length}');
       textSpeciality = fetchUserData[0]['specialty'].toString();
-      print(
-          'textSpeciality-------------------${textSpeciality}------------${textSpeciality!.length}');
       String firstTextL = textLanguages!;
       String firstTextD = textDegree!;
       String firstTextS = textSpeciality!;
@@ -125,47 +115,34 @@ class _MoreTabDDState extends State<MoreTabDD> {
       final splitedTextL = finalStringL.split(',');
       final splitedTextD = finalStringD.split(',');
       final splitedTextS = finalStringS.split(',');
-      print('2...............................}');
-      if (textLanguages!.length == 0) {
-        print(
-            '5........................${modelLanguages2![0]['language']}.......}');
+      if (textLanguages!.isEmpty) {
         modelLanguages3=[];
       } else {
         for (int i = 0; i < splitedTextL.length; i++) {
-          print('77777getUserData777777755$i--${splitedTextL[i].toString()}');
           modelLanguages3!.add(splitedTextL[i].toString());
         }
       }
-      print('3...............................}');
-      if (textDegree!.length == 0) {
-        print('6...............................}');
+      if (textDegree!.isEmpty) {
         modelDegree3=[];
       } else {
         for (int i = 0; i < splitedTextD.length; i++) {
-          print('77777getUserData777777755$i--${splitedTextD[i].toString()}');
           modelDegree3!.add(splitedTextD[i].toString());
         }
       }
-      print('4...............................}');
-      if (textSpeciality!.length == 0) {
+      if (textSpeciality!.isEmpty) {
         modelSpeciality3=[];
       } else {
         for (int i = 0; i < splitedTextS.length; i++) {
-          print('77777getUserData777777755$i--${splitedTextS[i].toString()}');
           modelSpeciality3!.add(splitedTextS[i].toString());
         }
       }
-      print('44...............................}');
-
-      print(
-          'dsa------------${modelDegree3![0]}-----${modelSpeciality3![0]}-------${modelLanguages3![0]}');
     } else {}
   }
 
   var fetchImageData;
 
   void _getImgeUrl(String doctorId) async {
-    fetchImageData = await ApiEditProfiles.getImgeUrl(doctorId);
+    fetchImageData = await ApiEditProfiles.getImageUrl(doctorId);
     if (fetchImageData[0]['image'] != '') {
       setState(() {
         uplaodImage = false;
@@ -178,14 +155,11 @@ class _MoreTabDDState extends State<MoreTabDD> {
   }
 
   Future<dynamic> getLanguages() async {
-    print('i========');
     var API =
-        'https://cabeloclinic.com/website/medlife/php_auth_api/languages_api.php';
+        '${API_BASE_URL}languages_api.php';
     try {
-      print('i========');
       final response = await http.post(Uri.parse(API));
       if (response.statusCode == 200) {
-        print('i========${response.body}');
         Iterable l = json.decode(response.body);
         List<ModelLanguages> posts = List<ModelLanguages>.from(
             l.map((model) => ModelLanguages.fromJson(model)));
@@ -195,13 +169,8 @@ class _MoreTabDDState extends State<MoreTabDD> {
             'language': posts[i].language.toString()
           });
         }
-        print('i========${modelLanguages2!.length}');
-        for (int i = 0; i < modelLanguages2!.length; i++) {
-          print('i========${modelLanguages2![i]}');
-        }
         jsonLanguage =
             jsonEncode(modelLanguages2!.map((e) => e.toJson()).toList());
-        print('=jsonLanguage=======${jsonLanguage}');
         setState(() {
           flagAccess = false;
         });
@@ -213,8 +182,7 @@ class _MoreTabDDState extends State<MoreTabDD> {
   }
 
   Future<dynamic> getDegrees() async {
-    var API =
-        'https://cabeloclinic.com/website/medlife/php_auth_api/degree_api.php';
+    var API = '${API_BASE_URL}degree_api.php';
     try {
       final response = await http.post(Uri.parse(API));
       if (response.statusCode == 200) {
@@ -237,9 +205,8 @@ class _MoreTabDDState extends State<MoreTabDD> {
     }
   }
 
-  Future<dynamic> getSpecialtyc() async {
-    var API =
-        'https://cabeloclinic.com/website/medlife/php_auth_api/specialist_profile_api.php';
+  Future<dynamic> getSpecialty() async {
+    var API = '${API_BASE_URL}specialist_profile_api.php';
     try {
       final response = await http.post(Uri.parse(API));
       if (response.statusCode == 200) {
@@ -252,14 +219,7 @@ class _MoreTabDDState extends State<MoreTabDD> {
             'speciality': posts[i].doctor_speciality.toString()
           });
         }
-        print('/modelSpeciality2///////////////${modelSpeciality2}');
-        for (int i = 0; i < modelSpeciality2!.length; i++) {
-          print('========${modelSpeciality2![i].speciality}');
-        }
-        jsonSpeciality =
-            jsonEncode(modelSpeciality2!.map((e) => e.toJson()).toList());
-        print('=jsonSpeciality=======${jsonSpeciality}');
-
+        jsonSpeciality = jsonEncode(modelSpeciality2!.map((e) => e.toJson()).toList());
         setState(() {
           flagAccess = false;
         });
@@ -273,7 +233,7 @@ class _MoreTabDDState extends State<MoreTabDD> {
   void getApiData() async {
     await getLanguages();
     await getDegrees();
-    await getSpecialtyc();
+    await getSpecialty();
     await getData();
     await getUserData();
   }
@@ -289,7 +249,7 @@ class _MoreTabDDState extends State<MoreTabDD> {
   Widget build(BuildContext context) {
     ScreenUtil.init(
       context,
-      designSize: Size(414, 896),
+      designSize: const Size(414, 896),
     );
     var profileInfo = Expanded(
       child: Column(
@@ -323,7 +283,7 @@ class _MoreTabDDState extends State<MoreTabDD> {
                     });
                   },
                   child: uplaodImage
-                      ? Center(
+                      ? const Center(
                           child: CircularProgressIndicator(),
                         )
                       : fetchImageData[0]['image'] != ''
@@ -332,7 +292,7 @@ class _MoreTabDDState extends State<MoreTabDD> {
                               radius: kSpacingUnit.w * 5,
                             )
                           : AvatarImagePD(
-                              'https://www.kindpng.com/picc/m/198-1985282_doctor-profile-icon-png-transparent-png.png',
+                              AppUrls.user,
                               radius: kSpacingUnit.w * 5,
                             ),
                 ),
@@ -341,8 +301,8 @@ class _MoreTabDDState extends State<MoreTabDD> {
                   child: Container(
                     height: kSpacingUnit.w * 2.5,
                     width: kSpacingUnit.w * 2.5,
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).accentColor,
+                    decoration: const BoxDecoration(
+                      color: Colors.amber,
                       shape: BoxShape.circle,
                     ),
                     child: Center(
@@ -363,7 +323,11 @@ class _MoreTabDDState extends State<MoreTabDD> {
           ),
           SizedBox(height: kSpacingUnit.w * 2),
           Text(
-            'Dr. ${data == null ? '' : data['name']}',
+            'Dr. ${data == null ? '' : (data['name'].length > 20
+                ? data['name']
+                .substring(0, 20) +
+                '...'
+                : data['name'] ?? '')}',
             style: kTitleTextStyle,
           ),
           SizedBox(height: kSpacingUnit.w * 0.5),
@@ -373,7 +337,7 @@ class _MoreTabDDState extends State<MoreTabDD> {
                   width: kSpacingUnit.w * 20,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(kSpacingUnit.w * 3),
-                    color: Theme.of(context).accentColor,
+                    color: Colors.amber,
                   ),
                   child: Center(
                     child: Text(
@@ -409,7 +373,7 @@ class _MoreTabDDState extends State<MoreTabDD> {
                     width: kSpacingUnit.w * 20,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(kSpacingUnit.w * 3),
-                      color: Theme.of(context).accentColor,
+                      color: Colors.amber,
                     ),
                     child: Center(
                       child: Text(
@@ -426,7 +390,7 @@ class _MoreTabDDState extends State<MoreTabDD> {
     var themeSwitcher = ThemeSwitcher(
       builder: (context) {
         return AnimatedCrossFade(
-          duration: Duration(milliseconds: 200),
+          duration: const Duration(milliseconds: 200),
           crossFadeState:
               ThemeModelInheritedNotifier.of(context).theme == Brightness.light
                   ? CrossFadeState.showFirst
@@ -476,7 +440,7 @@ class _MoreTabDDState extends State<MoreTabDD> {
               children: [
                 Text(
                   data == null ? 'Dr.' : 'Dr. ${data['name']} ',
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.black,
                     fontSize: 17.0,
                     fontWeight: FontWeight.bold,
@@ -486,10 +450,10 @@ class _MoreTabDDState extends State<MoreTabDD> {
             ),
           ),
           uplaodImage
-              ? Padding(
-                  padding: const EdgeInsets.all(8.0),
+              ? const Padding(
+                  padding: EdgeInsets.all(8.0),
                   child: AvatarImagePD(
-                    "https://www.kindpng.com/picc/m/198-1985282_doctor-profile-icon-png-transparent-png.png",
+                    AppUrls.user,
                     radius: 35,
                     height: 40,
                     width: 40,
@@ -518,7 +482,7 @@ class _MoreTabDDState extends State<MoreTabDD> {
             header,
             SizedBox(height: kSpacingUnit.w * 3),
             GestureDetector(
-              child: ProfileListItem(
+              child: const ProfileListItem(
                 icon: Icons.password,
                 text: 'Change Password',
               ),
@@ -531,9 +495,9 @@ class _MoreTabDDState extends State<MoreTabDD> {
               },
             ),
             GestureDetector(
-              child: ProfileListItem(
+              child: const ProfileListItem(
                 icon: LineAwesomeIcons.user,
-                text: 'My Assistent',
+                text: 'My Assistant',
               ),
               onTap: () {
                 Navigator.of(context).push(MaterialPageRoute(
@@ -544,7 +508,7 @@ class _MoreTabDDState extends State<MoreTabDD> {
               },
             ),
             GestureDetector(
-              child: ProfileListItem(
+              child: const ProfileListItem(
                 icon: LineAwesomeIcons.cog,
                 text: 'Settings',
               ),
@@ -557,66 +521,46 @@ class _MoreTabDDState extends State<MoreTabDD> {
               },
             ),
             GestureDetector(
-              child: ProfileListItem(
+              child: const ProfileListItem(
                 icon: LineAwesomeIcons.question_circle,
-                text: 'About Medeleaf',
+                text: 'About Medilipse',
               ),
               onTap: () {
                 Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (_) => About()));
+                    .push(MaterialPageRoute(builder: (_) => const About()));
               },
             ),
             GestureDetector(
-              child: ProfileListItem(
+              child: const ProfileListItem(
                 icon: LineAwesomeIcons.user_shield,
                 text: 'Privacy Policy',
               ),
               onTap: () {
                 Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (_) => PrivacyPolicy()));
+                    .push(MaterialPageRoute(builder: (_) => const PrivacyPolicy()));
               },
             ),
             GestureDetector(
-              child: ProfileListItem(
+              child: const ProfileListItem(
                 icon: LineAwesomeIcons.book,
                 text: 'Term & Condition',
               ),
               onTap: () {
                 Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (_) => TermsOfServices()));
+                    .push(MaterialPageRoute(builder: (_) => const TermsOfServices()));
               },
             ),
             GestureDetector(
-              child: ProfileListItem(
+              child: const ProfileListItem(
                 icon: LineAwesomeIcons.alternate_sign_out,
                 text: 'Logout',
                 hasNavigation: false,
               ),
               onTap: () async {
-                SharedPreferences preferences =
-                    await SharedPreferences.getInstance();
+                SharedPreferences preferences = await SharedPreferences.getInstance();
                 preferences.setBool('isLogin', false);
+                if (!mounted) return;
                 Navigator.pushReplacementNamed(context, RouteGenerator.signIn);
-              },
-            ),
-            GestureDetector(
-              child: ProfileListItem(
-                icon: LineAwesomeIcons.book,
-                text: 'Patient Dashboard',
-              ),
-              onTap: () {
-                Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => PatientDashboard()));
-              },
-            ),
-            GestureDetector(
-              child: ProfileListItem(
-                icon: LineAwesomeIcons.book,
-                text: 'Assistent Dashboard',
-              ),
-              onTap: () {
-                Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => AssistentDashBoard()));
               },
             ),
           ],
@@ -626,7 +570,7 @@ class _MoreTabDDState extends State<MoreTabDD> {
   }
 
   getAppBar() {
-    return PreferredSize(
+    return const PreferredSize(
       preferredSize: Size.fromHeight(60),
       child: CustomAppBar(
         isleading: false,

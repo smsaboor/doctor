@@ -1,11 +1,10 @@
 import 'dart:convert';
-
-import 'package:doctor/dashboard_patient/widgets/avatar_image.dart';
+import 'package:doctor/core/constants/apis.dart';
+import 'package:doctor/core/avatar_image.dart';
 import 'package:doctor/doctor_dashboard/appointments/save_consult/save_consult.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
+import 'dart:ui';
 class NextAppointmentCard extends StatefulWidget {
   const NextAppointmentCard(
       {Key? key,
@@ -44,19 +43,41 @@ class NextAppointmentCard extends StatefulWidget {
 class _NextAppointmentCardState extends State<NextAppointmentCard> {
   int? _value;
   bool dataF = false;
+  double fontSizeName = 16;
+  double fontSizeAddress = 16;
+  bool fontTwoLine = false;
   var dataSkipAppointment;
+  int? addressMaxlength;
+
+  @override
+  void initState() {
+    addressMaxlength = widget.address.length;
+    super.initState();
+    if (widget.patient_name.length > 20) {
+      fontSizeName = 12;
+    } else if (widget.patient_name.length > 25) {
+      fontSizeName = 10;
+    }
+    if (widget.address.length > 25) {
+      fontSizeAddress = 14;
+      fontTwoLine = true;
+      addressMaxlength = 25;
+    } else if (widget.address.length > 100) {
+      fontSizeAddress = 8;
+      fontTwoLine = true;
+      addressMaxlength = 25;
+    }
+  }
 
   changeStatus(int changedValue, String appNo) async {
-    print('change value=$changedValue    --------  appN = $appNo');
     if (changedValue == 1) {
       dataF = true;
-      var API =
-          'https://cabeloclinic.com/website/medlife/php_auth_api/skip_appointment_api.php';
+      var API = '${API_BASE_URL}skip_appointment_api.php';
       Map<String, dynamic> body = {'appointment_no': appNo};
       http.Response response = await http
           .post(Uri.parse(API), body: body)
           .then((value) => value)
-          .catchError((error) => print(" Failed to changeStatus: $error"));
+          .catchError((error) => print(error));
       if (response.statusCode == 200) {
         setState(() {
           dataF = false;
@@ -65,20 +86,17 @@ class _NextAppointmentCardState extends State<NextAppointmentCard> {
       } else {}
     } else if (changedValue == 2) {
       dataF = true;
-      var API =
-          'https://cabeloclinic.com/website/medlife/php_auth_api/reject_appointment_api.php';
+      var API = '${API_BASE_URL}reject_appointment_api.php';
       Map<String, dynamic> body = {'appointment_no': appNo};
       http.Response response = await http
           .post(Uri.parse(API), body: body)
           .then((value) => value)
-          .catchError((error) => print(" Failed to changeStatus: $error"));
+          .catchError((error) => print(error));
       if (response.statusCode == 200) {
         setState(() {
           dataF = false;
         });
         dataSkipAppointment = jsonDecode(response.body.toString());
-        print(
-            '..changeStatus 22222222222222222222222222222222....${dataSkipAppointment.length ?? 0}');
       } else {}
     }
   }
@@ -88,12 +106,12 @@ class _NextAppointmentCardState extends State<NextAppointmentCard> {
     return Padding(
       padding: const EdgeInsets.only(left: 10.0, right: 5, bottom: 5, top: 5),
       child: SizedBox(
-        height: 290,
+        height: 300,
         width: MediaQuery.of(context).size.width * .9,
         child: Card(
           elevation: 10,
           color: Colors.white,
-          shape: RoundedRectangleBorder(
+          shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(10)),
             side: BorderSide(color: Colors.white),
           ),
@@ -108,10 +126,10 @@ class _NextAppointmentCardState extends State<NextAppointmentCard> {
                     Padding(
                       padding: const EdgeInsets.only(left: 15.0),
                       child: AvatarImagePD(
-                        "https://images.unsplash.com/photo-1537368910025-700350fe46c7?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80",
+                        widget.image,
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 20,
                     ),
                     Column(
@@ -123,25 +141,25 @@ class _NextAppointmentCardState extends State<NextAppointmentCard> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              Text(
+                              const Text(
                                 'Appointment No:',
                                 style: TextStyle(
                                     fontSize: 16, fontWeight: FontWeight.w500),
                               ),
                               Text(
                                 '  ${widget.appointment_no}',
-                                style: TextStyle(
+                                style: const TextStyle(
                                     fontSize: 16, fontWeight: FontWeight.w400),
                               ),
-                              Spacer(),
+                              const Spacer(),
                               PopupMenuButton<int>(
                                   itemBuilder: (BuildContext context) =>
                                       <PopupMenuItem<int>>[
-                                        new PopupMenuItem<int>(
-                                            value: 1, child: new Text('Skip')),
-                                        new PopupMenuItem<int>(
+                                        const PopupMenuItem<int>(
+                                            value: 1, child: Text('Skip')),
+                                        const PopupMenuItem<int>(
                                             value: 2,
-                                            child: new Text('Reject')),
+                                            child: Text('Reject')),
                                       ],
                                   onSelected: (int value) {
                                     setState(() {
@@ -155,7 +173,7 @@ class _NextAppointmentCardState extends State<NextAppointmentCard> {
                         ),
                         Row(
                           children: [
-                            Text(
+                            const Text(
                               'Booking Type:',
                               style: TextStyle(
                                   fontSize: 16, fontWeight: FontWeight.w500),
@@ -171,12 +189,12 @@ class _NextAppointmentCardState extends State<NextAppointmentCard> {
                             ),
                           ],
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 3,
                         ),
                         Row(
                           children: [
-                            Text(
+                            const Text(
                               'Name:',
                               style: TextStyle(
                                   fontSize: 16,
@@ -184,13 +202,16 @@ class _NextAppointmentCardState extends State<NextAppointmentCard> {
                                   fontWeight: FontWeight.w500),
                             ),
                             Text(
-                              '  ${widget.patient_name}',
+                              ' ${widget.patient_name[0].toUpperCase()}${widget.patient_name.length > 16 ?
+                              widget.patient_name.substring(0, 16)+'...' :
+                              widget.patient_name.substring(1) ?? ''}',
                               style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.w500),
+                                  fontSize: fontSizeName,
+                                  fontWeight: FontWeight.w500),
                             ),
                           ],
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 3,
                         ),
                         Row(
@@ -198,7 +219,7 @@ class _NextAppointmentCardState extends State<NextAppointmentCard> {
                           children: [
                             Row(
                               children: [
-                                Text(
+                                const Text(
                                   'Sex:',
                                   style: TextStyle(
                                       color: Colors.pink,
@@ -207,18 +228,18 @@ class _NextAppointmentCardState extends State<NextAppointmentCard> {
                                 ),
                                 Text(
                                   '  ${widget.gender},',
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w400),
                                 ),
                               ],
                             ),
-                            SizedBox(
+                            const SizedBox(
                               width: 10,
                             ),
                             Row(
                               children: [
-                                Text(
+                                const Text(
                                   'Age:',
                                   style: TextStyle(
                                       color: Colors.pink,
@@ -227,7 +248,7 @@ class _NextAppointmentCardState extends State<NextAppointmentCard> {
                                 ),
                                 Text(
                                   ' ${widget.age}',
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w400),
                                 ),
@@ -235,12 +256,12 @@ class _NextAppointmentCardState extends State<NextAppointmentCard> {
                             ),
                           ],
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 3,
                         ),
                         Row(
                           children: [
-                            Text(
+                            const Text(
                               'Address:',
                               style: TextStyle(
                                   color: Colors.pink,
@@ -248,18 +269,35 @@ class _NextAppointmentCardState extends State<NextAppointmentCard> {
                                   fontWeight: FontWeight.w500),
                             ),
                             Text(
-                              '  ${widget.address}',
+                              ' ${widget.address.length > 16 ?
+                              widget.address.substring(0, 16)+'...' :
+                              widget.address.substring(0) ?? ''}',
                               style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.w400),
+                                  fontFeatures: const [
+                                    FontFeature.tabularFigures(),
+                                  ],
+                                  fontSize: fontSizeAddress,
+                                  fontWeight: FontWeight.w400),
                             ),
                           ],
                         ),
-                        SizedBox(
+                        fontTwoLine
+                            ? Text(
+                                '${widget.address.toLowerCase().substring(26, widget.address.length)}',
+                                maxLines: 3,
+                                softWrap: true,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                    fontSize: fontSizeAddress,
+                                    fontWeight: FontWeight.w400),
+                              )
+                            : Container(),
+                        const SizedBox(
                           height: 5,
                         ),
                         Row(
                           children: [
-                            Text(
+                            const Text(
                               'Date:',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -268,7 +306,7 @@ class _NextAppointmentCardState extends State<NextAppointmentCard> {
                             ),
                             Text(
                               '  ${widget.date}',
-                              style: TextStyle(
+                              style: const TextStyle(
                                   fontSize: 16, fontWeight: FontWeight.w400),
                             ),
                           ],
@@ -277,7 +315,7 @@ class _NextAppointmentCardState extends State<NextAppointmentCard> {
                     )
                   ],
                 ),
-                Divider(
+                const Divider(
                   color: Colors.black12,
                 ),
                 Row(
@@ -285,7 +323,7 @@ class _NextAppointmentCardState extends State<NextAppointmentCard> {
                   children: [
                     Row(
                       children: [
-                        Text(
+                        const Text(
                           'Total Fees: ',
                           style: TextStyle(
                               fontSize: 16,
@@ -294,7 +332,7 @@ class _NextAppointmentCardState extends State<NextAppointmentCard> {
                         ),
                         Text(
                           widget.total_fees,
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
                               color: Colors.black87),
@@ -303,16 +341,17 @@ class _NextAppointmentCardState extends State<NextAppointmentCard> {
                     ),
                     Row(
                       children: [
-                        Text(
+                        const Text(
                           'Received: ',
                           style: TextStyle(
+
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                               color: Colors.black87),
                         ),
                         Text(
                           widget.received_payment,
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: Colors.green),
@@ -321,7 +360,7 @@ class _NextAppointmentCardState extends State<NextAppointmentCard> {
                     ),
                     Row(
                       children: [
-                        Text(
+                        const Text(
                           'Due: ',
                           style: TextStyle(
                               fontSize: 16,
@@ -330,7 +369,7 @@ class _NextAppointmentCardState extends State<NextAppointmentCard> {
                         ),
                         Text(
                           widget.due_payment,
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: Colors.red),
@@ -339,7 +378,7 @@ class _NextAppointmentCardState extends State<NextAppointmentCard> {
                     ),
                   ],
                 ),
-                Divider(
+                const Divider(
                   color: Colors.black12,
                 ),
                 Padding(
@@ -347,80 +386,28 @@ class _NextAppointmentCardState extends State<NextAppointmentCard> {
                   child: SizedBox(
                     width: MediaQuery.of(context).size.width * .8,
                     height: 50,
-                    child: Container(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (_) => SaveConsultDD(
-                                    appointmentNumber: widget.appointment_no,
-                                    patientName: widget.patient_name,
-                                    patientId: widget.patient_id,
-                                  )));
-                        },
-                        style: ElevatedButton.styleFrom(
-                            primary: Colors.pink,
-                            textStyle: TextStyle(
-                                fontSize: 30, fontWeight: FontWeight.bold)),
-                        child: Text(
-                          widget.button,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 20),
-                        ),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (_) => SaveConsultDD(
+                                  appointmentNumber: widget.appointment_no,
+                                  patientName: widget.patient_name,
+                                  patientId: widget.patient_id,
+                                )));
+                      },
+                      style: ElevatedButton.styleFrom(
+                          primary: Colors.pink,
+                          textStyle: const TextStyle(
+                              fontSize: 30, fontWeight: FontWeight.bold)),
+                      child: Text(
+                        widget.button,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 20),
                       ),
                     ),
                   ),
                 )
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                //   children: [
-                //   Text(
-                //     'Total',
-                //     style: TextStyle(
-                //         fontSize: 16,
-                //         fontWeight: FontWeight.w600,
-                //         color: Colors.black87),
-                //   ),
-                //   Text(
-                //     'Received',
-                //     style: TextStyle(
-                //         fontSize: 16,
-                //         fontWeight: FontWeight.w600,
-                //         color: Colors.black87),
-                //   ),
-                //   Text(
-                //     'Due',
-                //     style: TextStyle(
-                //         fontSize: 16,
-                //         fontWeight: FontWeight.w600,
-                //         color: Colors.black87),
-                //   ),
-                // ],),
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                //   children: [
-                //     Text(
-                //       '1200 Rs',
-                //       style: TextStyle(
-                //           fontSize: 16,
-                //           fontWeight: FontWeight.w400,
-                //           color: Colors.black87),
-                //     ),
-                //     Text(
-                //       '800',
-                //       style: TextStyle(
-                //           fontSize: 16,
-                //           fontWeight: FontWeight.w400,
-                //           color: Colors.black87),
-                //     ),
-                //     Text(
-                //       '400',
-                //       style: TextStyle(
-                //           fontSize: 16,
-                //           fontWeight: FontWeight.w400,
-                //           color: Colors.black87),
-                //     ),
-                //   ],)
               ],
             ),
           ),
@@ -428,27 +415,4 @@ class _NextAppointmentCardState extends State<NextAppointmentCard> {
       ),
     );
   }
-
-  void choiceAction(String choice) {
-    if (choice == Constants.fund) {
-      print('Settings');
-    } else if (choice == Constants.SignOut) {
-      print('Subscribe');
-    } else if (choice == Constants.SignOut) {
-      print('SignOut');
-    }
-  }
-}
-
-class Constants {
-  static const String fund = 'Fund';
-
-//  static const String Settings = 'Settings';
-  static const String SignOut = 'Sign out';
-
-  static const List<String> choices = <String>[
-    'fund',
-    'enter code here',
-    'SignOut'
-  ];
 }

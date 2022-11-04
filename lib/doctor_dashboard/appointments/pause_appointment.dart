@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'package:doctor/core/constants/apis.dart';
 import 'package:doctor/doctor_dashboard/appointments/pause_appointmentCard.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:doctor/core/shimmer/shimmer.dart';
 
 class PauseAppointmentsDD extends StatefulWidget {
   const PauseAppointmentsDD({Key? key, required this.doctorId})
@@ -18,12 +20,12 @@ class _PauseAppointmentsDDState extends State<PauseAppointmentsDD> {
   bool dataHomeFlag = true;
 
   Future<void> getAllAppointments() async {
-    var API = 'https://cabeloclinic.com/website/medlife/php_auth_api/pending_appointment_api.php';
+    var API = '${API_BASE_URL}pending_appointment_api.php';
     Map<String, dynamic> body = {'doctor_id': widget.doctorId};
     http.Response response = await http
         .post(Uri.parse(API), body: body)
         .then((value) => value)
-        .catchError((error) => print(" Failed to getAPPOINTMENTS $error"));
+        .catchError((error) => print(error));
     if (response.statusCode == 200) {
       dataAppointments = jsonDecode(response.body.toString());
       setState(() {
@@ -36,18 +38,17 @@ class _PauseAppointmentsDDState extends State<PauseAppointmentsDD> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    print('wwwwww${widget.doctorId}');
     getAllAppointments();
   }
 
-  final popupMenu = new PopupMenuButton(
-    child: new ListTile(
-      title: new Text('Doge or lion?'),
-      trailing: const Icon(Icons.more_vert),
+  final popupMenu = PopupMenuButton(
+    child: const ListTile(
+      title: Text('Doge or lion?'),
+      trailing: Icon(Icons.more_vert),
     ),
     itemBuilder: (_) => <PopupMenuItem<String>>[
-      new PopupMenuItem<String>(child: new Text('Doge'), value: 'Doge'),
-      new PopupMenuItem<String>(child: new Text('Lion'), value: 'Lion'),
+      const PopupMenuItem<String>(value: 'Doge', child: Text('Doge')),
+      const PopupMenuItem<String>(value: 'Lion', child: Text('Lion')),
     ],
     onSelected: (v) {},
   );
@@ -58,21 +59,27 @@ class _PauseAppointmentsDDState extends State<PauseAppointmentsDD> {
       child: Column(
         children: [
           dataHomeFlag
-              ? Center(
-            child: CircularProgressIndicator(),
-          )
-              : FutureBuilder(
+              ? const ShimmerCategories()
+              : (dataAppointments.length ?? 0) == 0
+              ? const Padding(
+            padding:  EdgeInsets.only(top: 150.0),
+                child: Center(
+            child: Text('No Pause Appointments !'),
+          ),
+              )
+              :FutureBuilder(
             future: getAllAppointments(),
             builder: (context, snapshot) {
               return ListView.builder(
                   shrinkWrap: true,
-                  physics: ScrollPhysics(),
+                  physics: const ScrollPhysics(),
                   itemCount: dataAppointments.length ?? 0,
                   itemBuilder: (context, index) {
                     return PauseAppointmentCard(
                       button: 'Reactive Consult',
                       appointment_no:
                       dataAppointments[index]['appointment_no'] ?? '',
+                      image: dataAppointments[index]['image'] ?? '',
                       booking_type:
                       dataAppointments[index]['booking_type'] ?? '',
                       address: dataAppointments[index]['address'] ?? '',

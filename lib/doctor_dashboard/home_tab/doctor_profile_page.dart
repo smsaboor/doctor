@@ -1,8 +1,8 @@
 
-import 'package:doctor/dashboard_patient/theme/colors.dart';
-import 'package:doctor/dashboard_patient/widgets/avatar_image.dart';
-import 'package:doctor/dashboard_patient/widgets/doctor_info_box.dart';
-import 'package:doctor/dashboard_patient/widgets/mybutton.dart';
+import 'package:doctor/doctor_dashboard/theme/colors.dart';
+import 'package:doctor/core/avatar_image.dart';
+import 'package:doctor/doctor_dashboard/more_tab/widget/doctor_info_box.dart';
+import 'package:doctor/doctor_dashboard/more_tab/widget/mybutton.dart';
 import 'package:flutter/material.dart';
 
 class DoctorProfilePageDD extends StatefulWidget {
@@ -18,10 +18,7 @@ class _DoctorProfilePageDDState extends State<DoctorProfilePageDD> {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
-        return Container(child: Text('mytext'),);
-        // return RequestSheet(
-        //   doctor: widget.doctor,
-        // );
+        return const Text('mytext');
       },
     );
   }
@@ -30,10 +27,10 @@ class _DoctorProfilePageDDState extends State<DoctorProfilePageDD> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.black),
+        iconTheme: const IconThemeData(color: Colors.black),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Text(
+        title: const Text(
           "Doctor's Profile",
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
         ),
@@ -54,13 +51,12 @@ class _DoctorProfilePageDDState extends State<DoctorProfilePageDD> {
   }
 
   getBody() {
-    print('..............................${widget.doctor['image'].toString()}');
     return SingleChildScrollView(
-      padding: EdgeInsets.only(left: 15, right: 15),
+      padding: const EdgeInsets.only(left: 15, right: 15),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          SizedBox(
+          const SizedBox(
             height: 25,
           ),
           Row(
@@ -78,48 +74,48 @@ class _DoctorProfilePageDDState extends State<DoctorProfilePageDD> {
                   children: [
                     Text(
                         widget.doctor['clinic_name'].toString(),
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontSize: 20, fontWeight: FontWeight.w700)),
-                    SizedBox(
+                    const SizedBox(
                       height: 5,
                     ),
                     Text(widget.doctor['doctor_name'].toString(),
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontSize: 17, fontWeight: FontWeight.w500)),
-                    SizedBox(
+                    const SizedBox(
                       height: 5,
                     ),
                     Text(
                         widget.doctor['digree'].toString(),
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w400,
                             color: Colors.pink)),
-                    SizedBox(
+                    const SizedBox(
                       height: 5,
                     ),
                     Text(
                       widget.doctor['specialty'].toString(),
-                      style: TextStyle(color: Colors.black87, fontSize: 14),
+                      style: const TextStyle(color: Colors.black87, fontSize: 14),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 5,
                     ),
                     Row(
                       children: [
-                        Text(
+                        const Text(
                           'Speak: ',
                           style: TextStyle(
                               color: Colors.black,
                               fontSize: 14,
                               fontWeight: FontWeight.w500),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           width: 5,
                         ),
                         Text(
                           widget.doctor['speak'].toString(),
-                          style: TextStyle(
+                          style: const TextStyle(
                               color: Colors.blueAccent,
                               fontSize: 14,
                               fontWeight: FontWeight.w500),
@@ -128,62 +124,60 @@ class _DoctorProfilePageDDState extends State<DoctorProfilePageDD> {
                     ),
                     Padding(
                       padding: const EdgeInsets.only(left: 0.0, top: 5),
-                      child: Container(
-                        child: ClipRRect(
-                            borderRadius: BorderRadius.all(Radius.circular(10)),
-                            child: Container(
-                              width: 120,
-                              height: 25,
-                              color: Colors.orange,
-                              child: Stack(
-                                fit: StackFit.expand,
-                                children: <Widget>[
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                    CrossAxisAlignment.center,
-                                    children: <Widget>[
-                                      Text(
-                                        'Fees: ${widget.doctor['doctor_fee']}',
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w500,
-                                            color: Colors.white),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            )),
-                      ),
+                      child: ClipRRect(
+                          borderRadius: const BorderRadius.all(Radius.circular(10)),
+                          child: Container(
+                            width: 120,
+                            height: 25,
+                            color: Colors.orange,
+                            child: Stack(
+                              fit: StackFit.expand,
+                              children: <Widget>[
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.center,
+                                  children: <Widget>[
+                                    Text(
+                                      'Fees: ${widget.doctor['doctor_fee']}',
+                                      style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.white),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          )),
                     )
                   ],
                 ),
               ),
             ],
           ),
-          SizedBox(
+          const SizedBox(
             height: 25,
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
+              const Icon(
                 Icons.star,
                 size: 18,
                 color: Colors.orangeAccent,
               ),
-              Icon(
+              const Icon(
                 Icons.star,
                 size: 18,
                 color: Colors.orangeAccent,
               ),
-              Icon(
+              const Icon(
                 Icons.star,
                 size: 18,
                 color: Colors.orangeAccent,
               ),
-              Icon(
+              const Icon(
                 Icons.star,
                 size: 18,
                 color: Colors.orangeAccent,
@@ -195,19 +189,19 @@ class _DoctorProfilePageDDState extends State<DoctorProfilePageDD> {
               ),
             ],
           ),
-          SizedBox(
+          const SizedBox(
             height: 5,
           ),
-          Text("4.0 Out of 5.0",
+          const Text("4.0 Out of 5.0",
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-          SizedBox(
+          const SizedBox(
             height: 3,
           ),
-          Text(
+          const Text(
             "340 Patients review",
             style: TextStyle(color: Colors.grey, fontSize: 12),
           ),
-          SizedBox(
+          const SizedBox(
             height: 25,
           ),
           Container(
@@ -218,7 +212,7 @@ class _DoctorProfilePageDDState extends State<DoctorProfilePageDD> {
               children: [
                 // ContactBox(icon: Icons.videocam_rounded, color: Colors.blue,),
                 Column(
-                  children: [
+                  children: const [
                     Text("Live Consultant",
                         style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.w700)),
@@ -233,7 +227,7 @@ class _DoctorProfilePageDDState extends State<DoctorProfilePageDD> {
                   ],
                 ),
                 Column(
-                  children: [
+                  children: const [
                     Text("Last Booking Number",
                         style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.w700)),
@@ -250,7 +244,7 @@ class _DoctorProfilePageDDState extends State<DoctorProfilePageDD> {
               ],
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           Row(
@@ -262,7 +256,7 @@ class _DoctorProfilePageDDState extends State<DoctorProfilePageDD> {
                 icon: Icons.groups_rounded,
                 color: Colors.green,
               ),
-              SizedBox(
+              const SizedBox(
                 width: 20,
               ),
               DoctorInfoBoxPD(
@@ -273,7 +267,7 @@ class _DoctorProfilePageDDState extends State<DoctorProfilePageDD> {
               ),
             ],
           ),
-          SizedBox(
+          const SizedBox(
             height: 15,
           ),
           Row(
@@ -285,7 +279,7 @@ class _DoctorProfilePageDDState extends State<DoctorProfilePageDD> {
                 icon: Icons.bloodtype_rounded,
                 color: Colors.blue,
               ),
-              SizedBox(
+              const SizedBox(
                 width: 20,
               ),
               DoctorInfoBoxPD(

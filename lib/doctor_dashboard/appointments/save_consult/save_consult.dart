@@ -1,3 +1,4 @@
+import 'package:doctor/core/constants/apis.dart';
 import 'package:doctor/doctor_dashboard/appointments/completed_appointment_card.dart';
 import 'package:doctor/doctor_dashboard/appointments/save_consult/add_doses.dart';
 import 'package:doctor/doctor_dashboard/appointments/save_consult/display_old_appointments.dart';
@@ -34,15 +35,14 @@ class _SaveConsultDDState extends State<SaveConsultDD>
   int status = 0;
 
   Future<void> getAllDoses() async {
-    var API =
-        'https://cabeloclinic.com/website/medlife/php_auth_api/all_doses_api.php';
+    var API = '${API_BASE_URL}all_doses_api.php';
     Map<String, dynamic> body = {
       'appointment_no': widget.appointmentNumber.toString()
     };
     http.Response response = await http
         .post(Uri.parse(API), body: body)
         .then((value) => value)
-        .catchError((error) => print(" Failed to getAPPOINTMENTS $error"));
+        .catchError((error) => print(error));
     if (response.statusCode == 200) {
       dataDoses = jsonDecode(response.body.toString());
       setState(() {
@@ -50,18 +50,17 @@ class _SaveConsultDDState extends State<SaveConsultDD>
       });
     } else {}
   }
-
+  String test='aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa aaaaaaaaa0';
   Future<void> getAllOldAppointments() async {
     setState(() {
       status = 1;
     });
-    var API =
-        'https://cabeloclinic.com/website/medlife/php_auth_api/old_appointment_api.php';
+    var API = '${API_BASE_URL}old_appointment_api.php';
     Map<String, dynamic> body = {'patient_id': widget.patientId.toString()};
     http.Response response = await http
         .post(Uri.parse(API), body: body)
         .then((value) => value)
-        .catchError((error) => print(" Failed to getOldAPPOINTMENTS $error"));
+        .catchError((error) => print(error));
     if (response.statusCode == 200) {
       dataOldAppointments = jsonDecode(response.body.toString());
       if (dataOldAppointments[0]['status'] == 0) {
@@ -79,20 +78,20 @@ class _SaveConsultDDState extends State<SaveConsultDD>
 
   Future<void> appointmentsDone() async {
     appDonF = true;
-    var API =
-        'https://cabeloclinic.com/website/medlife/php_auth_api/complete_after_dose_api.php';
+    var API = '${API_BASE_URL}complete_after_dose_api.php';
     Map<String, dynamic> body = {
       'appointment_no': widget.appointmentNumber.toString()
     };
     http.Response response = await http
         .post(Uri.parse(API), body: body)
         .then((value) => value)
-        .catchError((error) => print(" Failed to appointmentsDone $error"));
+        .catchError((error) => print(error));
     if (response.statusCode == 200) {
       dataDoses = jsonDecode(response.body.toString());
       setState(() {
         appDonF = false;
       });
+      if (!mounted) return;
       Navigator.pop(context);
     } else {}
   }
@@ -117,7 +116,7 @@ class _SaveConsultDDState extends State<SaveConsultDD>
     return Padding(
       padding: const EdgeInsets.only(left: 15.0, right: 15),
       child: Row(children: <Widget>[
-        Text('Medicine Name',
+        const Text('Medicine Name',
             style: TextStyle(
               height: 3.0,
               fontSize: 20.2,
@@ -126,14 +125,14 @@ class _SaveConsultDDState extends State<SaveConsultDD>
         SizedBox(
           width: MediaQuery.of(context).size.width * .1,
         ),
-        Text('Type',
+        const Text('Type',
             style: TextStyle(
               height: 3.0,
               fontSize: 20.2,
               fontWeight: FontWeight.bold,
             )),
-        Spacer(),
-        Text('Dosage Time',
+        const Spacer(),
+        const Text('Dosage Time',
             style: TextStyle(
               height: 3.0,
               fontSize: 20.2,
@@ -146,7 +145,7 @@ class _SaveConsultDDState extends State<SaveConsultDD>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
+      appBar: const PreferredSize(
         preferredSize: Size.fromHeight(55),
         child: CustomAppBar(
           isleading: false,
@@ -155,9 +154,9 @@ class _SaveConsultDDState extends State<SaveConsultDD>
       body: NestedScrollView(
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return <Widget>[
-            new SliverAppBar(
+            SliverAppBar(
               title: SizedBox(
-                  width: MediaQuery.of(context).size.width * .6,
+                  width: MediaQuery.of(context).size.width * .7,
                   child: Padding(
                     padding: const EdgeInsets.only(left: 0.0),
                     child: Row(
@@ -177,20 +176,22 @@ class _SaveConsultDDState extends State<SaveConsultDD>
                         ),
                         Text(
                           '#${widget.appointmentNumber}  ',
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontSize: 18, fontWeight: FontWeight.w500),
                         ), //
                         Text(
-                          '${widget.patientName}',
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.w600),
+                          '${widget.patientName.length > 13 ?
+                          widget.patientName.substring(0, 13)+'...' :
+                          widget.patientName ?? ''}',
+                          style: const TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.w400),
                         ), // Tex
                       ],
                     ),
                   )),
               actions: <Widget>[
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.only(right: 8.0,top: 8,bottom: 8),
                   child: SizedBox(
                     height: 20,
                     width: 100,
@@ -207,7 +208,7 @@ class _SaveConsultDDState extends State<SaveConsultDD>
                                       appNo: widget.appointmentNumber)))
                               .then((value) => dataHomeFlag = true);
                         },
-                        child: Text(
+                        child: const Text(
                           'Add Doses',
                           style: TextStyle(color: Colors.black),
                         )),
@@ -215,7 +216,7 @@ class _SaveConsultDDState extends State<SaveConsultDD>
                 )
               ],
               bottom: PreferredSize(
-                preferredSize: Size.fromHeight(55),
+                preferredSize: const Size.fromHeight(55),
                 child: Container(
                   height: 50,
                   width: double.infinity,
@@ -228,8 +229,8 @@ class _SaveConsultDDState extends State<SaveConsultDD>
                       ),
                       SizedBox(
                           width: MediaQuery.of(context).size.width * .40,
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 8.0),
+                          child: const Padding(
+                            padding: EdgeInsets.only(left: 8.0),
                             child: Text(
                               'Medicine Name',
                               style: TextStyle(
@@ -238,7 +239,7 @@ class _SaveConsultDDState extends State<SaveConsultDD>
                           )),
                       SizedBox(
                           width: MediaQuery.of(context).size.width * .25,
-                          child: Center(
+                          child: const Center(
                             child: Text(
                               'Dosage ',
                               style: TextStyle(
@@ -247,7 +248,7 @@ class _SaveConsultDDState extends State<SaveConsultDD>
                           )),
                       SizedBox(
                           width: MediaQuery.of(context).size.width * .25,
-                          child: Center(
+                          child: const Center(
                               child: Text(
                             'Duration ',
                             style: TextStyle(
@@ -272,13 +273,8 @@ class _SaveConsultDDState extends State<SaveConsultDD>
         },
         body: ListView(
           children: [
-            // header(),
-            // Divider(
-            //   color: Colors.black,
-            //   thickness: 1,
-            // ),
             dataHomeFlag
-                ? Center(
+                ? const Center(
                     child: CircularProgressIndicator(),
                   )
                 : Container(
@@ -289,7 +285,7 @@ class _SaveConsultDDState extends State<SaveConsultDD>
                       builder: (context, snapshot) {
                         return ListView.builder(
                             shrinkWrap: true,
-                            physics: ScrollPhysics(),
+                            physics: const ScrollPhysics(),
                             itemCount: dataDoses.length,
                             itemBuilder: (context, index) {
                               return DosesCardForAll(
@@ -314,7 +310,7 @@ class _SaveConsultDDState extends State<SaveConsultDD>
                   ),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Container(
+              child: SizedBox(
                 width: MediaQuery.of(context).size.width * .5,
                 height: 50,
                 child: ElevatedButton(
@@ -324,12 +320,12 @@ class _SaveConsultDDState extends State<SaveConsultDD>
                   style: ElevatedButton.styleFrom(
                       primary: Colors.blue,
                       textStyle:
-                          TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+                          const TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
                   child: appDonF
-                      ? Center(
+                      ? const Center(
                           child: CircularProgressIndicator(),
                         )
-                      : Text(
+                      : const Text(
                           'Done',
                           textAlign: TextAlign.center,
                           style: TextStyle(
@@ -338,7 +334,7 @@ class _SaveConsultDDState extends State<SaveConsultDD>
                 ),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 30,
             ),
             Container(
@@ -347,7 +343,7 @@ class _SaveConsultDDState extends State<SaveConsultDD>
               width: double.infinity,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [
+                children: const [
                   Text(
                     'Old Appointments',
                     style: TextStyle(
@@ -359,22 +355,22 @@ class _SaveConsultDDState extends State<SaveConsultDD>
               ),
             ),
             status == 0
-                ? Text('')
+                ? const Text('')
                 : status == 1
-                    ? Center(child: Text('Searching....'))
+                    ? const Center(child: Text('Searching....'))
                     : status == 2
-                        ? Center(child: Text('No Data Found'))
+                        ? const Center(child: Text('No Data Found'))
                         : status == 3
-                            ? Text('')
-                            : Text('oops something wrong please try again '),
+                            ? const Text('')
+                            : const Text('oops something wrong please try again '),
             status != 3
-                ? Center(child: Text(''))
+                ? const Center(child: Text(''))
                 : Container(
                     width: double.infinity,
                     color: Colors.white,
                     child: ListView.builder(
                         shrinkWrap: true,
-                        physics: ScrollPhysics(),
+                        physics: const ScrollPhysics(),
                         itemCount: dataOldAppointments.length,
                         itemBuilder: (context, index) {
                           return InkWell(

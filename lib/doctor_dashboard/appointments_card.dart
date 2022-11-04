@@ -1,5 +1,4 @@
-import 'package:doctor/doctor_dashboard/circle_image.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:doctor/core/constants/circle_image.dart';
 import 'package:flutter/material.dart';
 
 class AppointmentCard extends StatelessWidget {
@@ -20,7 +19,7 @@ class AppointmentCard extends StatelessWidget {
                 color: Colors.grey.withOpacity(0.4),
                 spreadRadius: 1,
                 blurRadius: 1,
-                offset: Offset(1, 1), // changes position of shadow
+                offset: const Offset(1, 1), // changes position of shadow
               ),
             ],
           ),
@@ -36,7 +35,7 @@ class AppointmentCard extends StatelessWidget {
                       padding: const EdgeInsets.only(left: 15.0),
                       child: CircleImage(doctor["image"]),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 10,
                     ),
                     Column(
@@ -50,15 +49,15 @@ class AppointmentCard extends StatelessWidget {
                                 doctor["name"],
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
+                                style: const TextStyle(
                                     fontSize: 19, fontWeight: FontWeight.w600),
                               ),
                             ),
-                            SizedBox(
+                            const SizedBox(
                               width: 40,
                             ),
-                            Padding(
-                              padding: const EdgeInsets.only(right: 2.0),
+                            const Padding(
+                              padding: EdgeInsets.only(right: 2.0),
                               child: Text(
                                 'Cost: Rs-5422',
                                 maxLines: 1,
@@ -71,7 +70,7 @@ class AppointmentCard extends StatelessWidget {
                             ),
                           ],
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 10,
                         ),
                         Padding(
@@ -80,7 +79,7 @@ class AppointmentCard extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                children: [
+                                children: const [
                                   Text(
                                     "Service: ",
                                     maxLines: 1,
@@ -108,7 +107,7 @@ class AppointmentCard extends StatelessWidget {
                     )
                   ],
                 ),
-                Divider(
+                const Divider(
                   color: Colors.black12,
                 ),
                 Row(
@@ -116,9 +115,9 @@ class AppointmentCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Column(
-                      children: [
+                      children: const [
                         Padding(
-                          padding: const EdgeInsets.only(right: 2.0),
+                          padding: EdgeInsets.only(right: 2.0),
                           child: Text(
                             'May 26',
                             maxLines: 1,
@@ -130,7 +129,7 @@ class AppointmentCard extends StatelessWidget {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(right: 2.0),
+                          padding: EdgeInsets.only(right: 2.0),
                           child: Text(
                             '10:00 - 11:00 A.M',
                             maxLines: 1,
@@ -145,8 +144,8 @@ class AppointmentCard extends StatelessWidget {
                     ),
                     Column(
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.only(right: 2.0),
+                        const Padding(
+                          padding: EdgeInsets.only(right: 2.0),
                           child: Text(
                             'In-Clinic Appointment',
                             maxLines: 1,
@@ -163,7 +162,7 @@ class AppointmentCard extends StatelessWidget {
                             doctor['hospital'],
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
+                            style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
                                 color: Colors.black),
@@ -184,10 +183,10 @@ class AppointmentCard extends StatelessWidget {
                         child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
                                 primary: Colors.indigo,
-                                textStyle: TextStyle(
+                                textStyle: const TextStyle(
                                     fontSize: 24, fontWeight: FontWeight.w500)),
                             onPressed: () {},
-                            child: Text('Accept')),
+                            child: const Text('Accept')),
                       ),
                       SizedBox(
                         height: 35,
@@ -195,10 +194,10 @@ class AppointmentCard extends StatelessWidget {
                         child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
                                 primary: Colors.red,
-                                textStyle: TextStyle(
+                                textStyle: const TextStyle(
                                     fontSize: 24, fontWeight: FontWeight.w500)),
                             onPressed: () {},
-                            child: Text('Reject')),
+                            child: const Text('Reject')),
                       )
                     ],
                   ),

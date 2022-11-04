@@ -21,48 +21,29 @@ class MyHomePage32 extends StatefulWidget {
 }
 
 class _MyHomePage32State extends State<MyHomePage32> {
-  static List<Animal> _animals2 = [
-    Animal(id: 1, name: "Lion"),
-    Animal(id: 2, name: "Flamingo"),
-    Animal(id: 3, name: "Hippo"),
-    Animal(id: 4, name: "Flamingo2"),
-  ];
-
-  //List<Animal> _selectedAnimals = [];
-  List<Animal> _selectedAnimals2 = [];
-  List<Animal> _selectedAnimals3 = [];
-
-  //List<Animal> _selectedAnimals4 = [];
-  List<Animal> _selectedAnimals5 = [];
-  final _multiSelectKey = GlobalKey<FormFieldState>();
 
   List? _myActivities;
-  late String _myActivitiesResult;
   final formKey = new GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
     _myActivities = [];
-    _myActivitiesResult = '';
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('home'),
+        title: const Text('home'),
       ),
       body: SingleChildScrollView(
         child: Container(
           alignment: Alignment.center,
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           child: Column(
             children: <Widget>[
-              SizedBox(height: 40),
-              //################################################################################################
-              // Rounded blue MultiSelectDialogField
-              //################################################################################################
+              const SizedBox(height: 40),
               Container(
                 width: double.infinity,
                 height: 80,
@@ -77,17 +58,17 @@ class _MyHomePage32State extends State<MyHomePage32> {
                 child: MultiSelectFormField(
                   autovalidate: AutovalidateMode.disabled,
                   chipBackGroundColor: Colors.blue,
-                  chipLabelStyle: TextStyle(
+                  chipLabelStyle: const TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.white),
                   dialogTextStyle:
-                  TextStyle(fontWeight: FontWeight.bold),
+                  const TextStyle(fontWeight: FontWeight.bold),
                   checkBoxActiveColor: Colors.blue,
                   checkBoxCheckColor: Colors.white,
-                  dialogShapeBorder: RoundedRectangleBorder(
+                  dialogShapeBorder: const RoundedRectangleBorder(
                       borderRadius:
                       BorderRadius.all(Radius.circular(12.0))),
-                  title: Text(
+                  title: const Text(
                     "Languages you speak",
                     style: TextStyle(fontSize: 16),
                   ),
@@ -97,7 +78,7 @@ class _MyHomePage32State extends State<MyHomePage32> {
                     }
                     return null;
                   },
-                  dataSource: [
+                  dataSource: const [
                     {
                       "display": "Running",
                       "value": "Running",
@@ -132,7 +113,7 @@ class _MyHomePage32State extends State<MyHomePage32> {
                   valueField: 'value',
                   okButtonLabel: 'OK',
                   cancelButtonLabel: 'CANCEL',
-                  hintWidget: Text('Please choose one or more'),
+                  hintWidget: const Text('Please choose one or more'),
                   initialValue: _myActivities,
                   onSaved: (value) {
                     if (value == null) return;

@@ -1,9 +1,9 @@
 import 'dart:convert';
-
 import 'package:awesome_dialog/awesome_dialog.dart';
-import 'package:doctor/core/constants.dart';
+import 'package:doctor/core/constants/apis.dart';
+import 'package:doctor/core/constants/urls.dart';
 import 'package:doctor/core/custom_snackbar.dart';
-import 'package:doctor/dashboard_patient/widgets/avatar_image.dart';
+import 'package:doctor/core/avatar_image.dart';
 import 'package:doctor/doctor_dashboard/custom_widgtes/app_bar.dart';
 import 'package:doctor/doctor_dashboard/more_tab/assistent/add_assistent.dart';
 import 'package:doctor/doctor_dashboard/more_tab/assistent/edit_assistent.dart';
@@ -16,24 +16,22 @@ class DisplayAssistents extends StatefulWidget {
       : super(key: key);
   final doctorId;
   final userData;
-
   @override
   _DisplayAssistentsState createState() => _DisplayAssistentsState();
 }
 
 class _DisplayAssistentsState extends State<DisplayAssistents> {
   DateTime selectedDate = DateTime.now();
-
   var dataAssistence;
   bool dataHomeFlag = true;
 
-  Future<void> getAllAssitents() async {
+  Future<void> getAllAssistants() async {
     var API = API_BASE_URL + API_DD_ASSISTENT_LIST;
     Map<String, dynamic> body = {'doctor_id': widget.doctorId};
     http.Response response = await http
         .post(Uri.parse(API), body: body)
         .then((value) => value)
-        .catchError((error) => print(" Failed to getAllAssitents: $error"));
+        .catchError((error) => print(error));
     if (response.statusCode == 200) {
       dataAssistence = jsonDecode(response.body.toString());
       setState(() {
@@ -42,14 +40,14 @@ class _DisplayAssistentsState extends State<DisplayAssistents> {
     } else {}
   }
 
-  Future<String> deleteAssitent(String id) async {
+  Future<String> deleteAssistant(String id) async {
     var data;
     var API = API_BASE_URL + API_DD_ASSISTENT_DELETE;
     Map<String, dynamic> body = {'assistant_id': id};
     http.Response response = await http
         .post(Uri.parse(API), body: body)
         .then((value) => value)
-        .catchError((error) => print(" Failed to delete: $error"));
+        .catchError((error) => print(error));
     if (response.statusCode == 200) {
       data = jsonDecode(response.body.toString());
       setState(() {
@@ -64,13 +62,13 @@ class _DisplayAssistentsState extends State<DisplayAssistents> {
   @override
   void initState() {
     super.initState();
-    getAllAssitents();
+    getAllAssistants();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
+      appBar: const PreferredSize(
         preferredSize: Size.fromHeight(60),
         child: CustomAppBar(
           isleading: false,
@@ -81,22 +79,22 @@ class _DisplayAssistentsState extends State<DisplayAssistents> {
           children: [
             AppBar(
               backgroundColor: Colors.blue,
-              title: Text("All Assistents"),
+              title: const Text("All Assistants"),
             ),
             dataHomeFlag
-                ? Center(
+                ? const Center(
                     child: CircularProgressIndicator(),
                   )
                 : FutureBuilder(
-                    future: getAllAssitents(),
+                    future: getAllAssistants(),
                     builder: (context, snapshot) {
                       return dataAssistence[0]['status'] == 0
-                          ? Center(
+                          ? const Center(
                               child: Text('No Data Found!'),
                             )
                           : ListView.builder(
                               shrinkWrap: true,
-                              physics: ScrollPhysics(),
+                              physics: const ScrollPhysics(),
                               itemCount: dataAssistence.length,
                               itemBuilder: (context, index) {
                                 return Padding(
@@ -108,7 +106,7 @@ class _DisplayAssistentsState extends State<DisplayAssistents> {
                                     child: Card(
                                       elevation: 10,
                                       color: Colors.white,
-                                      shape: RoundedRectangleBorder(
+                                      shape: const RoundedRectangleBorder(
                                         borderRadius: BorderRadius.all(
                                             Radius.circular(10)),
                                         side: BorderSide(color: Colors.white),
@@ -124,15 +122,14 @@ class _DisplayAssistentsState extends State<DisplayAssistents> {
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
                                               children: [
-                                                Padding(
+                                                const Padding(
                                                   padding:
-                                                      const EdgeInsets.only(
+                                                      EdgeInsets.only(
                                                           left: 15.0),
                                                   child: AvatarImagePD(
-                                                      dataAssistence[index]
-                                                          ['image']),
+                                                      AppUrls.userNurse),
                                                 ),
-                                                SizedBox(
+                                                const SizedBox(
                                                   width: 20,
                                                 ),
                                                 Column(
@@ -140,12 +137,12 @@ class _DisplayAssistentsState extends State<DisplayAssistents> {
                                                         CrossAxisAlignment
                                                             .start,
                                                     children: [
-                                                      SizedBox(
+                                                      const SizedBox(
                                                         height: 3,
                                                       ),
                                                       Row(
                                                         children: [
-                                                          Text(
+                                                          const Text(
                                                             'Name:  ',
                                                             style: TextStyle(
                                                                 fontSize: 18,
@@ -156,15 +153,24 @@ class _DisplayAssistentsState extends State<DisplayAssistents> {
                                                                         .w600),
                                                           ),
                                                           Text(
-                                                            dataAssistence[
-                                                                        index][
-                                                                    'assistant_name'] ??
-                                                                '',
+                                                            '${dataAssistence[
+                                                            index][
+                                                            'assistant_name'] == null ? '' : (dataAssistence[
+                                                            index][
+                                                            'assistant_name'].length > 15
+                                                                ? dataAssistence[
+                                                            index][
+                                                            'assistant_name']
+                                                                .substring(0, 15) +
+                                                                '...'
+                                                                : dataAssistence[
+                                                            index][
+                                                            'assistant_name'] ?? '')}',
                                                             maxLines: 1,
                                                             overflow:
                                                                 TextOverflow
                                                                     .ellipsis,
-                                                            style: TextStyle(
+                                                            style: const TextStyle(
                                                                 fontSize: 18,
                                                                 fontWeight:
                                                                     FontWeight
@@ -172,7 +178,7 @@ class _DisplayAssistentsState extends State<DisplayAssistents> {
                                                           ),
                                                         ],
                                                       ),
-                                                      SizedBox(
+                                                      const SizedBox(
                                                         height: 8,
                                                       ),
                                                       Row(
@@ -182,7 +188,7 @@ class _DisplayAssistentsState extends State<DisplayAssistents> {
                                                         children: [
                                                           Row(
                                                             children: [
-                                                              Text(
+                                                              const Text(
                                                                 'Mobile:  ',
                                                                 style: TextStyle(
                                                                     color: Colors
@@ -194,12 +200,19 @@ class _DisplayAssistentsState extends State<DisplayAssistents> {
                                                                             .w500),
                                                               ),
                                                               Text(
+                                                                ' ${dataAssistence[
+                                                                index]
+                                                                [
+                                                                'number'].toString().length > 14 ?
                                                                 dataAssistence[
-                                                                            index]
-                                                                        [
-                                                                        'number'] ??
-                                                                    '',
-                                                                style: TextStyle(
+                                                                index]
+                                                                [
+                                                                'number'].substring(0, 14)+'...' :
+                                                                dataAssistence[
+                                                                index]
+                                                                [
+                                                                'number'].substring(0) ?? ''}',
+                                                                style: const TextStyle(
                                                                     fontSize:
                                                                         18,
                                                                     fontWeight:
@@ -210,12 +223,12 @@ class _DisplayAssistentsState extends State<DisplayAssistents> {
                                                           ),
                                                         ],
                                                       ),
-                                                      SizedBox(
+                                                      const SizedBox(
                                                         height: 8,
                                                       ),
                                                       Row(
                                                         children: [
-                                                          Text(
+                                                          const Text(
                                                             'Status:  ',
                                                             style: TextStyle(
                                                                 color:
@@ -230,7 +243,7 @@ class _DisplayAssistentsState extends State<DisplayAssistents> {
                                                                         index][
                                                                     'status_order'] ??
                                                                 '',
-                                                            style: TextStyle(
+                                                            style: const TextStyle(
                                                                 fontSize: 18,
                                                                 color: Colors
                                                                     .green,
@@ -240,12 +253,12 @@ class _DisplayAssistentsState extends State<DisplayAssistents> {
                                                           ),
                                                         ],
                                                       ),
-                                                      SizedBox(
+                                                      const SizedBox(
                                                         height: 8,
                                                       ),
                                                       Row(
                                                         children: [
-                                                          Text(
+                                                          const Text(
                                                             'Address:',
                                                             style: TextStyle(
                                                                 color:
@@ -256,11 +269,10 @@ class _DisplayAssistentsState extends State<DisplayAssistents> {
                                                                         .w500),
                                                           ),
                                                           Text(
-                                                            dataAssistence[
-                                                                        index][
-                                                                    'address'] ??
-                                                                '',
-                                                            style: TextStyle(
+                                                            ' ${dataAssistence[index]['address'].length > 16 ?
+                                                            dataAssistence[index]['address'].substring(0, 16)+'...' :
+                                                            dataAssistence[index]['address'].substring(0) ?? ''}',
+                                                            style: const TextStyle(
                                                                 fontSize: 18,
                                                                 fontWeight:
                                                                     FontWeight
@@ -289,7 +301,7 @@ class _DisplayAssistentsState extends State<DisplayAssistents> {
                                                                     index][
                                                                 'assistant_id']);
                                                       },
-                                                      child: Text(
+                                                      child: const Text(
                                                         'Delete',
                                                         style: TextStyle(
                                                             fontSize: 20,
@@ -297,7 +309,7 @@ class _DisplayAssistentsState extends State<DisplayAssistents> {
                                                                 FontWeight
                                                                     .w500),
                                                       )),
-                                                  Spacer(),
+                                                  const Spacer(),
                                                   InkWell(
                                                       onTap: () {
                                                         Navigator.of(context).push(
@@ -308,7 +320,7 @@ class _DisplayAssistentsState extends State<DisplayAssistents> {
                                                                     data: dataAssistence[
                                                                         index])));
                                                       },
-                                                      child: Text(
+                                                      child: const Text(
                                                         'Edit',
                                                         style: TextStyle(
                                                             fontSize: 20,
@@ -319,7 +331,7 @@ class _DisplayAssistentsState extends State<DisplayAssistents> {
                                                 ],
                                               ),
                                             ),
-                                            Divider(
+                                            const Divider(
                                               color: Colors.black12,
                                             ),
                                           ],
@@ -331,7 +343,7 @@ class _DisplayAssistentsState extends State<DisplayAssistents> {
                               });
                     },
                   ),
-            SizedBox(
+            const SizedBox(
               height: 200,
             )
           ],
@@ -339,19 +351,19 @@ class _DisplayAssistentsState extends State<DisplayAssistents> {
       ),
       floatingActionButton: FloatingActionButton(
         // isExtended: true,
-        child: Icon(
-          Icons.add,
-          color: Colors.white,
-        ),
         backgroundColor: Colors.blue,
         onPressed: () {
-          print('${widget.doctorId}');
           Navigator.of(context).push(MaterialPageRoute(
               builder: (_) => AddAssistent(
                     button: 'Add',
                     doctor_id: widget.doctorId,
                   )));
         },
+        // isExtended: true,
+        child: const Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
       ),
     );
   }
@@ -376,7 +388,7 @@ class _DisplayAssistentsState extends State<DisplayAssistents> {
       dismissOnBackKeyPress: false,
       desc: 'Are You Confirm to delete.',
       btnOkOnPress: () async {
-        String status = await deleteAssitent(id);
+        String status = await deleteAssistant(id);
         if (status == 'ok') {
           CustomSnackBar.snackBar(
               context: context,
@@ -396,25 +408,25 @@ class _DisplayAssistentsState extends State<DisplayAssistents> {
       Container(
         decoration: BoxDecoration(color: oddColour),
         padding:
-            EdgeInsets.only(top: 20.0, bottom: 20.0, left: 5.0, right: 5.0),
+            const EdgeInsets.only(top: 20.0, bottom: 20.0, left: 5.0, right: 5.0),
         child: Column(
           children: <Widget>[
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Text(item, style: TextStyle(fontSize: 16.0)),
-                Text(charge, style: TextStyle(fontSize: 16.0))
+                Text(item, style: const TextStyle(fontSize: 16.0)),
+                Text(charge, style: const TextStyle(fontSize: 16.0))
               ],
             ),
-            SizedBox(
+            const SizedBox(
               height: 10.0,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 Text(dateString,
-                    style: TextStyle(color: Colors.grey, fontSize: 14.0)),
-                Text(type, style: TextStyle(color: Colors.grey, fontSize: 14.0))
+                    style: const TextStyle(color: Colors.grey, fontSize: 14.0)),
+                Text(type, style: const TextStyle(color: Colors.grey, fontSize: 14.0))
               ],
             ),
           ],

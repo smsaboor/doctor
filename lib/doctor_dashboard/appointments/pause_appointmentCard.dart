@@ -1,7 +1,6 @@
 import 'dart:convert';
-
-import 'package:doctor/dashboard_patient/widgets/avatar_image.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:doctor/core/constants/apis.dart';
+import 'package:doctor/core/avatar_image.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -10,6 +9,7 @@ class PauseAppointmentCard extends StatefulWidget {
       {Key? key,
       required this.button,
       this.appointment_no,
+        this.image,
       this.booking_type,
       this.date,
       this.patient_name,
@@ -24,6 +24,7 @@ class PauseAppointmentCard extends StatefulWidget {
   final appointment_no,
       booking_type,
       date,
+      image,
       patient_name,
       age,
       gender,
@@ -42,12 +43,12 @@ class _PauseAppointmentCardState extends State<PauseAppointmentCard> {
 
   changeStatus(String appNo) async {
     dataF = true;
-    var API = 'https://cabeloclinic.com/website/medlife/php_auth_api/reactive_pause_appointment_api.php';
+    var API = '${API_BASE_URL}reactive_pause_appointment_api.php';
     Map<String, dynamic> body = {'appointment_no': appNo};
     http.Response response = await http
         .post(Uri.parse(API), body: body)
         .then((value) => value)
-        .catchError((error) => print(" Failed to changeStatus: $error"));
+        .catchError((error) => print(error));
     if (response.statusCode == 200) {
       setState(() {
         dataF = false;
@@ -56,6 +57,29 @@ class _PauseAppointmentCardState extends State<PauseAppointmentCard> {
     } else {}
   }
 
+  double fontSizeName = 16;
+  double fontSizeAddress = 16;
+  bool fontTwoLine=false;
+
+  @override
+  void initState() {
+    super.initState();
+    if(widget.patient_name.length>20){
+      fontSizeName = 14;
+    }else if(widget.patient_name.length>30){
+      fontSizeName = 14;
+    }
+    else if(widget.patient_name.length>40){
+      fontSizeName = 12;
+    }
+    if(widget.address.length>25){
+      fontSizeAddress = 14;
+      fontTwoLine=true;
+    }else if(widget.address.length>100){
+      fontSizeAddress = 8;
+      fontTwoLine=true;
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -66,7 +90,7 @@ class _PauseAppointmentCardState extends State<PauseAppointmentCard> {
         child: Card(
           elevation: 10,
           color: Colors.white,
-          shape: RoundedRectangleBorder(
+          shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(10)),
             side: BorderSide(color: Colors.white),
           ),
@@ -79,12 +103,12 @@ class _PauseAppointmentCardState extends State<PauseAppointmentCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.only(left: 15.0),
+                      padding: EdgeInsets.only(left: 15.0),
                       child: AvatarImagePD(
-                        "https://images.unsplash.com/photo-1537368910025-700350fe46c7?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80",
+                      widget.image,
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 20,
                     ),
                     Column(
@@ -93,24 +117,24 @@ class _PauseAppointmentCardState extends State<PauseAppointmentCard> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            Text(
+                            const Text(
                               'Appointment:',
                               style: TextStyle(
                                   fontSize: 16, fontWeight: FontWeight.w500),
                             ),
                             Text(
                               '  ${widget.appointment_no}',
-                              style: TextStyle(
+                              style: const TextStyle(
                                   fontSize: 16, fontWeight: FontWeight.w400),
                             ),
                           ],
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 3,
                         ),
                         Row(
                           children: [
-                            Text(
+                            const Text(
                               'Booking Type:',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -128,29 +152,29 @@ class _PauseAppointmentCardState extends State<PauseAppointmentCard> {
                             ),
                           ],
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 3,
                         ),
                         Row(
                           children: [
-                            Text(
+                            const Text(
                               'Date:',
                               style: TextStyle(
                                   fontSize: 16, fontWeight: FontWeight.w500),
                             ),
                             Text(
                               '  ${widget.date}',
-                              style: TextStyle(
+                              style: const TextStyle(
                                   fontSize: 16, fontWeight: FontWeight.w400),
                             ),
                           ],
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 3,
                         ),
                         Row(
                           children: [
-                            Text(
+                            const Text(
                               'Name:',
                               style: TextStyle(
                                   fontSize: 16,
@@ -158,15 +182,17 @@ class _PauseAppointmentCardState extends State<PauseAppointmentCard> {
                                   fontWeight: FontWeight.w500),
                             ),
                             Text(
-                              '  ${widget.patient_name}',
+                              ' ${widget.patient_name[0].toUpperCase()}${widget.patient_name.length > 16 ?
+                              widget.patient_name.substring(0, 16)+'...' :
+                              widget.patient_name.substring(1) ?? ''}',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
+                              style: const TextStyle(
                                   fontSize: 16, fontWeight: FontWeight.w500),
                             ),
                           ],
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 3,
                         ),
                         Row(
@@ -174,7 +200,7 @@ class _PauseAppointmentCardState extends State<PauseAppointmentCard> {
                           children: [
                             Row(
                               children: [
-                                Text(
+                                const Text(
                                   'Sex:',
                                   style: TextStyle(
                                       color: Colors.pink,
@@ -183,18 +209,18 @@ class _PauseAppointmentCardState extends State<PauseAppointmentCard> {
                                 ),
                                 Text(
                                   '  ${widget.gender},',
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w400),
                                 ),
                               ],
                             ),
-                            SizedBox(
+                            const SizedBox(
                               width: 10,
                             ),
                             Row(
                               children: [
-                                Text(
+                                const Text(
                                   'Age:',
                                   style: TextStyle(
                                       color: Colors.pink,
@@ -203,7 +229,7 @@ class _PauseAppointmentCardState extends State<PauseAppointmentCard> {
                                 ),
                                 Text(
                                   '  ${widget.age}',
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w400),
                                 ),
@@ -211,12 +237,12 @@ class _PauseAppointmentCardState extends State<PauseAppointmentCard> {
                             ),
                           ],
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 3,
                         ),
                         Row(
                           children: [
-                            Text(
+                            const Text(
                               'Address:',
                               style: TextStyle(
                                   color: Colors.pink,
@@ -224,17 +250,30 @@ class _PauseAppointmentCardState extends State<PauseAppointmentCard> {
                                   fontWeight: FontWeight.w500),
                             ),
                             Text(
-                              '  ${widget.address}',
+                              ' ${widget.address.length > 16 ?
+                              widget.address.substring(0, 16)+'...' :
+                              widget.address.substring(0) ?? ''}',
+                              maxLines: 3,
+                              softWrap: true,
+                              overflow: TextOverflow.ellipsis,
                               style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.w400),
+                                  fontSize: fontSizeAddress, fontWeight: FontWeight.w400),
                             ),
+                            fontTwoLine?Text(
+                              '  ${widget.address.substring(26, widget.address.length)}',
+                              maxLines: 3,
+                              softWrap: true,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                  fontSize: fontSizeAddress, fontWeight: FontWeight.w400),
+                            ):Container(),
                           ],
                         ),
                       ],
                     )
                   ],
                 ),
-                Divider(
+                const Divider(
                   color: Colors.black12,
                 ),
                 Row(
@@ -242,7 +281,7 @@ class _PauseAppointmentCardState extends State<PauseAppointmentCard> {
                   children: [
                     Row(
                       children: [
-                        Text(
+                        const Text(
                           'Total Fees: ',
                           style: TextStyle(
                               fontSize: 16,
@@ -251,7 +290,7 @@ class _PauseAppointmentCardState extends State<PauseAppointmentCard> {
                         ),
                         Text(
                           widget.total_fees,
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
                               color: Colors.black87),
@@ -260,7 +299,7 @@ class _PauseAppointmentCardState extends State<PauseAppointmentCard> {
                     ),
                     Row(
                       children: [
-                        Text(
+                        const Text(
                           'Received: ',
                           style: TextStyle(
                               fontSize: 16,
@@ -269,7 +308,7 @@ class _PauseAppointmentCardState extends State<PauseAppointmentCard> {
                         ),
                         Text(
                           widget.received_payment,
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: Colors.green),
@@ -278,7 +317,7 @@ class _PauseAppointmentCardState extends State<PauseAppointmentCard> {
                     ),
                     Row(
                       children: [
-                        Text(
+                        const Text(
                           'Due: ',
                           style: TextStyle(
                               fontSize: 16,
@@ -287,7 +326,7 @@ class _PauseAppointmentCardState extends State<PauseAppointmentCard> {
                         ),
                         Text(
                           widget.due_payment,
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: Colors.red),
@@ -296,7 +335,7 @@ class _PauseAppointmentCardState extends State<PauseAppointmentCard> {
                     ),
                   ],
                 ),
-                Divider(
+                const Divider(
                   color: Colors.black12,
                 ),
                 Padding(
@@ -304,79 +343,27 @@ class _PauseAppointmentCardState extends State<PauseAppointmentCard> {
                   child: SizedBox(
                     width: MediaQuery.of(context).size.width * .8,
                     height: 50,
-                    child: Container(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          changeStatus(widget.appointment_no);
-                        },
-                        style: ElevatedButton.styleFrom(
-                            primary: Colors.pink,
-                            textStyle: TextStyle(
-                                fontSize: 30, fontWeight: FontWeight.bold)),
-                        child: dataF
-                            ? Center(
-                                child: CircularProgressIndicator(),
-                              )
-                            : Text(
-                                widget.button,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 20),
-                              ),
-                      ),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        changeStatus(widget.appointment_no);
+                      },
+                      style: ElevatedButton.styleFrom(
+                          primary: Colors.pink,
+                          textStyle: const TextStyle(
+                              fontSize: 30, fontWeight: FontWeight.bold)),
+                      child: dataF
+                          ? const Center(
+                              child: CircularProgressIndicator(color: Colors.white,),
+                            )
+                          : Text(
+                              widget.button,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 20),
+                            ),
                     ),
                   ),
                 )
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                //   children: [
-                //   Text(
-                //     'Total',
-                //     style: TextStyle(
-                //         fontSize: 16,
-                //         fontWeight: FontWeight.w600,
-                //         color: Colors.black87),
-                //   ),
-                //   Text(
-                //     'Received',
-                //     style: TextStyle(
-                //         fontSize: 16,
-                //         fontWeight: FontWeight.w600,
-                //         color: Colors.black87),
-                //   ),
-                //   Text(
-                //     'Due',
-                //     style: TextStyle(
-                //         fontSize: 16,
-                //         fontWeight: FontWeight.w600,
-                //         color: Colors.black87),
-                //   ),
-                // ],),
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                //   children: [
-                //     Text(
-                //       '1200 Rs',
-                //       style: TextStyle(
-                //           fontSize: 16,
-                //           fontWeight: FontWeight.w400,
-                //           color: Colors.black87),
-                //     ),
-                //     Text(
-                //       '800',
-                //       style: TextStyle(
-                //           fontSize: 16,
-                //           fontWeight: FontWeight.w400,
-                //           color: Colors.black87),
-                //     ),
-                //     Text(
-                //       '400',
-                //       style: TextStyle(
-                //           fontSize: 16,
-                //           fontWeight: FontWeight.w400,
-                //           color: Colors.black87),
-                //     ),
-                //   ],)
               ],
             ),
           ),
@@ -384,27 +371,4 @@ class _PauseAppointmentCardState extends State<PauseAppointmentCard> {
       ),
     );
   }
-
-  void choiceAction(String choice) {
-    if (choice == Constants.fund) {
-      print('Settings');
-    } else if (choice == Constants.SignOut) {
-      print('Subscribe');
-    } else if (choice == Constants.SignOut) {
-      print('SignOut');
-    }
-  }
-}
-
-class Constants {
-  static const String fund = 'Fund';
-
-//  static const String Settings = 'Settings';
-  static const String SignOut = 'Sign out';
-
-  static const List<String> choices = <String>[
-    'fund',
-    'enter code here',
-    'SignOut'
-  ];
 }

@@ -1,5 +1,4 @@
-import 'package:doctor/dashboard_patient/widgets/avatar_image.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:doctor/core/avatar_image.dart';
 import 'package:flutter/material.dart';
 
 class CompletedAppointmentCard extends StatefulWidget {
@@ -49,7 +48,7 @@ class _CompletedAppointmentCardState extends State<CompletedAppointmentCard> {
         child: Card(
           elevation: 10,
           color: Colors.white,
-          shape: RoundedRectangleBorder(
+          shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(10)),
             side: BorderSide(color: Colors.white),
           ),
@@ -67,7 +66,7 @@ class _CompletedAppointmentCardState extends State<CompletedAppointmentCard> {
                         widget.image,
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 20,
                     ),
                     Column(
@@ -76,24 +75,24 @@ class _CompletedAppointmentCardState extends State<CompletedAppointmentCard> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            Text(
+                            const Text(
                               'Appointment:',
                               style: TextStyle(
                                   fontSize: 16, fontWeight: FontWeight.w500),
                             ),
                             Text(
                               '  ${widget.appointment_no}',
-                              style: TextStyle(
+                              style: const TextStyle(
                                   fontSize: 16, fontWeight: FontWeight.w400),
                             ),
                           ],
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 3,
                         ),
                         Row(
                           children: [
-                            Text(
+                            const Text(
                               'Booking Type:',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -104,17 +103,17 @@ class _CompletedAppointmentCardState extends State<CompletedAppointmentCard> {
                               widget.booking_type,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
+                              style: const TextStyle(
                                   fontSize: 16, fontWeight: FontWeight.w500),
                             ),
                           ],
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 3,
                         ),
                         Row(
                           children: [
-                            Text(
+                            const Text(
                               'Date:',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -125,17 +124,17 @@ class _CompletedAppointmentCardState extends State<CompletedAppointmentCard> {
                               widget.date,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
+                              style: const TextStyle(
                                   fontSize: 16, fontWeight: FontWeight.w500),
                             ),
                           ],
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 3,
                         ),
                         Row(
                           children: [
-                            Text(
+                            const Text(
                               'Name:',
                               style: TextStyle(
                                   fontSize: 16,
@@ -143,15 +142,17 @@ class _CompletedAppointmentCardState extends State<CompletedAppointmentCard> {
                                   fontWeight: FontWeight.w500),
                             ),
                             Text(
-                              '  ${widget.patient_name}',
+                              ' ${widget.patient_name[0].toUpperCase()}${widget.patient_name.length > 16 ?
+                              widget.patient_name.substring(0, 16)+'...' :
+                              widget.patient_name.substring(1) ?? ''}',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
+                              style: const TextStyle(
                                   fontSize: 16, fontWeight: FontWeight.w500),
                             ),
                           ],
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 3,
                         ),
                         Row(
@@ -159,7 +160,7 @@ class _CompletedAppointmentCardState extends State<CompletedAppointmentCard> {
                           children: [
                             Row(
                               children: [
-                                Text(
+                                const Text(
                                   'Sex:',
                                   style: TextStyle(
                                       color: Colors.pink,
@@ -168,18 +169,18 @@ class _CompletedAppointmentCardState extends State<CompletedAppointmentCard> {
                                 ),
                                 Text(
                                   ' ${widget.gender},',
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w400),
                                 ),
                               ],
                             ),
-                            SizedBox(
+                            const SizedBox(
                               width: 10,
                             ),
                             Row(
                               children: [
-                                Text(
+                                const Text(
                                   'Age:',
                                   style: TextStyle(
                                       color: Colors.pink,
@@ -188,7 +189,7 @@ class _CompletedAppointmentCardState extends State<CompletedAppointmentCard> {
                                 ),
                                 Text(
                                   ' ${widget.age}',
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w400),
                                 ),
@@ -196,12 +197,12 @@ class _CompletedAppointmentCardState extends State<CompletedAppointmentCard> {
                             ),
                           ],
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 3,
                         ),
                         Row(
                           children: [
-                            Text(
+                            const Text(
                               'Address:',
                               style: TextStyle(
                                   color: Colors.pink,
@@ -209,8 +210,10 @@ class _CompletedAppointmentCardState extends State<CompletedAppointmentCard> {
                                   fontWeight: FontWeight.w500),
                             ),
                             Text(
-                              '  ${widget.address}',
-                              style: TextStyle(
+                              ' ${widget.address.length > 16 ?
+                              widget.address.substring(0, 16)+'...' :
+                              widget.address.substring(0) ?? ''}',
+                              style: const TextStyle(
                                   fontSize: 16, fontWeight: FontWeight.w400),
                             ),
                           ],
@@ -219,7 +222,7 @@ class _CompletedAppointmentCardState extends State<CompletedAppointmentCard> {
                     )
                   ],
                 ),
-                Divider(
+                const Divider(
                   color: Colors.black12,
                 ),
                 Row(
@@ -227,7 +230,7 @@ class _CompletedAppointmentCardState extends State<CompletedAppointmentCard> {
                   children: [
                     Row(
                       children: [
-                        Text(
+                        const Text(
                           'Total Fees: ',
                           style: TextStyle(
                               fontSize: 16,
@@ -236,7 +239,7 @@ class _CompletedAppointmentCardState extends State<CompletedAppointmentCard> {
                         ),
                         Text(
                           widget.total_fees,
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
                               color: Colors.black87),
@@ -245,7 +248,7 @@ class _CompletedAppointmentCardState extends State<CompletedAppointmentCard> {
                     ),
                     Row(
                       children: [
-                        Text(
+                        const Text(
                           'Received: ',
                           style: TextStyle(
                               fontSize: 16,
@@ -254,7 +257,7 @@ class _CompletedAppointmentCardState extends State<CompletedAppointmentCard> {
                         ),
                         Text(
                           widget.received_payment,
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: Colors.green),
@@ -263,7 +266,7 @@ class _CompletedAppointmentCardState extends State<CompletedAppointmentCard> {
                     ),
                     Row(
                       children: [
-                        Text(
+                        const Text(
                           'Due: ',
                           style: TextStyle(
                               fontSize: 16,
@@ -272,7 +275,7 @@ class _CompletedAppointmentCardState extends State<CompletedAppointmentCard> {
                         ),
                         Text(
                           widget.due_payment,
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: Colors.red),
@@ -281,32 +284,9 @@ class _CompletedAppointmentCardState extends State<CompletedAppointmentCard> {
                     ),
                   ],
                 ),
-                Divider(
+                const Divider(
                   color: Colors.black12,
                 ),
-                // Padding(
-                //   padding: const EdgeInsets.all(8.0),
-                //   child: SizedBox(
-                //     width: MediaQuery.of(context).size.width * .8,
-                //     height: 50,
-                //     child: Container(
-                //       child: ElevatedButton(
-                //         onPressed: () {
-                //         },
-                //         style: ElevatedButton.styleFrom(
-                //             primary: Colors.pink,
-                //             textStyle: TextStyle(
-                //                 fontSize: 30, fontWeight: FontWeight.bold)),
-                //         child: Text(
-                //           widget.button,
-                //           textAlign: TextAlign.center,
-                //           style: TextStyle(
-                //               fontWeight: FontWeight.bold, fontSize: 20),
-                //         ),
-                //       ),
-                //     ),
-                //   ),
-                // )
               ],
             ),
           ),
@@ -314,27 +294,4 @@ class _CompletedAppointmentCardState extends State<CompletedAppointmentCard> {
       ),
     );
   }
-
-  void choiceAction(String choice) {
-    if (choice == Constants.fund) {
-      print('Settings');
-    } else if (choice == Constants.SignOut) {
-      print('Subscribe');
-    } else if (choice == Constants.SignOut) {
-      print('SignOut');
-    }
-  }
-}
-
-class Constants {
-  static const String fund = 'Fund';
-
-//  static const String Settings = 'Settings';
-  static const String SignOut = 'Sign out';
-
-  static const List<String> choices = <String>[
-    'fund',
-    'enter code here',
-    'SignOut'
-  ];
 }

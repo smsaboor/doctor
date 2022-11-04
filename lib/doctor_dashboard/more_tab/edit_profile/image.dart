@@ -1,10 +1,11 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 enum ImageSourceType { gallery, camera }
 
 class SelectImage extends StatelessWidget {
+  const SelectImage({super.key});
+
   void _handleURLButtonPress(BuildContext context, var type) {
     Navigator.push(context,
         MaterialPageRoute(builder: (context) => ImageFromGalleryEx(type)));
@@ -14,14 +15,14 @@ class SelectImage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("Image Picker Example"),
+          title: const Text("Image Picker Example"),
         ),
         body: Center(
           child: Column(
             children: [
               MaterialButton(
                 color: Colors.blue,
-                child: Text(
+                child: const Text(
                   "Pick Image from Gallery",
                   style: TextStyle(
                       color: Colors.white70, fontWeight: FontWeight.bold),
@@ -32,7 +33,7 @@ class SelectImage extends StatelessWidget {
               ),
               MaterialButton(
                 color: Colors.blue,
-                child: Text(
+                child: const Text(
                   "Pick Image from Camera",
                   style: TextStyle(
                       color: Colors.white70, fontWeight: FontWeight.bold),
@@ -49,10 +50,10 @@ class SelectImage extends StatelessWidget {
 
 class ImageFromGalleryEx extends StatefulWidget {
   final type;
-  ImageFromGalleryEx(this.type);
+  const ImageFromGalleryEx(this.type, {super.key});
 
   @override
-  ImageFromGalleryExState createState() => ImageFromGalleryExState(this.type);
+  ImageFromGalleryExState createState() => ImageFromGalleryExState(type);
 }
 
 class ImageFromGalleryExState extends State<ImageFromGalleryEx> {
@@ -67,7 +68,7 @@ class ImageFromGalleryExState extends State<ImageFromGalleryEx> {
     // ignore: todo
     // TODO: implement initState
     super.initState();
-    imagePicker = new ImagePicker();
+    imagePicker =  ImagePicker();
   }
 
   @override
@@ -79,7 +80,7 @@ class ImageFromGalleryExState extends State<ImageFromGalleryEx> {
               : "Image from Gallery")),
       body: Column(
         children: <Widget>[
-          SizedBox(
+          const SizedBox(
             height: 52,
           ),
           Center(

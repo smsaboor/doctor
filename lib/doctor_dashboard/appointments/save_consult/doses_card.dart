@@ -1,5 +1,4 @@
-import 'package:doctor/dashboard_patient/widgets/avatar_image.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:doctor/core/avatar_image.dart';
 import 'package:flutter/material.dart';
 
 class DosesCard extends StatefulWidget {
@@ -41,7 +40,7 @@ class _DosesCardState extends State<DosesCard> {
         child: Card(
           elevation: 2,
           color: Colors.white,
-          shape: RoundedRectangleBorder(
+          shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(10)),
             side: BorderSide(color: Colors.white),
           ),
@@ -63,15 +62,15 @@ class _DosesCardState extends State<DosesCard> {
                           width: 90,
                           height: 80,
                         ),
-                        SizedBox(height: 3,),
+                        const SizedBox(height: 3,),
                           Text(
                             widget.medicineName,
-                            style: TextStyle(
+                            style: const TextStyle(
                                 fontSize: 14, fontWeight: FontWeight.w500),
                           ),
                       ],)
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 20,
                     ),
                     Column(
@@ -80,24 +79,24 @@ class _DosesCardState extends State<DosesCard> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            Text(
-                              'Medicin Type:',
+                            const Text(
+                              'Medicine Type:',
                               style: TextStyle(
                                   fontSize: 14, fontWeight: FontWeight.w500),
                             ),
                             Text(
                               '  ${widget.medicineType}',
-                              style: TextStyle(
+                              style: const TextStyle(
                                   fontSize: 14, fontWeight: FontWeight.w400),
                             ),
                           ],
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 3,
                         ),
                         Row(
                           children: [
-                            Text(
+                            const Text(
                               'Dose at one time:',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -109,17 +108,17 @@ class _DosesCardState extends State<DosesCard> {
                               widget.medicinDoses,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
+                              style: const TextStyle(
                                   fontSize: 14, fontWeight: FontWeight.w500),
                             ),
                           ],
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 3,
                         ),
                         Row(
                           children: [
-                            Text(
+                            const Text(
                               'Daily Take:',
                               style: TextStyle(
                                   fontSize: 14,
@@ -130,12 +129,12 @@ class _DosesCardState extends State<DosesCard> {
                               '  ${widget.medicineRepetationPerDay}',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
+                              style: const TextStyle(
                                   fontSize: 14, fontWeight: FontWeight.w500),
                             ),
                           ],
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 3,
                         ),
                         Row(
@@ -143,7 +142,7 @@ class _DosesCardState extends State<DosesCard> {
                           children: [
                             Row(
                               children: [
-                                Text(
+                                const Text(
                                   'How many days:',
                                   style: TextStyle(
                                       color: Colors.pink,
@@ -152,7 +151,7 @@ class _DosesCardState extends State<DosesCard> {
                                 ),
                                 Text(
                                   ' ${widget.medicineRepedationLongTime},',
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w400),
                                 ),
@@ -160,7 +159,7 @@ class _DosesCardState extends State<DosesCard> {
                             ),
                           ],
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 3,
                         ),
                         Row(
@@ -168,7 +167,7 @@ class _DosesCardState extends State<DosesCard> {
                           children: [
                             Row(
                               children: [
-                                Text(
+                                const Text(
                                   'Power: ',
                                   style: TextStyle(
                                       fontSize: 14,
@@ -177,16 +176,16 @@ class _DosesCardState extends State<DosesCard> {
                                 ),
                                 Text(
                                   '${widget.medicinePower}',
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500,
                                       color: Colors.red),
                                 ),
                               ],
                             ),
-                            SizedBox(width: 5,),
+                            const SizedBox(width: 5,),
                             Row(
-                              children: [
+                              children: const [
                                 Text(
                                   'Daily Dose: ',
                                   style: TextStyle(
@@ -203,9 +202,9 @@ class _DosesCardState extends State<DosesCard> {
                                 ),
                               ],
                             ),
-                            SizedBox(width: 5,),
+                            const SizedBox(width: 5,),
                             Row(
-                              children: [
+                              children: const [
                                 Text(
                                   'Due: ',
                                   style: TextStyle(
@@ -229,29 +228,6 @@ class _DosesCardState extends State<DosesCard> {
                     )
                   ],
                 ),
-                // Padding(
-                //   padding: const EdgeInsets.all(8.0),
-                //   child: SizedBox(
-                //     width: MediaQuery.of(context).size.width * .8,
-                //     height: 50,
-                //     child: Container(
-                //       child: ElevatedButton(
-                //         onPressed: () {
-                //         },
-                //         style: ElevatedButton.styleFrom(
-                //             primary: Colors.pink,
-                //             textStyle: TextStyle(
-                //                 fontSize: 30, fontWeight: FontWeight.bold)),
-                //         child: Text(
-                //           widget.button,
-                //           textAlign: TextAlign.center,
-                //           style: TextStyle(
-                //               fontWeight: FontWeight.bold, fontSize: 20),
-                //         ),
-                //       ),
-                //     ),
-                //   ),
-                // )
               ],
             ),
           ),
@@ -259,27 +235,4 @@ class _DosesCardState extends State<DosesCard> {
       ),
     );
   }
-
-  void choiceAction(String choice) {
-    if (choice == Constants.fund) {
-      print('Settings');
-    } else if (choice == Constants.SignOut) {
-      print('Subscribe');
-    } else if (choice == Constants.SignOut) {
-      print('SignOut');
-    }
-  }
-}
-
-class Constants {
-  static const String fund = 'Fund';
-
-//  static const String Settings = 'Settings';
-  static const String SignOut = 'Sign out';
-
-  static const List<String> choices = <String>[
-    'fund',
-    'enter code here',
-    'SignOut'
-  ];
 }

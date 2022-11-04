@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:doctor/core/constants/apis.dart';
+import 'package:doctor/core/custom_snackbar.dart';
 import 'package:doctor/doctor_dashboard/custom_widgtes/app_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -16,25 +18,26 @@ class SettingDD extends StatefulWidget {
 
 class _SettingDDState extends State<SettingDD> {
   final TextEditingController _controllerNormalFees =
-      new TextEditingController();
+  TextEditingController();
   final TextEditingController _controllerEmergencyFees =
-      new TextEditingController();
+  TextEditingController();
   bool dataHomeFlag = true;
   var fetchData;
   var updateData;
+  bool _switchValue = false;
+  bool updateBooking = false;
+
+  GlobalKey<FormState> formKey=GlobalKey<FormState>();
 
   getSetting(int button) async {
-      _controllerNormalFees.text = '0';
-      _controllerEmergencyFees.text = '0';
-    var API =
-        'https://cabeloclinic.com/website/medlife/php_auth_api/setting_api.php';
+    var API = '${API_BASE_URL}setting_api.php';
     Map<String, dynamic> body = {
       'doctor_id': widget.doctorId,
     };
     http.Response response = await http
         .post(Uri.parse(API), body: body)
         .then((value) => value)
-        .catchError((error) => print(" Failed to getSetting: $error"));
+        .catchError((error) => print(error));
     if (response.statusCode == 200) {
       fetchData = jsonDecode(response.body.toString());
       setState(() {
@@ -46,23 +49,35 @@ class _SettingDDState extends State<SettingDD> {
   }
 
   Future<void> updateSetting(int button) async {
-    var API = 'https://cabeloclinic.com/website/medlife/php_auth_api/setting_api.php';
+
+    var API = '${API_BASE_URL}setting_api.php';
     Map<String, dynamic> body = {
       'doctor_fee': _controllerNormalFees.text,
       'emergency_fees': _controllerEmergencyFees.text,
       'doctor_id': widget.doctorId,
     };
-    http.Response response = await http
-        .post(Uri.parse(API), body: body)
-        .then((value) => value)
-        .catchError((error) => print(" Failed to update Setting: $error"));
-    if (response.statusCode == 200) {
-      updateData = jsonDecode(response.body.toString());
-      setState(() {
-        dataHomeFlag = false;
-      });
-      getSetting(button);
-    } else {}
+    if (formKey.currentState!.validate()) {
+      http.Response response = await http
+          .post(Uri.parse(API), body: body)
+          .then((value) => value)
+          .catchError((error) => print(error));
+      if (response.statusCode == 200) {
+        updateData = jsonDecode(response.body.toString());
+        CustomSnackBar.snackBar(
+            context: context,
+            data: button==1?'Normal Fees Updated Successfully !': 'Emergency Fees Updated Successfully !',
+            color: Colors.green);
+        setState(() {
+          dataHomeFlag = false;
+        });
+        getSetting(button);
+      } else {
+        CustomSnackBar.snackBar(
+            context: context,
+            data: 'Fees Not Saved!',
+            color: Colors.red);
+      }
+    }
   }
 
   bool emergencyFlag=true;
@@ -70,56 +85,127 @@ class _SettingDDState extends State<SettingDD> {
   var emergencyData;
   bool indicatorF=false;
 
+
   Future<void> getEmergencyService() async {
-    var API = 'https://cabeloclinic.com/website/medlife/php_auth_api/emergency_api.php';
     Map<String, dynamic> body = {
       'doctor_id': widget.doctorId,
     };
+   var API = '${API_BASE_URL}emergency_api.php';
     http.Response response = await http
         .post(Uri.parse(API), body: body)
         .then((value) => value)
-        .catchError((error) => print(" Failed to update getEmergencyData: $error"));
+        .catchError((error) => print(error));
     if (response.statusCode == 200) {
       setState(() {
         getEmergencyData = jsonDecode(response.body.toString());
-        if(getEmergencyData['emergency_status'].toString()=="0"){
-          emergencyFlag = false;
-        }else{
-          emergencyFlag = true;
+        if (getEmergencyData['emergency_status'] == "0") {
+          setState(() {
+            _switchValue = false;
+            emergencyFlag = false;
+          });
+        } else {
+          setState(() {
+            _switchValue = true;
+            emergencyFlag = false;
+          });
         }
       });
     } else {}
   }
+
   Future<void> updateEmergencyService() async {
-    indicatorF=true;
-    String setString;
-    var API = 'https://cabeloclinic.com/website/medlife/php_auth_api/update_emergency_api.php';
-    getEmergencyService();
-    if(getEmergencyData['emergency_status'].toString()=="0"){
-      setString ="1";
-    }else{
-      setString ="0";
+    updateBooking = true;
+    String isSwitch;
+    var API = '${API_BASE_URL}update_emergency_api.php';
+    await getEmergencyService();
+    if (getEmergencyData['emergency_status'] == "0") {
+      isSwitch = '1';
+    } else {
+      isSwitch = '0';
     }
     Map<String, dynamic> body = {
       'doctor_id': widget.doctorId,
-      'emergency_status':setString,
+      'emergency_status': isSwitch,
     };
     http.Response response = await http
         .post(Uri.parse(API), body: body)
         .then((value) => value)
-        .catchError((error) => print(" Failed to update updateEmergencyService: $error"));
+        .catchError((error) =>
+        print(error));
     if (response.statusCode == 200) {
-      getEmergencyData();
+      getEmergencyService();
+      emergencyData = jsonDecode(response.body.toString());
+      if (getEmergencyData['emergency_status'] == "0") {
       setState(() {
-        emergencyData = jsonDecode(response.body.toString());
-        if(getEmergencyData['emergency_status']=='0'){
-          emergencyFlag = false;
-        }else{
-          emergencyFlag = true;
-        }
+        _switchValue = false;
+        updateBooking = false;
       });
-    } else {}
-  }
+    CustomSnackBar.snackBar(
+    context: context,
+    data: 'Emergency Service On!',
+    color: Colors.green);
+    } else {
+    setState(() {
+    _switchValue = true;
+    updateBooking = false;
+    });
+    CustomSnackBar.snackBar(
+        context: context,
+        data: 'Emergency Service Off!',
+        color: Colors.red);
+    }
+  } else {}
+}
+  // Future<void> getEmergencyService() async {
+  //   var API = '${API_BASE_URL}emergency_api.php';
+  //   Map<String, dynamic> body = {
+  //     'doctor_id': widget.doctorId,
+  //   };
+  //   http.Response response = await http
+  //       .post(Uri.parse(API), body: body)
+  //       .then((value) => value)
+  //       .catchError((error) => print(error));
+  //   if (response.statusCode == 200) {
+  //     setState(() {
+  //       getEmergencyData = jsonDecode(response.body.toString());
+  //       if(getEmergencyData['emergency_status'].toString()=="0"){
+  //         emergencyFlag = false;
+  //       }else{
+  //         emergencyFlag = false;
+  //       }
+  //     });
+  //   } else {}
+  // }
+  // Future<void> updateEmergencyService() async {
+  //   indicatorF=true;
+  //   String setString;
+  //   var API = '${API_BASE_URL}update_emergency_api.php';
+  //   getEmergencyService();
+  //   if(getEmergencyData['emergency_status'].toString()=="0"){
+  //     setString ="1";
+  //   }else{
+  //     setString ="0";
+  //   }
+  //   Map<String, dynamic> body = {
+  //     'doctor_id': widget.doctorId,
+  //     'emergency_status':setString,
+  //   };
+  //   http.Response response = await http
+  //       .post(Uri.parse(API), body: body)
+  //       .then((value) => value)
+  //       .catchError((error) => print(error));
+  //   if (response.statusCode == 200) {
+  //     getEmergencyData();
+  //     setState(() {
+  //       emergencyData = jsonDecode(response.body.toString());
+  //       if(getEmergencyData['emergency_status']=='0'){
+  //         emergencyFlag = false;
+  //       }else{
+  //         emergencyFlag = true;
+  //       }
+  //     });
+  //   } else {}
+  // }
 
   @override
   void initState() {
@@ -132,7 +218,7 @@ class _SettingDDState extends State<SettingDD> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
+      appBar: const PreferredSize(
         preferredSize: Size.fromHeight(50),
         child: CustomAppBar(isleading: false),),
       body: SingleChildScrollView(
@@ -142,267 +228,297 @@ class _SettingDDState extends State<SettingDD> {
           children: [
             AppBar(
               backgroundColor: Colors.blue,
-              title: Text("Setting"),
+              title: const Text("Setting"),
             ),
-            SizedBox(
+            const SizedBox(
               height: 15,
             ),
-            dataHomeFlag || emergencyFlag
-                ? Center(
-                    child: CircularProgressIndicator(),
-                  )
-                : SizedBox(
-                    height: 350,
-                    width: MediaQuery.of(context).size.width,
-                    child: Card(
-                      elevation: 10,
-                      color: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                        side: BorderSide(color: Colors.white),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 8.0, top: 15),
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(10.0),
+            SizedBox(
+              height: 380,
+              width: MediaQuery.of(context).size.width,
+              child: Card(
+                elevation: 10,
+                color: Colors.white,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  side: BorderSide(color: Colors.white),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 8.0, top: 15),
+                  child: Form(
+                    key: formKey,
+                    child: Column(
+                      children: [
+                        dataHomeFlag
+                            ? const Padding(
+                              padding: EdgeInsets.all(10.0),
                               child: SizedBox(
-                                height: 50,
-                                width: MediaQuery.of(context).size.width * .9,
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Flexible(
-                                      child: Theme(
-                                        data: new ThemeData(
-                                          primaryColor: Colors.redAccent,
-                                          primaryColorDark: Colors.red,
-                                        ),
-                                        child: SizedBox(
-                                          height: 70,
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              .60,
-                                          child: new TextFormField(
-                                            controller: _controllerNormalFees,
-                                            textAlignVertical:
-                                                TextAlignVertical.center,
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                                fontSize: 26.0,
-                                                color: Colors.red),
-                                            keyboardType: TextInputType.number,
-                                            decoration: new InputDecoration(
-                                              // floatingLabelBehavior:
-                                              //     FloatingLabelBehavior.never,
-                                              contentPadding: EdgeInsets.all(8),
-                                              filled: true,
-                                              fillColor: Colors.white,
-                                              border: new OutlineInputBorder(
-                                                  borderSide: new BorderSide(
-                                                      color: Colors.orange)),
-                                              focusedBorder: OutlineInputBorder(
-                                                borderSide: BorderSide(
-                                                    color: Colors.orange),
-                                              ),
-                                              labelText: 'Normal Fees',
-                                              disabledBorder: InputBorder.none,
-                                              labelStyle: TextStyle(
-                                                  fontSize: 12,
-                                                  color: Colors.black54),
-                                            ),
+                              width: 100,
+                              child: Center(
+                                child: LinearProgressIndicator(),
+                              )),
+                            )
+                            : const Text(''),
+                        Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: SizedBox(
+                            height: 50,
+                            width: MediaQuery.of(context).size.width * .9,
+                            child: Row(
+                              mainAxisAlignment:
+                              MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Flexible(
+                                  child: Theme(
+                                    data: ThemeData(
+                                      primaryColor: Colors.redAccent,
+                                      primaryColorDark: Colors.red,
+                                    ),
+                                    child: SizedBox(
+                                      width: MediaQuery.of(context)
+                                          .size
+                                          .width *
+                                          .60,
+                                      child: TextFormField(
+                                        controller: _controllerNormalFees,
+                                        validator: (value) {
+                                          if (value!.length>5) {
+                                            return 'Limit 5 character';
+                                          }
+                                          if (int.parse(value)<1000) {
+                                            return 'Greater then 1000';
+                                          }
+                                          if (value.isEmpty) {
+                                            return 'Please Enter Fees';
+                                          }
+                                          return null;
+                                        },
+                                        textAlignVertical:
+                                        TextAlignVertical.center,
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                            fontSize: 26.0,
+                                            color: Colors.red),
+                                        keyboardType: TextInputType.number,
+                                        decoration: const InputDecoration(
+                                          // floatingLabelBehavior:
+                                          //     FloatingLabelBehavior.never,
+                                          contentPadding: EdgeInsets.all(8),
+                                          filled: true,
+                                          fillColor: Colors.white,
+                                          border: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: Colors.orange)),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color: Colors.orange),
                                           ),
+                                          labelText: 'Normal Fees',
+                                          disabledBorder: InputBorder.none,
+                                          labelStyle: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.black54),
                                         ),
                                       ),
                                     ),
-                                    Spacer(),
-                                    SizedBox(
-                                      width: MediaQuery.of(context).size.width *
-                                          .3,
-                                      height: 45,
-                                      child: Container(
-                                        child: ElevatedButton(
-                                          onPressed: () {
-                                            updateSetting(1);
-                                            // Navigator.of(context).push(MaterialPageRoute(builder: (_)=>SuccessScreen()));
-                                          },
-                                          style: ElevatedButton.styleFrom(
-                                              primary: Colors.blue,
-                                              textStyle: TextStyle(
-                                                  fontSize: 30,
-                                                  fontWeight: FontWeight.bold)),
-                                          child: Text(
-                                            'Save',
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 20),
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                  ],
+                                  ),
                                 ),
-                              ),
-                            ),
-                            SizedBox(
-                                height:
-                                    MediaQuery.of(context).size.height * 0.01),
-                            Divider(
-                              color: Colors.black12,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(20.0),
-                              child: SizedBox(
-                                height: 50,
-                                width: MediaQuery.of(context).size.width * .9,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Flexible(
-                                      child: Theme(
-                                        data: new ThemeData(
-                                          primaryColor: Colors.redAccent,
-                                          primaryColorDark: Colors.red,
-                                        ),
-                                        child: SizedBox(
-                                          height: 70,
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              .60,
-                                          child: new TextFormField(
-                                            controller:
-                                                _controllerEmergencyFees,
-                                            textAlignVertical:
-                                                TextAlignVertical.center,
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                                fontSize: 26.0,
-                                                color: Colors.red),
-                                            keyboardType: TextInputType.number,
-                                            decoration: new InputDecoration(
-                                              // floatingLabelBehavior:
-                                              //     FloatingLabelBehavior.never,
-                                              contentPadding: EdgeInsets.all(8),
-                                              filled: true,
-                                              fillColor: Colors.white,
-                                              border: new OutlineInputBorder(
-                                                  borderSide: new BorderSide(
-                                                      color: Colors.orange)),
-                                              focusedBorder: OutlineInputBorder(
-                                                borderSide: BorderSide(
-                                                    color: Colors.orange),
-                                              ),
-                                              labelText: 'Emergency Fees',
-                                              disabledBorder: InputBorder.none,
-                                              labelStyle: TextStyle(
-                                                  fontSize: 12,
-                                                  color: Colors.black54),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
+                                const Spacer(),
+                                SizedBox(
+                                  width: MediaQuery.of(context).size.width *
+                                      .3,
+                                  height: 45,
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      updateSetting(1);
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                        primary: Colors.blue,
+                                        textStyle: const TextStyle(
+                                            fontSize: 30,
+                                            fontWeight: FontWeight.bold)),
+                                    child: const Text(
+                                      'Save',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20),
                                     ),
-                                    Spacer(),
-                                    SizedBox(
-                                      width: MediaQuery.of(context).size.width *
-                                          .3,
-                                      height: 45,
-                                      child: Container(
-                                        child: ElevatedButton(
-                                          onPressed: () {
-                                            updateSetting(2);
-                                            // Navigator.of(context).push(MaterialPageRoute(builder: (_)=>SuccessScreen()));
-                                          },
-                                          style: ElevatedButton.styleFrom(
-                                              primary: Colors.blue,
-                                              textStyle: TextStyle(
-                                                  fontSize: 30,
-                                                  fontWeight: FontWeight.bold)),
-                                          child: Text(
-                                            'Save',
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 20),
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
+                                  ),
+                                )
+                              ],
                             ),
-                            Divider(
-                              color: Colors.black12,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(20.0),
-                              child: SizedBox(
-                                height: 50,
-                                width: MediaQuery.of(context).size.width * .9,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Column(
-                                      children: [
-                                        Text(
-                                          'Emergency Service',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w900,
-                                              fontSize: 20),
-                                        ),
-                                        Text(
-                                          '${getEmergencyData['emergency_status']=="0" ?'InActive':'Active'}',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w900,
-                                              fontSize: 20,
-                                              color: getEmergencyData['emergency_status']=='0'?Colors.red:Colors.green),
-                                        ),
-                                      ],
-                                    ),
-                                    Spacer(),
-                                    SizedBox(
-                                      width: MediaQuery.of(context).size.width *
-                                          .3,
-                                      height: 45,
-                                      child: Container(
-                                        child: ElevatedButton(
-                                          onPressed: () {
-                                            updateEmergencyService();
-                                            // Navigator.of(context).push(MaterialPageRoute(builder: (_)=>SuccessScreen()));
-                                          },
-                                          style: ElevatedButton.styleFrom(
-                                              primary: getEmergencyData['emergency_status'].toString()=='0'?Colors.green: Colors.red,
-                                              textStyle: TextStyle(
-                                                  fontSize: 30,
-                                                  fontWeight: FontWeight.bold)),
-                                          child: Text(
-                                            getEmergencyData['emergency_status'].toString()=='0'?'Activate':'Left',
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 20),
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
+                        SizedBox(
+                            height:
+                            MediaQuery.of(context).size.height * 0.01),
+                        const Divider(
+                          color: Colors.black12,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: SizedBox(
+                            height: 50,
+                            width: MediaQuery.of(context).size.width * .9,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Flexible(
+                                  child: Theme(
+                                    data: ThemeData(
+                                      primaryColor: Colors.redAccent,
+                                      primaryColorDark: Colors.red,
+                                    ),
+                                    child: SizedBox(
+                                      height: 50,
+                                      width: MediaQuery.of(context)
+                                          .size
+                                          .width *
+                                          .60,
+                                      child: TextFormField(
+                                        controller:
+                                        _controllerEmergencyFees,
+                                        validator: (value) {
+                                          if (value!.length>5) {
+                                            return 'Limit 5 character';
+                                          }
+                                          if (int.parse(value)<1000) {
+                                            return 'Greater then 1000';
+                                          }
+                                          if (value.isEmpty) {
+                                            return 'Please Enter Fees';
+                                          }
+                                          return null;
+                                        },
+                                        textAlignVertical:
+                                        TextAlignVertical.center,
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                            fontSize: 26.0,
+                                            color: Colors.red),
+                                        keyboardType: TextInputType.number,
+                                        decoration: const InputDecoration(
+                                          contentPadding: EdgeInsets.all(8),
+                                          filled: true,
+                                          fillColor: Colors.white,
+                                          border: OutlineInputBorder(
+                                              borderSide:  BorderSide(
+                                                  color: Colors.orange)),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color: Colors.orange),
+                                          ),
+                                          labelText: 'Emergency Fees',
+                                          disabledBorder: InputBorder.none,
+                                          labelStyle: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.black54),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const Spacer(),
+                                SizedBox(
+                                  width: MediaQuery.of(context).size.width * .3,
+                                  height: 45,
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      updateSetting(2);
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                        primary: Colors.blue,
+                                        textStyle: const TextStyle(
+                                            fontSize: 30,
+                                            fontWeight: FontWeight.bold)),
+                                    child: const Text(
+                                      'Save',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20),
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                        const Divider(
+                          color: Colors.black12,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: SizedBox(
+                            height: 80,
+                            width: MediaQuery.of(context).size.width * .9,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Column(
+                                  children: [
+                                    const Text(
+                                      'Emergency Service',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w900,
+                                          fontSize: 20),
+                                    ),
+                                    Text(
+                                      _switchValue?'Active':'InActive',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w900,
+                                          fontSize: 20,
+                                          color:_switchValue?Colors.green:Colors.red),
+                                    ),
+                                  ],
+                                ),
+                                const Spacer(),
+                                SizedBox(
+                                  height: 80,
+                                  width: 100,
+                                  child: Column(
+                                    children: [
+                                      const Text(
+                                        'On/Off',
+                                        style: TextStyle(
+                                          fontSize: 20.0,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      CupertinoSwitch(
+                                        value: _switchValue,
+                                        trackColor: Colors.red,
+                                        activeColor: Colors.green,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            updateEmergencyService();
+                                          });
+                                        },
+                                      ),
+                                      updateBooking
+                                          ? const SizedBox(
+                                          width: 40,
+                                          child: Center(
+                                            child: LinearProgressIndicator(),
+                                          ))
+                                          : const Text('')
+                                    ],
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -412,9 +528,9 @@ class _SettingDDState extends State<SettingDD> {
   BoxDecoration myBoxDecoration() {
     return BoxDecoration(
       border: Border.all(width: 1.0, color: Colors.black26),
-      borderRadius: BorderRadius.all(
+      borderRadius: const BorderRadius.all(
           Radius.circular(5.0) //                 <--- border radius here
-          ),
+      ),
     );
   }
 }

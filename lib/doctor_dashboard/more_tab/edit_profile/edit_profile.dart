@@ -1,15 +1,14 @@
 import 'dart:convert';
-import 'package:doctor/core/custom_form_field.dart';
+import 'package:doctor/core/constants/apis.dart';
+import 'package:flutter_package1/CustomFormField.dart';
 import 'package:doctor/core/custom_snackbar.dart';
-import 'package:doctor/dashboard_patient/widgets/avatar_image.dart';
+import 'package:doctor/core/avatar_image.dart';
 import 'package:doctor/doctor_dashboard/more_tab/edit_profile/api/api.dart';
-import 'package:doctor/doctor_dashboard/more_tab/edit_profile/api/multi.dart';
 import 'package:doctor/doctor_dashboard/more_tab/edit_profile/image.dart';
 import 'package:doctor/doctor_dashboard/more_tab/edit_profile/model_degree.dart';
 import 'package:doctor/doctor_dashboard/more_tab/edit_profile/model_lang.dart';
 import 'package:doctor/doctor_dashboard/more_tab/edit_profile/model_profile.dart';
 import 'package:doctor/doctor_dashboard/more_tab/edit_profile/model_speciality.dart';
-import 'package:doctor/doctor_dashboard/more_tab/edit_profile/multi_select_api.dart';
 import 'package:doctor/doctor_dashboard/more_tab/edit_profile/profile_servicee.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -51,19 +50,17 @@ class EditProfileDD extends StatefulWidget {
 class _EditProfileDDState extends State<EditProfileDD> {
   bool? isUserAdded;
   bool updateProfile=false;
-  final TextEditingController _startDateController =
-      new TextEditingController();
-  final TextEditingController _controllerName = new TextEditingController();
-  final TextEditingController _controllerMobile = new TextEditingController();
+  final TextEditingController _controllerName = TextEditingController();
+  final TextEditingController _controllerMobile =  TextEditingController();
   final TextEditingController _controllerLicenceNum =
-      new TextEditingController();
+       TextEditingController();
   final TextEditingController _controllerExperience =
-      new TextEditingController();
-  final TextEditingController _controllerDegree = new TextEditingController();
+       TextEditingController();
+  final TextEditingController _controllerDegree =  TextEditingController();
   final TextEditingController _controllerSpeciality =
-      new TextEditingController();
-  final TextEditingController _controllerAddress = new TextEditingController();
-  final TextEditingController _controllerSpeaks = new TextEditingController();
+       TextEditingController();
+  final TextEditingController _controllerAddress =  TextEditingController();
+  final TextEditingController _controllerSpeaks =  TextEditingController();
 
   List<dynamic>? modelLanguages2 = [];
   List? _selectedLanguages = [];
@@ -93,18 +90,12 @@ class _EditProfileDDState extends State<EditProfileDD> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    print('-----%%%%%%%%%%%%%%%%%%%%%%-----------${widget.specialities}--------${widget.intialValueSpec}');
-    print('-----%%%%%%%%%%%%%%%%%%%%%%-----------${widget.specialities.length}--------${widget.intialValueDegree}');
-    print('-----%%%%%%%%%%%%%%%%%%%%%%-----------${widget.language}--------${widget.intialValueLang}');
     getUserData();
     _selectedLanguages = widget.intialValueLang;
     _selectedDegrees = ['1'];
     _selectedSpeciality = ['1'];
     _getImgeUrl(widget.id);
-    print('-------==============$modelLanguages2');
-    imagePicker = new ImagePicker();
-    // getDegree();
-    // getLanguages();
+    imagePicker =  ImagePicker();
   }
 
   void _getImgeUrl(String doctorId) async {
@@ -134,7 +125,7 @@ class _EditProfileDDState extends State<EditProfileDD> {
       // uploadImage();
     });
     if (_image != null) {
-      Dio.FormData formData = new Dio.FormData.fromMap({
+      Dio.FormData formData =  Dio.FormData.fromMap({
         "doctor_id": widget.id,
         "image": await Dio.MultipartFile.fromFile(_image!.path,
             filename: _image!.path.split('/').last)
@@ -148,21 +139,18 @@ class _EditProfileDDState extends State<EditProfileDD> {
     } else {
 
     }
-
-    // Navigator.push(context,
-    //     MaterialPageRoute(builder: (context) => ImageFromGalleryEx(type)));
   }
 
   Future<void> getUserData() async {
     var API =
-        'https://cabeloclinic.com/website/medlife/php_auth_api/fetch_profile_api.php';
+        '${API_BASE_URL}fetch_profile_api.php';
     Map<String, dynamic> body = {
       'doctor_id': widget.id,
     };
     http.Response response = await http
         .post(Uri.parse(API), body: body)
         .then((value) => value)
-        .catchError((error) => print(" Failed to fetchProfileData: $error"));
+        .catchError((error) => print(error));
     if (response.statusCode == 200) {
       fetchUserData = jsonDecode(response.body.toString());
       setState(() {
@@ -190,16 +178,16 @@ class _EditProfileDDState extends State<EditProfileDD> {
     } else {}
   }
 
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  bool isEditted = false;
+  bool isEdited = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar:  AppBar(
         backgroundColor: Colors.blue,
-        title: Text("Edit Profile"),
+        title: const Text("Edit Profile"),
       ),
       body: SingleChildScrollView(
         child: Form(
@@ -213,7 +201,7 @@ class _EditProfileDDState extends State<EditProfileDD> {
                 child: Card(
                   elevation: 10,
                   color: Colors.white,
-                  shape: RoundedRectangleBorder(
+                  shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(10)),
                     side: BorderSide(color: Colors.white),
                   ),
@@ -235,7 +223,7 @@ class _EditProfileDDState extends State<EditProfileDD> {
                                     uplaodImage?null:showAlertDialog(context);
                                   },
                                   child: uplaodImage
-                                      ? Center(
+                                      ? const Center(
                                           child: CircularProgressIndicator(),
                                         )
                                       : fetchImageData[0]['image'] != ''
@@ -282,6 +270,8 @@ class _EditProfileDDState extends State<EditProfileDD> {
                             labelText: 'Name',
                             readOnly: false,
                             icon: Icons.person,
+                            maxLimit: 30,
+                            maxLimitError: '30',
                             textInputType: TextInputType.text),
                         SizedBox(
                             height: MediaQuery.of(context).size.height * 0.01),
@@ -290,6 +280,8 @@ class _EditProfileDDState extends State<EditProfileDD> {
                             errorMsg: 'Enter Your Mobile',
                             labelText: 'Mobile',
                             readOnly: false,
+                            maxLimit: 10,
+                            maxLimitError: '10',
                             icon: Icons.phone_android,
                             textInputType: TextInputType.number),
                         SizedBox(
@@ -300,6 +292,8 @@ class _EditProfileDDState extends State<EditProfileDD> {
                             labelText: 'Licence No.',
                             readOnly: false,
                             icon: Icons.numbers,
+                            maxLimit: 50,
+                            maxLimitError: '50',
                             textInputType: TextInputType.text),
                         SizedBox(
                             height: MediaQuery.of(context).size.height * 0.01),
@@ -308,6 +302,8 @@ class _EditProfileDDState extends State<EditProfileDD> {
                             errorMsg: 'Enter Experience',
                             labelText: 'Experience',
                             readOnly: false,
+                            maxLimit: 2,
+                            maxLimitError: '2',
                             icon: Icons.cases,
                             textInputType: TextInputType.text),
                         SizedBox(
@@ -319,26 +315,28 @@ class _EditProfileDDState extends State<EditProfileDD> {
                             labelText: 'Address',
                             readOnly: false,
                             icon: Icons.home,
+                            maxLimit: 60,
+                            maxLimitError: '60',
                             textInputType: TextInputType.text),
                         SizedBox(
                             height: MediaQuery.of(context).size.height * 0.01),
                         Container(
-                          padding: EdgeInsets.only(left: 18,right: 18),
+                          padding: const EdgeInsets.only(left: 18,right: 18),
                           child: MultiSelectFormField(
-                            border: OutlineInputBorder(),
+                            border: const OutlineInputBorder(),
                             autovalidate: AutovalidateMode.disabled,
                             chipBackGroundColor: Colors.blue,
-                            chipLabelStyle: TextStyle(
+                            chipLabelStyle: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white),
                             dialogTextStyle:
-                                TextStyle(fontWeight: FontWeight.bold),
+                                const TextStyle(fontWeight: FontWeight.bold),
                             checkBoxActiveColor: Colors.blue,
                             checkBoxCheckColor: Colors.white,
-                            dialogShapeBorder: RoundedRectangleBorder(
+                            dialogShapeBorder: const RoundedRectangleBorder(
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(12.0))),
-                            title: Text(
+                            title: const Text(
                               "Select languages",
                               style: TextStyle(fontSize: 16),
                             ),
@@ -353,7 +351,7 @@ class _EditProfileDDState extends State<EditProfileDD> {
                             valueField: 'index',
                             okButtonLabel: 'OK',
                             cancelButtonLabel: 'CANCEL',
-                            hintWidget: Text('Please select language'),
+                            hintWidget: const Text('Please select language'),
                             initialValue: widget.intialValueLang,
                             onSaved: (value) {
                               if (value == null) return;
@@ -361,8 +359,6 @@ class _EditProfileDDState extends State<EditProfileDD> {
                                 _selectedLanguages = value;
                                 _controllerSpeaks.text =
                                     _selectedLanguages.toString();
-                                print(
-                                    '11---------------------------${_controllerSpeaks.text}');
                               });
                             },
                           ),
@@ -370,65 +366,18 @@ class _EditProfileDDState extends State<EditProfileDD> {
                         SizedBox(
                             height: MediaQuery.of(context).size.height * 0.01),
                         Container(
-                          padding: EdgeInsets.only(left: 18,right: 18),
+                          padding: const EdgeInsets.only(left: 18,right: 18),
                           child: MultiSelectFormField(
-                            border: OutlineInputBorder(),
+                            border: const OutlineInputBorder(),
                             autovalidate: AutovalidateMode.disabled,
                             chipBackGroundColor: Colors.blue,
-                            chipLabelStyle: TextStyle(
+                            chipLabelStyle: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white),
-                            dialogTextStyle:
-                                TextStyle(fontWeight: FontWeight.bold),
+                            dialogTextStyle: const TextStyle(fontWeight: FontWeight.bold),
                             checkBoxActiveColor: Colors.blue,
                             checkBoxCheckColor: Colors.white,
-                            dialogShapeBorder: RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(12.0))),
-                            title: Text(
-                              "Select Degrees",
-                              style: TextStyle(fontSize: 16),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.length == 0) {
-                                return 'Please select one or more options';
-                              }
-                              return null;
-                            },
-                            dataSource: widget.degree,
-                            textField: 'degree',
-                            valueField: 'index',
-                            okButtonLabel: 'OK',
-                            cancelButtonLabel: 'CANCEL',
-                            hintWidget: Text('Please select degree'),
-                            initialValue: widget.intialValueDegree,
-                            onSaved: (value) {
-                              if (value == null) return;
-                              setState(() {
-                                _selectedDegrees = value;
-                                _controllerDegree.text =
-                                    _selectedDegrees.toString();
-                                print(
-                                    '12---------------------------${_controllerDegree.text}');
-                              });
-                            },
-                          ),
-                        ),
-                        SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.01),
-                        Container(
-                          padding: EdgeInsets.only(left: 18,right: 18),
-                          child: MultiSelectFormField(
-                            border: OutlineInputBorder(),
-                            autovalidate: AutovalidateMode.disabled,
-                            chipBackGroundColor: Colors.blue,
-                            chipLabelStyle: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
-                            dialogTextStyle: TextStyle(fontWeight: FontWeight.bold),
-                            checkBoxActiveColor: Colors.blue,
-                            checkBoxCheckColor: Colors.white,
-                            title: Text(
+                            title: const Text(
                               "Select Speciality",
                               style: TextStyle(fontSize: 16),
                             ),
@@ -443,7 +392,7 @@ class _EditProfileDDState extends State<EditProfileDD> {
                             valueField: 'index',
                             okButtonLabel: 'OK',
                             cancelButtonLabel: 'CANCEL',
-                            hintWidget: Text('Please select specialities'),
+                            hintWidget: const Text('Please select specialities'),
                             initialValue: widget.intialValueSpec,
                             onSaved: (value) {
                               if (value == null) return;
@@ -457,7 +406,54 @@ class _EditProfileDDState extends State<EditProfileDD> {
                         ),
                         SizedBox(
                             height: MediaQuery.of(context).size.height * 0.01),
-                        Divider(
+                        Container(
+                          padding: const EdgeInsets.only(left: 18,right: 18),
+                          child: MultiSelectFormField(
+                            border: const OutlineInputBorder(),
+                            autovalidate: AutovalidateMode.disabled,
+                            chipBackGroundColor: Colors.blue,
+                            chipLabelStyle: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                            dialogTextStyle:
+                            const TextStyle(fontWeight: FontWeight.bold),
+                            checkBoxActiveColor: Colors.blue,
+                            checkBoxCheckColor: Colors.white,
+                            dialogShapeBorder: const RoundedRectangleBorder(
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(12.0))),
+                            title: const Text(
+                              "Select Degrees",
+                              style: TextStyle(fontSize: 16),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.length == 0) {
+                                return 'Please select one or more options';
+                              }
+                              return null;
+                            },
+                            dataSource: widget.degree,
+                            textField: 'degree',
+                            valueField: 'index',
+                            okButtonLabel: 'OK',
+                            cancelButtonLabel: 'CANCEL',
+                            hintWidget: const Text('Please select degree'),
+                            initialValue: widget.intialValueDegree,
+                            onSaved: (value) {
+                              if (value == null) return;
+                              setState(() {
+                                _selectedDegrees = value;
+                                _controllerDegree.text =
+                                    _selectedDegrees.toString();
+                              });
+                            },
+                          ),
+                        ),
+                        SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.01),
+                        SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.01),
+                        const Divider(
                           color: Colors.black12,
                         ),
                         Center(
@@ -466,24 +462,21 @@ class _EditProfileDDState extends State<EditProfileDD> {
                             child: SizedBox(
                               width: MediaQuery.of(context).size.width * .87,
                               height: 50,
-                              child: Container(
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    // Navigator.of(context).push(MaterialPageRoute(builder: (_)=>MyHomePage()));
-                                    _updateProfile(context);
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                      primary: Colors.blue,
-                                      textStyle: TextStyle(
-                                          fontSize: 30,
-                                          fontWeight: FontWeight.bold)),
-                                  child: updateProfile?Center(child: CircularProgressIndicator(),):Text(
-                                    widget.button,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 20),
-                                  ),
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  _updateProfile(context);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                    primary: Colors.blue,
+                                    textStyle: const TextStyle(
+                                        fontSize: 30,
+                                        fontWeight: FontWeight.bold)),
+                                child: updateProfile?const Center(child: CircularProgressIndicator(color: Colors.white,),):Text(
+                                  widget.button,
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20),
                                 ),
                               ),
                             ),
@@ -504,17 +497,15 @@ class _EditProfileDDState extends State<EditProfileDD> {
   }
 
   showAlertDialog(BuildContext context) {
-    // Create button
-    Widget okButton = FlatButton(
-      child: Text("OK"),
+    Widget okButton = ElevatedButton(
+      child: const Text("OK"),
       onPressed: () {
         Navigator.of(context).pop();
       },
     );
-    // Create AlertDialog
     AlertDialog alert = AlertDialog(
       backgroundColor: Colors.white,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(6))),
       content: Column(
         mainAxisSize: MainAxisSize.min,
@@ -524,14 +515,12 @@ class _EditProfileDDState extends State<EditProfileDD> {
               Navigator.pop(context);
               _handleURLButtonPress(context, ImageSourceType.gallery);
             },
-            child: Container(
-              child: ListTile(
-                  title: Text("From Gallery"),
-                  leading: Icon(
-                    Icons.image,
-                    color: Colors.deepPurple,
-                  )),
-            ),
+            child: const ListTile(
+                title: Text("From Gallery"),
+                leading: Icon(
+                  Icons.image,
+                  color: Colors.deepPurple,
+                )),
           ),
           Container(
             width: 200,
@@ -543,17 +532,15 @@ class _EditProfileDDState extends State<EditProfileDD> {
               Navigator.pop(context);
               _handleURLButtonPress(context, ImageSourceType.camera);
             },
-            child: Container(
-              child: ListTile(
-                  title: Text(
-                    "From Camera",
-                    style: TextStyle(color: Colors.red),
-                  ),
-                  leading: Icon(
-                    Icons.camera,
-                    color: Colors.red,
-                  )),
-            ),
+            child: const ListTile(
+                title: Text(
+                  "From Camera",
+                  style: TextStyle(color: Colors.red),
+                ),
+                leading: Icon(
+                  Icons.camera,
+                  color: Colors.red,
+                )),
           ),
         ],
       ),
@@ -571,13 +558,12 @@ class _EditProfileDDState extends State<EditProfileDD> {
   static Future<String> addProfile(ModelProfile? model) async {
     print('${model?.address}');
     var APIURL =
-        'https://cabeloclinic.com/website/medlife/php_auth_api/update_profile_api.php';
+        '${API_BASE_URL}update_profile_api.php';
     http.Response response = await http
         .post(Uri.parse(APIURL), body: model?.toJson())
         .then((value) => value)
-        .catchError((error) => print("doctore Failed to addProfile: $error"));
+        .catchError((error) => print(error));
     var data = jsonDecode(response.body);
-    print("addProfile DATA: ${data}");
     return data[0]['doctor_name'];
   }
 
@@ -585,12 +571,11 @@ class _EditProfileDDState extends State<EditProfileDD> {
     setState(() {
       updateProfile=true;
     });
-    print('77777777777777${_controllerSpeaks.text.toString()}');
     if (_formKey.currentState!.validate()) {
       setState(() {
-        isEditted = true;
+        isEdited = true;
       });
-      String assistant_name = await addProfile(ModelProfile(
+      String assistantName = await addProfile(ModelProfile(
         doctor_id: widget.id,
         name: _controllerName.text.toString(),
         number: _controllerMobile.text.toString(),
@@ -601,7 +586,7 @@ class _EditProfileDDState extends State<EditProfileDD> {
         experience: _controllerExperience.text.toString(),
         speciality: _controllerSpeciality.text.toString(),
       ));
-      if (assistant_name == _controllerName.text) {
+      if (assistantName == _controllerName.text) {
         setState(() {
           updateProfile=false;
         });
@@ -610,8 +595,9 @@ class _EditProfileDDState extends State<EditProfileDD> {
             data: 'Added Successfully !',
             color: Colors.green);
         setState(() {
-          isEditted = false;
+          isEdited = false;
         });
+        if (!mounted) return;
         Navigator.pop(context);
       } else {
         updateProfile=false;
@@ -626,7 +612,7 @@ class _EditProfileDDState extends State<EditProfileDD> {
   BoxDecoration myBoxDecoration() {
     return BoxDecoration(
       border: Border.all(width: 1.0, color: Colors.black26),
-      borderRadius: BorderRadius.all(
+      borderRadius: const BorderRadius.all(
           Radius.circular(5.0) //                 <--- border radius here
           ),
     );
