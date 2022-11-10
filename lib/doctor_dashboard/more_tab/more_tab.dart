@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:animated_theme_switcher/animated_theme_switcher.dart';
 import 'package:doctor/core/constants/apis.dart';
 import 'package:doctor/core/avatar_image.dart';
+import 'package:doctor/core/internet_error.dart';
 import 'package:doctor/doctor_dashboard/appointments/save_consult/api/api.dart';
 import 'package:doctor/doctor_dashboard/custom_widgtes/app_bar.dart';
 import 'package:doctor/doctor_dashboard/more_tab/about.dart';
@@ -16,6 +17,9 @@ import 'package:doctor/doctor_dashboard/more_tab/settings/setting.dart';
 import 'package:doctor/doctor_dashboard/more_tab/terms_notes.dart';
 import 'package:doctor/core/constants/route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_package1/bottom_nav/bottom_nav_cubit.dart';
+import 'package:flutter_package1/data_connection_checker/connectivity.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -23,6 +27,8 @@ import 'constant.dart';
 import 'package:doctor/doctor_dashboard/more_tab/widget/profile_list_item.dart';
 import 'package:http/http.dart' as http;
 import 'package:doctor/core/constants/urls.dart';
+import 'package:flutter_package1/loading/loading_card_list.dart';
+import 'package:flutter_package1/loading/loading1.dart';
 
 class MoreTabDD extends StatefulWidget {
   MoreTabDD({required this.userData, required this.userID});
@@ -39,7 +45,7 @@ class _MoreTabDDState extends State<MoreTabDD> {
   var jsonLanguage;
   var jsonDegrees;
   var jsonSpeciality;
-
+String? userName;
   bool flagAccess = true;
   List<dynamic>? modelLanguages2 = [];
   List<dynamic>? modelLanguages3 = [];
@@ -52,7 +58,9 @@ class _MoreTabDDState extends State<MoreTabDD> {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     final user = preferences.getString('userDetails');
     setState(() {
+      userName=preferences.getString('userName');
       data = jsonStringToMap(user!);
+
     });
     _getImgeUrl(data == null ? '' : data['user_id']);
   }
@@ -116,21 +124,21 @@ class _MoreTabDDState extends State<MoreTabDD> {
       final splitedTextD = finalStringD.split(',');
       final splitedTextS = finalStringS.split(',');
       if (textLanguages!.isEmpty) {
-        modelLanguages3=[];
+        modelLanguages3 = [];
       } else {
         for (int i = 0; i < splitedTextL.length; i++) {
           modelLanguages3!.add(splitedTextL[i].toString());
         }
       }
       if (textDegree!.isEmpty) {
-        modelDegree3=[];
+        modelDegree3 = [];
       } else {
         for (int i = 0; i < splitedTextD.length; i++) {
           modelDegree3!.add(splitedTextD[i].toString());
         }
       }
       if (textSpeciality!.isEmpty) {
-        modelSpeciality3=[];
+        modelSpeciality3 = [];
       } else {
         for (int i = 0; i < splitedTextS.length; i++) {
           modelSpeciality3!.add(splitedTextS[i].toString());
@@ -219,7 +227,8 @@ class _MoreTabDDState extends State<MoreTabDD> {
             'speciality': posts[i].doctor_speciality.toString()
           });
         }
-        jsonSpeciality = jsonEncode(modelSpeciality2!.map((e) => e.toJson()).toList());
+        jsonSpeciality =
+            jsonEncode(modelSpeciality2!.map((e) => e.toJson()).toList());
         setState(() {
           flagAccess = false;
         });
@@ -264,37 +273,39 @@ class _MoreTabDDState extends State<MoreTabDD> {
                   onTap: () async {
                     Navigator.of(context)
                         .push(MaterialPageRoute(
-                            builder: (_) => EditProfileDD(
-                                  intialValueLang: modelLanguages3,
-                                  intialValueDegree: modelDegree3,
-                                  intialValueSpec: modelSpeciality3,
-                                  button: 'Save',
-                                  language: modelLanguages2,
-                                  degree: modelDegree2,
-                                  specialities: modelSpeciality2,
-                                  jsonSpeciality: jsonSpeciality,
-                                  jsonDegrees: jsonDegrees,
-                                  jsonLanguage: jsonLanguage,
-                                  id: data == null ? '' : data['user_id'],
-                                )))
+                        builder: (_) =>
+                            EditProfileDD(
+                              intialValueLang: modelLanguages3,
+                              intialValueDegree: modelDegree3,
+                              intialValueSpec: modelSpeciality3,
+                              button: 'Save',
+                              language: modelLanguages2,
+                              degree: modelDegree2,
+                              specialities: modelSpeciality2,
+                              jsonSpeciality: jsonSpeciality,
+                              jsonDegrees: jsonDegrees,
+                              jsonLanguage: jsonLanguage,
+                              id: data == null ? '' : data['user_id'],
+                            )))
                         .then((value) {
+                          getData();
                       getUserData();
                       getAppBar();
                     });
                   },
                   child: uplaodImage
                       ? const Center(
-                          child: CircularProgressIndicator(),
-                        )
+                    child: CircularProgressIndicator(),
+                  )
                       : fetchImageData[0]['image'] != ''
-                          ? AvatarImagePD(
-                              fetchImageData[0]['image'],
-                              radius: kSpacingUnit.w * 5,
-                            )
-                          : AvatarImagePD(
-                              AppUrls.user,
-                              radius: kSpacingUnit.w * 5,
-                            ),
+                      ? AvatarImagePD(
+                    fetchImageData[0]['image'],
+                    radius: kSpacingUnit.w * 5,
+                  )
+                      : AvatarImagePD(
+                    AppUrls.user,
+                    radius: kSpacingUnit.w * 5,
+                  ),
                 ),
                 Align(
                   alignment: Alignment.bottomRight,
@@ -323,66 +334,68 @@ class _MoreTabDDState extends State<MoreTabDD> {
           ),
           SizedBox(height: kSpacingUnit.w * 2),
           Text(
-            'Dr. ${data == null ? '' : (data['name'].length > 20
-                ? data['name']
+            'Dr. ${userName == null ? '' : (userName!.length > 20
+                ? userName!
                 .substring(0, 20) +
                 '...'
-                : data['name'] ?? '')}',
+                : userName! ?? '')}',
             style: kTitleTextStyle,
           ),
           SizedBox(height: kSpacingUnit.w * 0.5),
           flagAccess
               ? Container(
-                  height: kSpacingUnit.w * 4,
-                  width: kSpacingUnit.w * 20,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(kSpacingUnit.w * 3),
-                    color: Colors.amber,
-                  ),
-                  child: Center(
-                    child: Text(
-                      'Please wait..',
-                      style: kButtonTextStyle,
-                    ),
-                  ),
-                )
+            height: kSpacingUnit.w * 4,
+            width: kSpacingUnit.w * 20,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(kSpacingUnit.w * 3),
+              color: Colors.amber,
+            ),
+            child: Center(
+              child: Text(
+                'Please wait..',
+                style: kButtonTextStyle,
+              ),
+            ),
+          )
               : InkWell(
-                  onTap: () {
-                    Navigator.of(context)
-                        .push(MaterialPageRoute(
-                            builder: (_) => EditProfileDD(
-                                  intialValueLang: modelLanguages3,
-                                  intialValueDegree: modelDegree3,
-                                  intialValueSpec: modelSpeciality3,
-                                  button: 'Save',
-                                  language: modelLanguages2,
-                                  degree: modelDegree2,
-                                  specialities: modelSpeciality2,
-                                  jsonSpeciality: jsonSpeciality,
-                                  jsonDegrees: jsonDegrees,
-                                  jsonLanguage: jsonLanguage,
-                                  id: data == null ? '' : data['user_id'],
-                                )))
-                        .then((value) {
-                      getUserData();
-                      getAppBar();
-                    });
-                  },
-                  child: Container(
-                    height: kSpacingUnit.w * 4,
-                    width: kSpacingUnit.w * 20,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(kSpacingUnit.w * 3),
-                      color: Colors.amber,
-                    ),
-                    child: Center(
-                      child: Text(
-                        'Edit Profile',
-                        style: kButtonTextStyle,
-                      ),
-                    ),
-                  ),
+            onTap: () {
+              Navigator.of(context)
+                  .push(MaterialPageRoute(
+                  builder: (_) =>
+                      EditProfileDD(
+                        intialValueLang: modelLanguages3,
+                        intialValueDegree: modelDegree3,
+                        intialValueSpec: modelSpeciality3,
+                        button: 'Save',
+                        language: modelLanguages2,
+                        degree: modelDegree2,
+                        specialities: modelSpeciality2,
+                        jsonSpeciality: jsonSpeciality,
+                        jsonDegrees: jsonDegrees,
+                        jsonLanguage: jsonLanguage,
+                        id: data == null ? '' : data['user_id'],
+                      )))
+                  .then((value) {
+                    getData();
+                getUserData();
+                getAppBar();
+              });
+            },
+            child: Container(
+              height: kSpacingUnit.w * 4,
+              width: kSpacingUnit.w * 20,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(kSpacingUnit.w * 3),
+                color: Colors.amber,
+              ),
+              child: Center(
+                child: Text(
+                  'Edit Profile',
+                  style: kButtonTextStyle,
                 ),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -392,9 +405,11 @@ class _MoreTabDDState extends State<MoreTabDD> {
         return AnimatedCrossFade(
           duration: const Duration(milliseconds: 200),
           crossFadeState:
-              ThemeModelInheritedNotifier.of(context).theme == Brightness.light
-                  ? CrossFadeState.showFirst
-                  : CrossFadeState.showSecond,
+          ThemeModelInheritedNotifier
+              .of(context)
+              .theme == Brightness.light
+              ? CrossFadeState.showFirst
+              : CrossFadeState.showSecond,
           firstChild: GestureDetector(
             onTap: () =>
                 ThemeSwitcher.of(context).changeTheme(theme: kLightTheme),
@@ -424,33 +439,149 @@ class _MoreTabDDState extends State<MoreTabDD> {
         SizedBox(width: kSpacingUnit.w * 3),
       ],
     );
-
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: Colors.white,
-        bottomOpacity: 0.0,
-        titleSpacing: 0,
-        elevation: 0.0,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  data == null ? 'Dr.' : 'Dr. ${data['name']} ',
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontSize: 17.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
+    var body = SingleChildScrollView(
+      child: Column(
+        children: <Widget>[
+          SizedBox(height: kSpacingUnit.w * 1),
+          header,
+          SizedBox(height: kSpacingUnit.w * 3),
+          GestureDetector(
+            child: const ProfileListItem(
+              icon: Icons.password,
+              text: 'Change Password',
+            ),
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (_) =>
+                      ChangePassword(
+                        mobile: data == null ? '' : data['number'],
+                        userType: data == null ? '' : data['user_type'],
+                      )));
+            },
+          ),
+          GestureDetector(
+            onTap: data==null?(){}:() {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (_) =>
+                      DisplayAssistents(
+                        doctorId: data == null ? '' : data['user_id'],
+                        userData: widget.userData,
+                      )));
+            },
+            child: const ProfileListItem(
+              icon: LineAwesomeIcons.user,
+              text: 'My Assistant',
             ),
           ),
-          uplaodImage
-              ? const Padding(
+          GestureDetector(
+            child: const ProfileListItem(
+              icon: LineAwesomeIcons.cog,
+              text: 'Settings',
+            ),
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (_) =>
+                      SettingDD(
+                        doctorId: data == null ? '' : data['user_id'],
+                        userData: widget.userData,
+                      )));
+            },
+          ),
+          GestureDetector(
+            child: const ProfileListItem(
+              icon: LineAwesomeIcons.question_circle,
+              text: 'About Medilipse',
+            ),
+            onTap: () {
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (_) => const About()));
+            },
+          ),
+          GestureDetector(
+            child: const ProfileListItem(
+              icon: LineAwesomeIcons.user_shield,
+              text: 'Privacy Policy',
+            ),
+            onTap: () {
+              Navigator.of(context)
+                  .push(
+                  MaterialPageRoute(builder: (_) => const PrivacyPolicy()));
+            },
+          ),
+          GestureDetector(
+            child: const ProfileListItem(
+              icon: LineAwesomeIcons.book,
+              text: 'Term & Condition',
+            ),
+            onTap: () {
+              Navigator.of(context)
+                  .push(
+                  MaterialPageRoute(builder: (_) => const TermsOfServices()));
+            },
+          ),
+          GestureDetector(
+            child: const ProfileListItem(
+              icon: LineAwesomeIcons.alternate_sign_out,
+              text: 'Logout',
+              hasNavigation: false,
+            ),
+            onTap: () async {
+              SharedPreferences preferences = await SharedPreferences
+                  .getInstance();
+              preferences.setBool('isLogin', false);
+              if (!mounted) return;
+              BlocProvider.of<NavigationCubit>(context).setNavBarItem(0);
+              Navigator.pushReplacementNamed(context, RouteGenerator.signIn);
+            },
+          ),
+        ],
+      ),
+    );
+    return BlocConsumer<NetworkCubit, NetworkState>(
+      listener: (context, state) {
+        if (state == NetworkState.initial) {
+          // showToast(msg: 'Network Searching....');
+        }
+        else if (state == NetworkState.gained) {
+          // showToast(msg: 'TX_ONLINE');
+        } else if (state == NetworkState.lost) {
+          // showToast(msg: 'TX_OFFLINE');
+        }
+        else {
+          // showToast(msg: 'error');
+        }
+      },
+      builder: (context, state) {
+        if (state == NetworkState.initial) {
+          return const InternetError(text: TX_CHECK_INTERNET);
+        } else if (state == NetworkState.gained) {
+          print('----------------------23');
+          return Scaffold(
+            appBar: AppBar(
+              automaticallyImplyLeading: false,
+              backgroundColor: Colors.white,
+              bottomOpacity: 0.0,
+              titleSpacing: 0,
+              elevation: 0.0,
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        userName == null ? 'Dr.' : 'Dr. ${userName} ',
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 17.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                uplaodImage
+                    ? const Padding(
                   padding: EdgeInsets.all(8.0),
                   child: AvatarImagePD(
                     AppUrls.user,
@@ -459,7 +590,7 @@ class _MoreTabDDState extends State<MoreTabDD> {
                     width: 40,
                   ),
                 )
-              : Padding(
+                    : Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: AvatarImagePD(
                     fetchImageData[0]['image'],
@@ -468,104 +599,40 @@ class _MoreTabDDState extends State<MoreTabDD> {
                     width: 40,
                   ),
                 )
-        ],
-        title: Image.asset(
-          'assets/img_2.png',
-          width: 150,
-          height: 90,
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            SizedBox(height: kSpacingUnit.w * 1),
-            header,
-            SizedBox(height: kSpacingUnit.w * 3),
-            GestureDetector(
-              child: const ProfileListItem(
-                icon: Icons.password,
-                text: 'Change Password',
+              ],
+              title: Image.asset(
+                'assets/img_2.png',
+                width: 150,
+                height: 90,
               ),
-              onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (_) => ChangePassword(
-                          mobile: data == null ? '' : data['number'],
-                          userType: data == null ? '' : data['user_type'],
-                        )));
-              },
             ),
-            GestureDetector(
-              child: const ProfileListItem(
-                icon: LineAwesomeIcons.user,
-                text: 'My Assistant',
+            body: flagAccess?SingleChildScrollView(
+              child: Column(
+                children: [
+                  const SizedBox(height: 60,),
+                  const LoadingWidget.circular(height: 120),
+                  const SizedBox(height: 20,),
+                  const LoadingWidget.rectangular(height: 40,width: 200,),
+                  const SizedBox(height: 70,),
+                  LoadingWidget.rectangular(height: 50,width: MediaQuery.of(context).size.width*.7,),
+                  const SizedBox(height: 20,),
+                  LoadingWidget.rectangular(height: 50,width: MediaQuery.of(context).size.width*.7,),
+                  const SizedBox(height: 20,),
+                  LoadingWidget.rectangular(height: 50,width: MediaQuery.of(context).size.width*.7,),
+                  const SizedBox(height: 20,),
+                  LoadingWidget.rectangular(height: 50,width: MediaQuery.of(context).size.width*.7,),
+                  const SizedBox(height: 20,),
+                  LoadingWidget.rectangular(height: 50,width: MediaQuery.of(context).size.width*.7,),
+                ],
               ),
-              onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (_) => DisplayAssistents(
-                          doctorId: data == null ? '' : data['user_id'],
-                          userData: widget.userData,
-                        )));
-              },
-            ),
-            GestureDetector(
-              child: const ProfileListItem(
-                icon: LineAwesomeIcons.cog,
-                text: 'Settings',
-              ),
-              onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (_) => SettingDD(
-                          doctorId: data == null ? '' : data['user_id'],
-                          userData: widget.userData,
-                        )));
-              },
-            ),
-            GestureDetector(
-              child: const ProfileListItem(
-                icon: LineAwesomeIcons.question_circle,
-                text: 'About Medilipse',
-              ),
-              onTap: () {
-                Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (_) => const About()));
-              },
-            ),
-            GestureDetector(
-              child: const ProfileListItem(
-                icon: LineAwesomeIcons.user_shield,
-                text: 'Privacy Policy',
-              ),
-              onTap: () {
-                Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (_) => const PrivacyPolicy()));
-              },
-            ),
-            GestureDetector(
-              child: const ProfileListItem(
-                icon: LineAwesomeIcons.book,
-                text: 'Term & Condition',
-              ),
-              onTap: () {
-                Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (_) => const TermsOfServices()));
-              },
-            ),
-            GestureDetector(
-              child: const ProfileListItem(
-                icon: LineAwesomeIcons.alternate_sign_out,
-                text: 'Logout',
-                hasNavigation: false,
-              ),
-              onTap: () async {
-                SharedPreferences preferences = await SharedPreferences.getInstance();
-                preferences.setBool('isLogin', false);
-                if (!mounted) return;
-                Navigator.pushReplacementNamed(context, RouteGenerator.signIn);
-              },
-            ),
-          ],
-        ),
-      ),
+            ):body,
+          );
+        } else if (state == NetworkState.lost) {
+          return const InternetError(text: TX_LOST_INTERNET);
+        } else {
+          return const InternetError(text: 'error');
+        }
+      },
     );
   }
 

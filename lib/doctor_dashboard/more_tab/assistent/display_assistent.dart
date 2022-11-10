@@ -9,6 +9,7 @@ import 'package:doctor/doctor_dashboard/more_tab/assistent/add_assistent.dart';
 import 'package:doctor/doctor_dashboard/more_tab/assistent/edit_assistent.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_package1/loading/loading_card_list.dart';
 
 class DisplayAssistents extends StatefulWidget {
   const DisplayAssistents(
@@ -34,6 +35,7 @@ class _DisplayAssistentsState extends State<DisplayAssistents> {
         .catchError((error) => print(error));
     if (response.statusCode == 200) {
       dataAssistence = jsonDecode(response.body.toString());
+      print('----getAllAssistants---${body}-----------${dataAssistence}');
       setState(() {
         dataHomeFlag = false;
       });
@@ -82,9 +84,7 @@ class _DisplayAssistentsState extends State<DisplayAssistents> {
               title: const Text("All Assistants"),
             ),
             dataHomeFlag
-                ? const Center(
-                    child: CircularProgressIndicator(),
-                  )
+                ? LoadingCardList()
                 : FutureBuilder(
                     future: getAllAssistants(),
                     builder: (context, snapshot) {

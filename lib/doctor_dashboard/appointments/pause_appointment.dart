@@ -3,8 +3,7 @@ import 'package:doctor/core/constants/apis.dart';
 import 'package:doctor/doctor_dashboard/appointments/pause_appointmentCard.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:doctor/core/shimmer/shimmer.dart';
-
+import 'package:flutter_package1/loading/loading_card_list.dart';
 class PauseAppointmentsDD extends StatefulWidget {
   const PauseAppointmentsDD({Key? key, required this.doctorId})
       : super(key: key);
@@ -59,7 +58,7 @@ class _PauseAppointmentsDDState extends State<PauseAppointmentsDD> {
       child: Column(
         children: [
           dataHomeFlag
-              ? const ShimmerCategories()
+              ? const LoadingCardList()
               : (dataAppointments.length ?? 0) == 0
               ? const Padding(
             padding:  EdgeInsets.only(top: 150.0),

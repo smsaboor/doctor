@@ -3,7 +3,7 @@ import 'package:doctor/core/constants/apis.dart';
 import 'package:doctor/doctor_dashboard/appointments/rejected_appointments_card.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:doctor/core/shimmer/shimmer.dart';
+import 'package:flutter_package1/loading/loading_card_list.dart';
 
 class RejectedAppointmentsDD extends StatefulWidget {
   const RejectedAppointmentsDD({Key? key, required this.doctorId})
@@ -59,7 +59,7 @@ class _RejectedAppointmentsDDState extends State<RejectedAppointmentsDD> {
       child: Column(
         children: [
           dataHomeFlag
-              ? const ShimmerCategories()
+              ? const LoadingCardList()
               : (dataAppointments.length ?? 0) == 0
                   ? const Padding(
                     padding:  EdgeInsets.only(top: 150.0),

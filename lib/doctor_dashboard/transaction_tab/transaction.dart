@@ -4,11 +4,12 @@ import 'package:doctor/core/internet_error.dart';
 import 'package:doctor/doctor_dashboard/custom_widgtes/app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_package1/components.dart';
 import 'package:flutter_package1/data_connection_checker/connectivity.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:flutter_package1/loading/loading_transaction.dart';
+
 class TransactionTabDD extends StatefulWidget {
   const TransactionTabDD({Key? key, required this.userData, this.doctor_id})
       : super(key: key);
@@ -29,8 +30,10 @@ class _TransactionTabDDState extends State<TransactionTabDD> {
   String? name = '2022-08-09';
   var data2;
 
-
   Future<void> getAllTrans() async {
+    setState(() {
+      dataF = true;
+    });
     var API = '${API_BASE_URL}all_transactions_api.php';
     Map<String, dynamic> body = {'doctor_id': widget.doctor_id};
     http.Response response = await http
@@ -42,14 +45,16 @@ class _TransactionTabDDState extends State<TransactionTabDD> {
         dataF = false;
       });
       dataTransaction = jsonDecode(response.body.toString());
+      print('---dataTransaction---------------------------${dataTransaction}');
+      print(
+          '---dataTransaction---------------------------${dataTransaction.length}');
     } else {}
   }
 
   Future<void> getDateTrans(String date) async {
     dataF = true;
     print('date: $date');
-    var API =
-        '${API_BASE_URL}datewise_transactions_api.php';
+    var API = '${API_BASE_URL}datewise_transactions_api.php';
     Map<String, dynamic> body = {'doctor_id': widget.doctor_id, 'date': date};
     http.Response response = await http
         .post(Uri.parse(API), body: body)
@@ -88,16 +93,17 @@ class _TransactionTabDDState extends State<TransactionTabDD> {
       });
     }
   }
+
   callApis() {
     getAllTrans();
   }
 
   final RefreshController _refreshController =
-  RefreshController(initialRefresh: false);
+      RefreshController(initialRefresh: false);
 
   void _onRefresh() async {
     // monitor network fetch
-    await Future.delayed(Duration(milliseconds: 1000));
+    await Future.delayed(const Duration(milliseconds: 1000));
     callApis();
     // if failed,use refreshFailed()
     _refreshController.refreshCompleted();
@@ -113,21 +119,20 @@ class _TransactionTabDDState extends State<TransactionTabDD> {
     }
     _refreshController.loadComplete();
   }
+
   @override
   Widget build(BuildContext context) {
-    return  BlocConsumer<NetworkCubit, NetworkState>(
+    return BlocConsumer<NetworkCubit, NetworkState>(
       listener: (context, state) {
         if (state == NetworkState.initial) {
-          showToast(msg: TX_OFFLINE);
-        }
-        else if (state == NetworkState.gained) {
+          // showToast(msg: 'Network Searching....');
+        } else if (state == NetworkState.gained) {
           callApis();
-          showToast(msg: TX_ONLINE);
+          // showToast(msg: 'TX_ONLINE');
         } else if (state == NetworkState.lost) {
-          showToast(msg: TX_OFFLINE);
-        }
-        else {
-          showToast(msg: 'error');
+          // showToast(msg: 'TX_OFFLINE');
+        } else {
+          // showToast(msg: 'error');
         }
       },
       builder: (context, state) {
@@ -135,7 +140,7 @@ class _TransactionTabDDState extends State<TransactionTabDD> {
           return const InternetError(text: TX_CHECK_INTERNET);
         } else if (state == NetworkState.gained) {
           print('----------------------23');
-          return  Scaffold(
+          return Scaffold(
             appBar: const PreferredSize(
               preferredSize: Size.fromHeight(60),
               child: CustomAppBar(
@@ -145,7 +150,8 @@ class _TransactionTabDDState extends State<TransactionTabDD> {
             body: SmartRefresher(
                 enablePullDown: true,
                 enablePullUp: false,
-                header: const WaterDropMaterialHeader(color: Colors.white,backgroundColor: Colors.blue),
+                header: const WaterDropMaterialHeader(
+                    color: Colors.white, backgroundColor: Colors.blue),
                 onRefresh: _onRefresh,
                 onLoading: _onLoading,
                 controller: _refreshController,
@@ -160,7 +166,7 @@ class _TransactionTabDDState extends State<TransactionTabDD> {
     );
   }
 
-  getBody(){
+  getBody() {
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -185,37 +191,51 @@ class _TransactionTabDDState extends State<TransactionTabDD> {
             ],
           ),
           dataF
-              ? const Center(child: CircularProgressIndicator())
-              : ListView.builder(
-              shrinkWrap: true,
-              physics: const ScrollPhysics(),
-              itemCount: dataTransaction.length ?? 0,
-              itemBuilder: (context, index) {
-                return accountItems(
-                    "Id: ${dataTransaction[index]['transaction_id']}",
-                    'Paid  : ${dataTransaction[index]['amount_paid']} Rs',
-                    "Date: ${dataTransaction[index]['transaction_date']}",
-                    'Type: ${dataTransaction[index]['booking_type']}',
-                    'Appointment No: ${dataTransaction[index]['receipt_no']}',
-                    'Total : ${dataTransaction[index]['amount']} Rs',
-                    'Due   : ${dataTransaction[index]['amount_due']} RS',
-                    'status: ${dataTransaction[index]['transaction_status']}',
-                    oddColour: const Color(0xFFF7F7F9));
-              })
+              ? Column(
+                  children: const [
+                    LoadingCardTransaction(),
+                    LoadingCardTransaction(),
+                    LoadingCardTransaction(),
+                    LoadingCardTransaction(),
+                    LoadingCardTransaction(),
+                  ],
+                )
+              : dataTransaction.length == 0
+                  ? const Text(
+                      'No Transaction Found!',
+                      style: TextStyle(color: Colors.black, fontSize: 16),
+                    )
+                  : ListView.builder(
+                      shrinkWrap: true,
+                      physics: const ScrollPhysics(),
+                      itemCount: dataTransaction.length ?? 0,
+                      itemBuilder: (context, index) {
+                        return accountItems(
+                            "Id: ${dataTransaction[index]['transaction_id']}",
+                            'Paid  : ${dataTransaction[index]['amount_paid']} Rs',
+                            "Date: ${dataTransaction[index]['transaction_date']}",
+                            'Type: ${dataTransaction[index]['booking_type']}',
+                            'Appointment No: ${dataTransaction[index]['receipt_no']}',
+                            'Total : ${dataTransaction[index]['amount']} Rs',
+                            'Due   : ${dataTransaction[index]['amount_due']} RS',
+                            'status: ${dataTransaction[index]['transaction_status']}',
+                            oddColour: const Color(0xFFF7F7F9));
+                      })
         ],
       ),
     );
   }
+
   Container accountItems(
-      String tran_id,
-      String amount_paid,
-      String date,
-      String tran_type,
-      String apntmnt_no,
-      String total_amount,
-      String amount_due,
-      String status,
-      {Color oddColour = Colors.white}) =>
+          String tran_id,
+          String amount_paid,
+          String date,
+          String tran_type,
+          String apntmnt_no,
+          String total_amount,
+          String amount_due,
+          String status,
+          {Color oddColour = Colors.white}) =>
       Container(
         decoration: BoxDecoration(color: oddColour),
         // padding: EdgeInsets.only(top: 20.0, bottom: 20.0, left: 5.0, right: 5.0),
@@ -223,9 +243,11 @@ class _TransactionTabDDState extends State<TransactionTabDD> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            const SizedBox(height: 10,),
+            const SizedBox(
+              height: 10,
+            ),
             Padding(
-              padding: const EdgeInsets.only(left: 8.0,right: 8),
+              padding: const EdgeInsets.only(left: 8.0, right: 8),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: const [
@@ -234,9 +256,12 @@ class _TransactionTabDDState extends State<TransactionTabDD> {
                           fontSize: 16.0,
                           color: Colors.black,
                           fontWeight: FontWeight.w500)),
-              ],),
+                ],
+              ),
             ),
-            const SizedBox(height: 5,),
+            const SizedBox(
+              height: 5,
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
@@ -246,19 +271,20 @@ class _TransactionTabDDState extends State<TransactionTabDD> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-
                       Padding(
                         padding: const EdgeInsets.only(left: 8.0),
-                        child: Text(tran_id, style: const TextStyle(fontSize: 14.0)),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 8.0),
-                        child: Text(apntmnt_no, style: const TextStyle(fontSize: 14.0)),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 8.0),
-                        child: Text(date,
+                        child: Text(tran_id,
                             style: const TextStyle(fontSize: 14.0)),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: Text(apntmnt_no,
+                            style: const TextStyle(fontSize: 14.0)),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child:
+                            Text(date, style: const TextStyle(fontSize: 14.0)),
                       ),
                       Padding(
                         padding: const EdgeInsets.only(left: 8.0),
@@ -279,29 +305,37 @@ class _TransactionTabDDState extends State<TransactionTabDD> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Amount Details', style: TextStyle(
-                          fontSize: 15.0,
-                          color: Colors.black,
-                          fontWeight: FontWeight.w400)),
+                      const Text('Amount Details',
+                          style: TextStyle(
+                              fontSize: 15.0,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w400)),
                       Padding(
                         padding: const EdgeInsets.only(left: 8.0),
-                        child: Text(total_amount, style: const TextStyle(fontSize: 14.0)),
+                        child: Text(total_amount,
+                            style: const TextStyle(fontSize: 14.0)),
                       ),
                       Padding(
                         padding: const EdgeInsets.only(left: 8.0),
-                        child: Text(amount_paid, style: const TextStyle(fontSize: 14.0)),
+                        child: Text(amount_paid,
+                            style: const TextStyle(fontSize: 14.0)),
                       ),
                       Padding(
                         padding: const EdgeInsets.only(left: 8.0),
-                        child: Text(amount_due, style: const TextStyle(fontSize: 14.0)),
+                        child: Text(amount_due,
+                            style: const TextStyle(fontSize: 14.0)),
                       )
                     ],
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 5,),
-            const Divider(color: Colors.black,)
+            const SizedBox(
+              height: 5,
+            ),
+            const Divider(
+              color: Colors.black,
+            )
           ],
         ),
       );

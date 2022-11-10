@@ -106,16 +106,16 @@ class _TabAppointmentDDState extends State<TabAppointmentDD>
     return  BlocConsumer<NetworkCubit, NetworkState>(
       listener: (context, state) {
         if (state == NetworkState.initial) {
-          showToast(msg: TX_OFFLINE);
+          // showToast(msg: 'TX_OFFLINE3');
         }
         else if (state == NetworkState.gained) {
           callApis();
-          showToast(msg: TX_ONLINE);
+          // showToast(msg: 'TX_ONLINE3');
         } else if (state == NetworkState.lost) {
-          showToast(msg: TX_OFFLINE);
+          // showToast(msg: 'TX_OFFLINE3');
         }
         else {
-          showToast(msg: 'error');
+          // showToast(msg: 'error');
         }
       },
       builder: (context, state) {

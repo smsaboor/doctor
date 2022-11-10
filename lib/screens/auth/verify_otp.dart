@@ -81,7 +81,7 @@ class _OtpVerificationState extends State<OtpVerification> {
             alignment: Alignment.centerLeft,
             padding: const EdgeInsets.symmetric(horizontal: 40),
             child: Text(
-              "Enter 4 digit code\nsend on ${widget.otp} ",
+              "Enter 4 digit code\nsend on ${widget.mobile} ",
               style: const TextStyle(
                   fontWeight: FontWeight.normal,
                   color: Colors.black45,

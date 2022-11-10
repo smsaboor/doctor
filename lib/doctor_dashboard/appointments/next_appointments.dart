@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'package:doctor/core/constants/apis.dart';
+import 'package:flutter_package1/loading/loading_card.dart';
 import 'package:doctor/doctor_dashboard/appointments/next_card.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:doctor/core/shimmer/shimmer.dart';
+import 'package:flutter_package1/loading/loading_card_list.dart';
 
 class NextAppointmentsDD extends StatefulWidget {
   const NextAppointmentsDD({Key? key, required this.doctorId})
@@ -47,7 +48,7 @@ class _NextAppointmentsDDState extends State<NextAppointmentsDD> {
       child: Column(
         children: [
           dataHomeFlag
-              ? const ShimmerCategories()
+              ? LoadingCardList()
               : (dataAppointments.length ?? 0) == 0
                   ? const Padding(
                       padding: EdgeInsets.only(top: 150.0),

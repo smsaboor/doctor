@@ -86,8 +86,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       if (value!.isEmpty) {
                         return 'Enter Your Mobile';
                       }
-                      else if (value!.length>10) {
-                        return 'Number Limit 10';
+                      if (value!.length>10) {
+                        return 'Number Max length 10';
+                      }
+                      if (value!.length<10) {
+                        return 'Number Min length 10';
                       }
                       return null;
                     },
@@ -249,6 +252,9 @@ class _LoginScreenState extends State<LoginScreen> {
             Navigator.of(context)
                 .push(MaterialPageRoute(builder: (_) => const Scaffold(body: Center(child: Text('Patient Dashboard'),),)));
           } else {
+            print('--------------------------------user2');
+            print('--------------------------------${data}');
+            preferences.setString('userName', data['name']);
             preferences.setString('userDetails', data.toString());
             preferences.setString('userType', data['user_type']);
             if (!mounted) return;

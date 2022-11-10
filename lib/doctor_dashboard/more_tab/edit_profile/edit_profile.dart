@@ -18,6 +18,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:dio/dio.dart' as Dio;
 import 'package:multiselect_formfield/multiselect_formfield.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../constant.dart';
 
 class EditProfileDD extends StatefulWidget {
@@ -300,12 +301,12 @@ class _EditProfileDDState extends State<EditProfileDD> {
                         CustomFormField(
                             controlller: _controllerExperience,
                             errorMsg: 'Enter Experience',
-                            labelText: 'Experience',
+                            labelText: 'Experience (in years)',
                             readOnly: false,
                             maxLimit: 2,
                             maxLimitError: '2',
                             icon: Icons.cases,
-                            textInputType: TextInputType.text),
+                            textInputType: TextInputType.number),
                         SizedBox(
                             height: MediaQuery.of(context).size.height * 0.01),
 
@@ -590,6 +591,8 @@ class _EditProfileDDState extends State<EditProfileDD> {
         setState(() {
           updateProfile=false;
         });
+        SharedPreferences preferences = await SharedPreferences.getInstance();
+        preferences.setString('userName', _controllerName.text);
         CustomSnackBar.snackBar(
             context: context,
             data: 'Added Successfully !',

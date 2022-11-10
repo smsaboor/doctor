@@ -1,7 +1,8 @@
-import 'package:doctor/core/constants.dart';
 import 'package:doctor/core/constants/apis.dart';
 import 'package:doctor/core/custom_snackbar.dart';
 import 'package:doctor/core/avatar_image.dart';
+import 'package:flutter_package1/loading/Loading_card_Outer.dart';
+import 'package:flutter_package1/loading/loading_card.dart';
 import 'package:doctor/doctor_dashboard/appointments/save_consult/save_consult.dart';
 import 'package:doctor/doctor_dashboard/custom_widgtes/app_bar.dart';
 import 'package:doctor/doctor_dashboard/home_doctor_dashboard.dart';
@@ -15,6 +16,8 @@ import 'dart:convert';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:flutter_package1/components.dart';
 import 'package:doctor/core/internet_error.dart';
+import 'package:flutter_package1/loading/loading1.dart';
+import 'package:flutter_package1/loading/loading_card_list.dart';
 
 class HomeTabDD extends StatefulWidget {
   const HomeTabDD({Key? key, required this.doctorId, required this.userData})
@@ -142,7 +145,31 @@ String test='aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa aaaaaaaaa0';
         }
     } else {}
   }
-
+  Widget buildLoading() =>
+      Padding(
+        padding: const EdgeInsets.all(18.0),
+        child: Column(
+          children: [
+            const SizedBox(height: 15,),
+            Row(
+              children: [
+              LoadingWidget.rectangular(height: 40,
+                width: MediaQuery.of(context).size.width*0.25,),
+              const Spacer(),
+              LoadingWidget.rectangular(height: 40,
+                width: MediaQuery.of(context).size.width*0.25,),
+            ],),
+            const SizedBox(height: 15,),
+            Row(children: [
+              LoadingWidget.rectangular(height: MediaQuery.of(context).size.width*0.4,
+                width: MediaQuery.of(context).size.width*0.4,),
+              const Spacer(),
+              LoadingWidget.rectangular(height: MediaQuery.of(context).size.width*0.4,
+                width: MediaQuery.of(context).size.width*0.4,),
+            ],),
+          ],
+        ),
+      );
   callApis(){
     getHomeData();
     getAllEmergencyAppointment();
@@ -182,16 +209,16 @@ String test='aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa aaaaaaaaa0';
     return  BlocConsumer<NetworkCubit, NetworkState>(
       listener: (context, state) {
         if (state == NetworkState.initial) {
-          showToast(msg: TX_OFFLINE);
+          // showToast(msg: TX_OFFLINE);
         }
         else if (state == NetworkState.gained) {
           callApis();
-          showToast(msg: TX_ONLINE);
+          // showToast(msg: TX_ONLINE);
         } else if (state == NetworkState.lost) {
-          showToast(msg: TX_OFFLINE);
+          // showToast(msg: TX_OFFLINE);
         }
         else {
-          showToast(msg: 'error');
+          // showToast(msg: 'error');
         }
       },
       builder: (context, state) {
@@ -283,9 +310,7 @@ String test='aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa aaaaaaaaa0';
                 height: 20,
               ),
               dataHomeFlag
-                  ? const Center(
-                child: CircularProgressIndicator(),
-              )
+                  ?buildLoading()
                   : Column(
                 children: [
                   Padding(
@@ -447,14 +472,12 @@ String test='aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa aaaaaaaaa0';
                 ],
               ),
               emergencyAppointmentsFlag
-                  ? Center(
-                child: Column(
-                  children: const [
-                    SizedBox(height: 10,),
-                    Text('Loading...'),
-                  ],
-                ),
-              )
+                  ? Column(
+                    children: const [
+                      SizedBox(height: 20,),
+                      LoadingCardList(),
+                    ],
+                  )
                   : dataAppointments[0]['status']==0 ? const Center(child: Text('No Emergency Appointments !'),): FutureBuilder(
                 future: getAllEmergencyAppointment(),
                 builder: (context, snapshot) {

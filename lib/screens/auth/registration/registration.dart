@@ -6,6 +6,7 @@ import 'package:doctor/model/model_patient.dart';
 import 'package:doctor/core/constants/route.dart';
 import 'package:flutter_package1/CustomFormField.dart';
 import 'package:doctor/service/api.dart';
+import 'package:flutter_package1/components.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key, required this.mobile}) : super(key: key);
@@ -476,42 +477,46 @@ stateWidget(){
           ));
         }
       } else if (currentUser == 'Doctor') {
-        setState(() {
-          tryRegistration = true;
-        });
-        data = await ApiService.signUpUser(API_SIGNUP,2, ModelDoctor(
-          userType: '2',
-          name: _controllerName.text,
-          mobile: _controllerMobile.text,
-          phone: _controllerPhone.text,
-          emergencyNumber: _controllerEmergencyNum.text,
-          clinicName: _controllerHospitalName.text,
-          specialist: '',
-          state: 'up',
-          address: _controllerAddress.text,
-          city: _controllerCity.text,
-          district: _controllerDistrict.text,
-          pincode: _controllerPin.text,
-          password: _controllerPassword.text,
-        ), ModelPatient());
-        if (data == 'ok') {
+        if(_controllerPassword.text==_controllerConfirmPassword.text){
           setState(() {
-            tryRegistration = false;
+            tryRegistration = true;
           });
-          if (!mounted) return;
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(
-              builder: (BuildContext context) => const LoginScreen(),
-            ),
-                (route) => false,
-          );
+          data = await ApiService.signUpUser(API_SIGNUP,2, ModelDoctor(
+            userType: '2',
+            name: _controllerName.text,
+            mobile: _controllerMobile.text,
+            phone: _controllerPhone.text,
+            emergencyNumber: _controllerEmergencyNum.text,
+            clinicName: _controllerHospitalName.text,
+            specialist: '',
+            state: 'up',
+            address: _controllerAddress.text,
+            city: _controllerCity.text,
+            district: _controllerDistrict.text,
+            pincode: _controllerPin.text,
+            password: _controllerPassword.text,
+          ), ModelPatient());
+          if (data == 'ok') {
+            setState(() {
+              tryRegistration = false;
+            });
+            if (!mounted) return;
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                builder: (BuildContext context) => const LoginScreen(),
+              ),
+                  (route) => false,
+            );
+          }else{
+            if (!mounted) return;
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text('Please select number'),
+              backgroundColor: Colors.red,
+            ));
+          }
         }else{
-          if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text('Please select number'),
-            backgroundColor: Colors.red,
-          ));
+          showToast(msg: 'Confirm Password not matched!');
         }
       }
     }

@@ -15,10 +15,12 @@ class CustomAppBar extends StatefulWidget {
 class _CustomAppBarState extends State<CustomAppBar> {
   var data;
   bool uplaodImage = true;
+  String? userName;
 
   void getData() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     final user = preferences.getString('userDetails');
+    userName=preferences.getString('userName');
     setState(() {
       data = jsonStringToMap(user!);
     });
@@ -95,9 +97,9 @@ class _CustomAppBarState extends State<CustomAppBar> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                data == null
+                userName == null
                     ? 'Dr.'
-                    : 'Dr. ${data['name'].length > 17 ? data['name'].substring(0, 17) + '...' : data['name'] ?? ''} ',
+                    : 'Dr. ${userName!.length > 17 ? userName!.substring(0, 17) + '...' : userName! ?? ''} ',
                 style: const TextStyle(
                   color: Colors.black,
                   fontSize: 17.0,

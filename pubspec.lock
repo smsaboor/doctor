@@ -270,7 +270,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: f71c8ce871eb769d743f10fa3c1b460b448c2b23
+      resolved-ref: "7c5627501cfa82aadfca3e5e5e21270f609f6058"
       url: "https://github.com/smsaboor/flutter_package1.git"
     source: git
     version: "0.0.1"
